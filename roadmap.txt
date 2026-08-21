@@ -1,0 +1,205 @@
+• La première ligne définit le nombre de drones à l'aide de nb_drones : <nombre>.
+
+• Définition de zone sur chaque ligne à l'aide de préfixes de type :
+    ◦ start_hub : <nom> <x> <y> [métadonnées] indique la zone de départ.
+    ◦ end_hub : <nom> <x> <y> [métadonnées] indique la zone d'arrivée.
+    ◦ hub : <nom> <x> <y> [métadonnées] définit une zone standard.
+    ◦ La syntaxe de connexion interdit les tirets dans les noms de zone (voir ci-dessous).
+
+• Toutes les métadonnées sont facultatives et placées entre crochets [...] avec des valeurs par défaut :
+    ◦ zone=<type> (par défaut : normal)
+    ◦ color=<value> (par défaut : none)
+    ◦ max_drones=<number> (par défaut : 1) - Nombre maximal de drones pouvant occuper cette zone simultanément
+    ◦ Les balises entre crochets peuvent apparaître dans n’importe quel ordre.
+
+• Types de zones :
+    ◦ normale – Zone standard avec un coût de déplacement de 1 tour (par défaut)
+    ◦ bloquée – Zone inaccessible. Les drones ne doivent ni y entrer ni la traverser. Tout chemin l'empruntant est invalide.
+    ◦ restreinte – Zone sensible ou dangereuse. Le déplacement vers cette zone coûte 2 tours.
+    ◦ prioritaire – Zone privilégiée. Le déplacement vers cette zone coûte 1 tour, mais elle doit être prioritaire lors du calcul des itinéraires.
+
+• Couleurs :
+    ◦ Les couleurs sont facultatives et peuvent servir à la représentation visuelle (affichage terminal ou représentation graphique).
+    ◦ Les valeurs acceptées pour la couleur sont toutes les chaînes de caractères valides d’un seul mot (par exemple, rouge, bleu, gris). Il n’existe pas de liste fixe de couleurs autorisées.
+    ◦ Lorsque des couleurs sont spécifiées, l’implémentation doit fournir un retour visuel via un affichage terminal coloré ou une représentation graphique.
+
+
+• Les connexions sont définies à l'aide de la syntaxe suivante : connexion : <nom1>-<nom2> [métadonnées] :
+    ◦ Définit une connexion bidirectionnelle (arête) entre deux zones.
+    ◦ La syntaxe de connexion interdit les tirets dans les noms de zone.
+    ◦ Des métadonnées facultatives peuvent être spécifiées entre crochets [...] :
+        ∗ max_link_capacity=<nombre> (par défaut : 1) - Nombre maximal de drones pouvant emprunter cette connexion simultanément
+
+• Les commentaires commençant par « # » sont ignorés.
+
+
+
+!!Les coordonnées des zones seront toujours des entiers, et il y aura toujours être un départ unique et une zone d'arrivée unique.
+
+-----------------------------------------------------------------------------
+
+                VII.1
+!!Exigences relatives à la recherche de chemin et à l'algorithme
+
+• Les drones peuvent se déplacer simultanément. L'algorithme doit planifier les chemins afin de maximiser le débit et d'éviter les retards inutiles.
+
+• Votre implémentation doit gérer :
+    ◦ La distribution des drones sur plusieurs chemins.
+    ◦ L'attente stratégique lorsque le déplacement est impossible.
+    ◦ L'évitement des conflits de chemins et des blocages.
+
+• L'algorithme doit prendre en compte :
+    ◦ Les longueurs des chemins, y compris les coûts de déplacement associés aux types de zones (par exemple, restreintes ou prioritaires).
+    ◦ La planification des tours, afin d'éviter les collisions ou les blocages entre drones.
+    ◦ La structure du graphe, afin de déterminer les chemins disponibles, disjoints ou se chevauchant.
+    ◦ Les contraintes de capacité des zones (nombre maximal de drones) et de connexion (capacité maximale des liens).
+
+• Votre algorithme doit être adaptable : différentes cartes peuvent nécessiter différentes stratégies de routage, en fonction de la topologie et des types de zones. • Représentation visuelle : Votre implémentation doit fournir un retour visuel de la simulation, soit par :
+    ◦ Affichage couleur sur un terminal indiquant les mouvements des drones et l’état des zones
+    ◦ Interface graphique affichant le réseau et les positions des drones
+    ◦ Combinaison des deux options pour une expérience utilisateur optimale
+
+
+    • Votre algorithme est-il efficace ?
+    • Peut-il fonctionner avec un grand nombre de drones ?
+    • Quelle est sa complexité (par exemple, O(n), O(log n), etc.) ?
+    • Recalculez-vous ou mettez-vous en cache les trajectoires ?
+    • Quel est son impact sur l’utilisation de la mémoire ?
+    • Comment votre représentation visuelle facilite-t-elle la compréhension de la simulation ?
+
+
+-----------------------------------------------------------------------------
+            VII.2
+Règles d'occupation des zones
+• Par défaut, une zone ne peut contenir qu'un seul drone par tour de simulation.
+
+• Les zones avec les métadonnées max_drones=N peuvent contenir jusqu'à N drones simultanément.
+
+• Les seules exceptions aux règles d'occupation sont :
+    ◦ La zone de départ : tous les drones commencent ici et peuvent partager l'espace initialement.
+    ◦ La zone d'arrivée : plusieurs drones peuvent y arriver et sont considérés comme ayant livré.
+
+• Deux drones ne peuvent pas entrer dans la même zone au même tour, sauf si la capacité de la zone le permet.
+
+• Un drone ne peut pas se déplacer dans une zone si sa capacité maximale est dépassée.
+
+• La capacité de connexion (max_link_capacity) définie pour les connexions limite le nombre de drones pouvant emprunter la même connexion simultanément.
+
+• Les drones peuvent se déplacer simultanément, à condition que toutes les contraintes de capacité soient respectées.
+
+
+-----------------------------------------------------------------------------
+            VII.3
+Mécanismes de déplacement et de rotation
+
+La simulation se déroule par rotations discrètes. À chaque rotation, chaque drone peut :
+    • Se déplacer vers une zone adjacente connectée (si la capacité le permet).
+    • Se déplacer vers une connexion menant à une zone restreinte (nécessitant 2 rotations pour être atteinte). Dans ce cas, le drone DOIT atteindre sa destination lors de la rotation suivante. Il ne peut pas attendre des rotations supplémentaires sur la connexion.
+    • Rester sur place (par exemple, pour attendre ou si le déplacement est bloqué).
+
+La simulation doit éviter les conflits et garantir une planification des déplacements valide basée sur une évaluation de l'état à chaque rotation :
+    • Les drones quittant une zone libèrent de la capacité pour cette même rotation.
+    • Une zone doit disposer de suffisamment de capacité pour qu'un drone puisse y entrer (après que tous les drones qui la quittent ont libéré de l'espace).
+    • Pour les déplacements à plusieurs virages (zones restreintes), le drone occupe la connexion pendant le transit et DOIT arriver à destination après le nombre de virages spécifié. Il ne peut pas attendre qu'un espace se libère dans la zone de destination.
+
+Chaque déplacement entre zones a un coût en virages, en fonction du type de zone de la
+destination :
+    • normale : 1 virage (par défaut)
+    • restreinte : 2 virages
+    • prioritaire : 1 virage (mais à privilégier dans les algorithmes de recherche de chemin)
+    • bloquée : inaccessible – l'entrée est interdite
+
+
+-----------------------------------------------------------------------------
+            VII.4
+Contraintes de l'analyseur
+
+Le fichier d'entrée doit respecter la structure et la syntaxe attendues :
+    • La première ligne doit définir le nombre de drones à l'aide de `nb_drones: <entier_positif>`.
+    • Le programme doit pouvoir gérer un nombre quelconque de drones.
+    • Il doit y avoir exactement une zone `start_hub: zone` et une zone `end_hub: zone`.
+    • Chaque zone doit avoir un nom unique et des coordonnées entières valides.
+    • Les noms de zone peuvent contenir tous les caractères valides, à l'exception des tirets et des espaces.
+    • Les connexions doivent relier uniquement les zones préalablement définies à l'aide de `connection: <zone1>-<zone2> [métadonnées]`.
+    • Une même connexion ne doit pas apparaître plus d'une fois (par exemple, `a-b` et `b-a` sont considérées comme des doublons).
+    • Tout bloc de métadonnées (par exemple, `[zone=... color=...]` pour les zones, `[max_link_capacity=...]` pour les connexions) doit être syntaxiquement valide.
+    • Les types de zone doivent être : `normal`, `blocked`, `restricted` ou `priority`. Tout type invalide doit générer une erreur d'analyse. Les valeurs de capacité (max_drones pour les zones, max_link_capacity pour les connexions) doivent être des entiers positifs. Toute autre erreur d'analyse doit interrompre le programme et renvoyer un message d'erreur clair indiquant la ligne et la cause.
+
+
+----------------------------------------------------------------------------
+Il est fortement recommandé de créer vos propres fichiers de carte en plus de ceux fournis dans le sujet pour gérer les cas particuliers et les erreurs.
+----------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------
+
+            VII.5
+Format de sortie de la simulation
+
+• La simulation doit afficher le déplacement étape par étape des drones, du point de départ à la zone d'arrivée.
+• Chaque tour de simulation est représenté par une ligne.
+• Chaque ligne doit lister tous les mouvements de drones effectués pendant ce tour, séparés par des espaces. Chaque mouvement doit respecter le format : D<ID>-<zone>, ou D<ID>-<connexion> dans le cas de drones encore en vol vers des zones réglementées.
+    ◦ D<ID> correspond à l'identifiant unique du drone (par exemple, D1, D2).
+    ◦ <zone> est le nom de la zone de destination.
+    ◦ <connexion> est le nom de la connexion vers une zone réglementée.
+
+• Les drones qui ne se déplacent pas pendant un tour donné sont omis de la ligne correspondante.
+• Les drones qui atteignent la zone d'arrivée sont considérés comme livrés et ne sont plus suivis.
+• La simulation se termine lorsque tous les drones ont atteint la zone d'arrivée.
+• Exemple :
+    D1-toit1 D2-couloirA
+    D1-toit2 D2-tunnelB
+    D1-but D2-but
+
+
+----------------------------------------------------------------------------
+            VII.6
+Système de notation
+    • La performance d'une solution est évaluée en fonction du nombre total de virages de simulation nécessaires pour acheminer tous les drones de la zone de départ à la zone d'arrivée.
+    • Moins il y a de virages, meilleur est le score.
+    • Une simulation valide doit :
+    • Respecter toutes les règles de déplacement et d'occupation.
+    • Gérer correctement les coûts de déplacement associés aux types de zones.
+    • Respecter toutes les contraintes de capacité (limites de zone et de connexion).
+    • Éviter tout conflit (par exemple, dépassement de la capacité d'une zone ou d'une connexion). Les indicateurs d'évaluation secondaires (optionnels) peuvent inclure 
+    • Le nombre de drones déplacés par virage (efficacité de l'allocation des trajectoires).
+    • Le nombre moyen de virages par drone.
+    • Le coût total du trajet (somme des coûts de déplacement pondérés pour tous les drones).
+    • Qualité et utilité de la représentation visuelle.
+
+    • En cas de nombre de tours identique, les solutions peuvent être comparées sur la base de critères secondaires ou de la qualité du code
+----------------------------------------------------------------------------
+
+VII.7 Critères de performance
+
+Les objectifs de performance suivants définissent le niveau d'optimisation attendu pour votre implémentation.
+
+• Performances attendues :
+    ◦ Les cartes faciles doivent être résolues en moins de 10 tours.
+    ◦ Les cartes moyennes doivent être résolues en 10 à 30 tours.
+    ◦ Les cartes difficiles doivent être résolues en moins de 60 tours.
+    ◦ La carte « Défi » (facultative) doit viser à battre le record de référence de 45 tours.
+
+Ce niveau est entièrement facultatif et n'affecte pas votre note. Pour vous aider à évaluer l'efficacité de votre algorithme, voici des objectifs de performance de référence
+
+basés sur les cartes de test fournies :
+
+• Cartes faciles :
+    ◦ Chemin linéaire avec 2 drones : Objectif ≤ 6 tours
+    ◦ Bifurcation simple avec 3 drones : Objectif ≤ 6 tours
+
+• Cartes moyennes :
+    ◦ Impasse avec 5 drones : Objectif ≤ 15 tours
+    ◦ Boucle circulaire avec 6 drones : Objectif ≤ 20 tours
+    ◦ Casse-tête de priorité avec 4 drones : Objectif ≤ 12 tours
+
+• Cartes difficiles :
+    ◦ Labyrinthe cauchemardesque avec 8 drones : Objectif ≤ 45 tours
+    ◦ Défi de capacité infernal avec 12 drones : Objectif ≤ 60 tours
+    ◦ Défi ultime avec 15 drones : Objectif ≤ 35 tours
+
+• Carte Challenger (optionnelle — pour les cas exceptionnels) Implémentations) :
+    ◦ Le Rêve Impossible avec 25 drones : Record de référence : 45 tours
+    ◦ Ce défi quasi insoluble est conçu pour la recherche et l’optimisation algorithmiques.
+    ◦ Résoudre cette carte démontre des compétences exceptionnelles en matière de recherche de chemin et d’optimisation.
+    ◦ Remarque : Ce niveau est entièrement optionnel et n’affecte pas votre note.
