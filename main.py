@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:36:20 by hery-rak            #+#    #+#            #
-#   Updated: 2026/08/22 17:50:51 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/08/21 14:07:23 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -86,7 +86,7 @@ def main() -> None:
         # print(f"Turn min : {list_path[0][0]}")
         # for y in list_path:
         #     print(f"    {y}")
-        game = Lancer(network, list_path[0][1])
+        game = Lancer(network)
         game.run()
 
 

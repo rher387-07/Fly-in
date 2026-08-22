@@ -1,8 +1,10 @@
 import pygame
 
 
-class Platform:
+class Platform(pygame.sprite.Sprite):
     def __init__(self, hub, image):
+        super().__init__()
+
         self.hub = hub
         self.image = image
 

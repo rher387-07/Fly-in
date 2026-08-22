@@ -22,7 +22,7 @@ class Lancer:
 
         return tile
 
-    def __init__(self, network, list_path):
+    def __init__(self, network):
         pygame.init()
 
         self.screen = pygame.display.set_mode((1366, 700))
@@ -62,10 +62,10 @@ class Lancer:
         ).convert_alpha()
 
         self.drone = Drone(
-            self.drone_image, list_path
+            self.drone_image
         )
 
-        self.platforms = []
+        self.platforms = pygame.sprite.Group()
         self.start_platform = None
 
 
@@ -80,10 +80,23 @@ class Lancer:
                 self.platform_image
             )
 
-            self.platforms.append(platform)
+            self.platforms.add(platform)
 
             if hub.name.lower() == "start":
                 self.start_platform = platform
+
+    def check_collisions(self):
+        hits = pygame.sprite.spritecollide(
+            self.drone,
+            self.platforms,
+            False
+        )
+
+        for platform in hits:
+            print(
+                f"[COLLISION] Le drone se trouve sur la plateforme "
+                f"'{platform.hub.name}'"
+            )
 
     def draw_connections(self):
         for connection in self.network.connections:
@@ -186,6 +199,7 @@ class Lancer:
             self.drone.update()
             self.camera.update()
             self.draw()
+            self.check_collisions()
             self.clock.tick(60)
 
         pygame.quit()

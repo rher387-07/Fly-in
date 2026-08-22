@@ -1,6 +1,8 @@
 import pygame
 
 from renderer.platform import Platform
+from renderer.camera import Camera
+from renderer.drone import Drone
 
 
 class Game:
@@ -19,11 +21,22 @@ class Game:
         self.offset_x = 100
         self.offset_y = 100
 
+        self.camera = Camera(1280, 720)
+
         self.platform_image = pygame.image.load(
             "asset/platform/1_Industrial_Tileset_1B.png"
         ).convert_alpha()
 
-        self.platforms = []
+        self.drone_image = pygame.image.load(
+            "asset/drone/Idle.png"
+        ).convert_alpha()
+
+        self.drone = Drone(
+            self.drone_image
+        )
+
+        self.platforms = pygame.sprite.Group()
+        self.start_platform = None
 
         self.create_platforms()
 
@@ -34,7 +47,23 @@ class Game:
                 self.platform_image
             )
 
-            self.platforms.append(platform)
+            self.platforms.add(platform)
+
+            if hub.name.lower() == "start":
+                self.start_platform = platform
+
+    def check_collisions(self):
+        hits = pygame.sprite.spritecollide(
+            self.drone,
+            self.platforms,
+            False
+        )
+
+        for platform in hits:
+            print(
+                f"[COLLISION] Le drone se trouve sur la plateforme "
+                f"'{platform.hub.name}'"
+            )
 
     def draw(self):
         self.screen.fill((30, 30, 30))
@@ -43,8 +72,17 @@ class Game:
             platform.draw(
                 self.screen,
                 self.tile_size,
+                self.tile_size,
                 self.offset_x,
-                self.offset_y
+                self.offset_y,
+                self.camera
+            )
+
+        if self.start_platform is not None:
+            self.drone.draw(
+                self.screen,
+                self.start_platform,
+                self.camera
             )
 
         pygame.display.flip()
@@ -56,7 +94,10 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
 
+            self.drone.update()
+            self.camera.update()
             self.draw()
+            self.check_collisions()
 
             self.clock.tick(60)
 
