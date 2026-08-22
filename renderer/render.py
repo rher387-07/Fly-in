@@ -22,7 +22,7 @@ class Lancer:
 
         return tile
 
-    def __init__(self, network):
+    def __init__(self, network, list_path):
         pygame.init()
 
         self.screen = pygame.display.set_mode((1366, 700))
@@ -62,7 +62,7 @@ class Lancer:
         ).convert_alpha()
 
         self.drone = Drone(
-            self.drone_image
+            self.drone_image, list_path
         )
 
         self.platforms = []
