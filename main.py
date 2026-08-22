@@ -15,6 +15,7 @@ from parser.errors import ParseError, DotenvError, BlockedZone
 from parser.parser import FlyInParser
 from parser.dotenv_parser import dot_parse
 from graph.graph import Graph
+from renderer.render import Lancer
 import os
 
 
@@ -78,13 +79,15 @@ def main() -> None:
         if not list_path:
             raise BlockedZone("There is no possible solution. "
                               "you have to look at the type of zone or the connection between the hubs")
-        print(f"nr_drones: {network.nb_drones}")
-        print(f"start_hub: {network.start_hub}")
-        print(f"end_hub  : {network.end_hub}")
-        print(f"Path     : {list_path}")
-        print(f"Turn min : {list_path[0][0]}")
+        # print(f"nr_drones: {network.nb_drones}")
+        # print(f"start_hub: {network.start_hub}")
+        # print(f"end_hub  : {network.end_hub}")
+        # print(f"Path     : {list_path}")
+        # print(f"Turn min : {list_path[0][0]}")
         # for y in list_path:
         #     print(f"    {y}")
+        game = Lancer(network)
+        game.run()
 
 
     except DotenvError as e:
