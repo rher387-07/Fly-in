@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:36:11 by hery-rak            #+#    #+#            #
-#   Updated: 2026/08/21 17:47:04 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/08/27 16:22:09 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -218,12 +218,6 @@ class FlyInParser:
 
         name, x_value, y_value = parts
 
-        if "-" in name or " " in name:
-            raise ParseError(
-                f"Line {line_number}: "
-                f"invalid hub name '{name}'."
-            )
-
         try:
             x = int(x_value)
             y = int(y_value)
@@ -232,6 +226,18 @@ class FlyInParser:
                 f"Line {line_number}: "
                 "coordinates must be integers."
             ) from e
+
+        # if x > 10 or y > 10 or x < -10 or y < -10:
+        #     raise ParseError(
+        #         f"Line {line_number}: "
+        #         f"The coordinates must not exceed -10|10 on the y and x axes"
+        #     )
+
+        if "-" in name or " " in name:
+            raise ParseError(
+                f"Line {line_number}: "
+                f"invalid hub name '{name}'."
+            )
 
         zone_type = metadata.get(
             "zone",
@@ -243,7 +249,6 @@ class FlyInParser:
                 f"Line {line_number}: "
                 f"invalid zone type '{zone_type}'."
             )
-
         max_drones = self._positive_int(
             metadata.get("max_drones", "1"),
             "max_drones",
@@ -255,10 +260,12 @@ class FlyInParser:
         return Hub(
             name=name,
             x=x,
-            y=y,
+            y=y * -1,
             zone_type=zone_type,
             color=color,
             max_drones=max_drones,
+            # max_drones=5,
+
         )
 
     def _parse_connection(
