@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 11:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/08/27 16:22:17 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/02 09:21:14 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -77,5 +77,5 @@ class Drone(pygame.sprite.Sprite):
         height = int(self.image.get_height() * camera.zoom)
 
         image = pygame.transform.scale(self.image, (width, height))
-        self.rect = image.get_rect(midbottom=(x, y))
+        self.rect = image.get_rect(midbottom=(self.x, y))
         screen.blit(image, self.rect)

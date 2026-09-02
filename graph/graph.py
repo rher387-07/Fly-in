@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/19 12:46:42 by hery-rak            #+#    #+#            #
-#   Updated: 2026/08/27 14:17:54 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/02 12:09:39 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -197,5 +197,11 @@ class Graph:
             all_path.sort(key=lambda x: x[0])
             self.shortest_paths.append(all_path.pop(0))
 
-        # print(type(self.shortest_paths))
+        # print(self.shortest_paths)
         return self.shortest_paths
+
+
+    def construct_hub_path(self, hubs: Hub):
+        # for x in self.shortest_paths:
+        #     print(x)
+        ...

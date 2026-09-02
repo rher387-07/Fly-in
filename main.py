@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:36:20 by hery-rak            #+#    #+#            #
-#   Updated: 2026/08/27 16:22:00 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/02 15:30:05 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -15,7 +15,8 @@ from parser.errors import ParseError, DotenvError, BlockedZone
 from parser.parser import FlyInParser
 from parser.dotenv_parser import dot_parse
 from graph.graph import Graph
-# from renderer.render import Lancer
+from renderer.render import Lancer
+from scheduler.simulate import Drone, Scheduler
 import os
 
 
@@ -86,19 +87,30 @@ def main() -> None:
                     graph.add_summit(value, key, list_hub)
 
         list_path = graph.yen(start, end, 20)
+        # graph.construct_hub_path(network.hubs)
         if not list_path:
             raise BlockedZone("There is no possible solution. "
                               "you have to look at the type of zone"
                               " or the connection between the hubs")
-        print(f"nr_drones: {network.nb_drones}")
-        print(f"start_hub: {network.start_hub}")
-        print(f"end_hub  : {network.end_hub}")
-        # print(f"Hub:")
-        for x in network.hubs.values():
-            print(f"    {x.name}: {x}")
-        print(f"Path     : {list_path}")
-        print(f"Turn min : {list_path[0][0]}")
+        # print(f"nr_drones: {network.nb_drones}")
+        # print(f"start_hub: {network.start_hub}")
+        # print(f"end_hub  : {network.end_hub}")
+        # # print(f"Hub:")
+        # # for x in network.hubs.values():
+        # #     print(f"    {x.name}: {x}")
+        # print(f"Path     : {list_path}")
+        # print(f"Turn min : {list_path[0][0]}")
+        # drone = []
+        drones = []
+        for i in range(1, network.nb_drones + 1):
+            drones.append(Drone(drone_id=f"D{i}", hubs=network.hubs, paths=list_path))
 
+        sched = Scheduler(network.hubs, network.connections, drones)
+        # print(list_path )
+        sched.run()
+        # print(p)
+            # p = d.construct_hub_path(network.hubs)
+            # print(p)
         # simulation = Lancer(network, list_path)
         # simulation.run()
         # run(simulation)

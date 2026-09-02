@@ -7,14 +7,14 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:36:00 by hery-rak            #+#    #+#            #
-#   Updated: 2026/08/24 15:05:43 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/02 12:39:27 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
 from dataclasses import dataclass, field
 
 
-@dataclass
+@dataclass(frozen=True)
 class Hub:
     name: str
     x: int
@@ -24,7 +24,7 @@ class Hub:
     max_drones: int = 1
 
 
-@dataclass
+@dataclass(frozen=True)
 class Connection:
     hub1: str
     hub2: str
