@@ -1,0 +1,13 @@
+# Example scenario for D1 and D2
+nb_drones: 2
+
+start_hub: roof1 0 0 [color=green]
+hub: roof2 1 0 [color=blue]
+hub: corridorA -1 0 [color=yellow]
+hub: tunnelB -2 0 [color=yellow]
+end_hub: goal 0 2 [color=red]
+
+connection: roof1-roof2
+connection: roof2-goal
+connection: corridorA-tunnelB
+connection: tunnelB-goal

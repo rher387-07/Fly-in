@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 11:26:52 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/02 10:09:57 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/09 16:03:28 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -123,12 +123,18 @@ class Lancer:
             self.platform2: Platform = next(platform
                                             for platform in self.platforms
                                             if platform.hub.name == hub2.name)
-
+            # if self.platform2.hub.zone_type == "blocked":
+            #     pygame.draw.line(self.screen,
+            #                     (255, 255, 255),
+            #                     self.platform1.rect.center,
+            #                     self.platform2.rect.center,
+            #                     max(1, int(1 * self.camera.zoom)))
             pygame.draw.line(self.screen,
-                             (255, 255, 255),
-                             self.platform1.rect.center,
-                             self.platform2.rect.center,
-                             max(1, int(1 * self.camera.zoom)))
+                            (255, 255, 255),
+                            self.platform1.rect.center,
+                            self.platform2.rect.center,
+                            max(1, int(1 * self.camera.zoom)))
+
 
             if hub2.zone_type == "restricted":
                 center_x = (self.platform1.rect.centerx

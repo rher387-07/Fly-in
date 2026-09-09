@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 12:09:02 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/02 15:18:37 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/08/27 16:24:01 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -52,19 +52,7 @@ class Platform(pygame.sprite.Sprite):
             # return -1
 
     def update_bar_max_drone(self, surface: pygame.Surface, zoom: float):
-
         bar_color = pygame.Color("green")
-        # try:
-        #     if self.hub.color == "rainbow":
-        #         bg_bar_color = self._get_color_rnadom()
-        #     elif self.hub.color:
-        #         bg_bar_color = pygame.Color(self.hub.color)
-        #     else:
-        #         bg_bar_color = pygame.Color("white")
-
-        # except ValueError as e:
-        #     raise ValueError(f"Colors Invalid: '{self.hub.color}'") from e
-        # bar_color = self.hub.color
         bg_bar_color = pygame.Color("grey")
 
         bar_w = self.max_bar * zoom

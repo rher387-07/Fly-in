@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:36:20 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/02 15:30:05 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/09 16:19:16 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -16,7 +16,8 @@ from parser.parser import FlyInParser
 from parser.dotenv_parser import dot_parse
 from graph.graph import Graph
 from renderer.render import Lancer
-from scheduler.simulate import Drone, Scheduler
+from parser.models import Hub
+from simulation.simulation import Simulation
 import os
 
 
@@ -63,8 +64,8 @@ def main() -> None:
                 "No available hubs"
                 " (all hubs are blocked or none defined)")
 
-        start_hub = list_hub[0]
-        end_hub = list_hub[-1]
+        start_hub: Hub = list_hub[0]
+        end_hub: Hub = list_hub[-1]
 
         if (network.start_hub is not None and network.end_hub is not None
                 and network.start_hub.name == start_hub.name
@@ -87,7 +88,6 @@ def main() -> None:
                     graph.add_summit(value, key, list_hub)
 
         list_path = graph.yen(start, end, 20)
-        # graph.construct_hub_path(network.hubs)
         if not list_path:
             raise BlockedZone("There is no possible solution. "
                               "you have to look at the type of zone"
@@ -96,21 +96,31 @@ def main() -> None:
         # print(f"start_hub: {network.start_hub}")
         # print(f"end_hub  : {network.end_hub}")
         # # print(f"Hub:")
-        # # for x in network.hubs.values():
-        # #     print(f"    {x.name}: {x}")
+        # for x in network.hubs.values():
+        #     print(f"    {x.name}: {x}")
         # print(f"Path     : {list_path}")
         # print(f"Turn min : {list_path[0][0]}")
-        # drone = []
-        drones = []
-        for i in range(1, network.nb_drones + 1):
-            drones.append(Drone(drone_id=f"D{i}", hubs=network.hubs, paths=list_path))
 
-        sched = Scheduler(network.hubs, network.connections, drones)
-        # print(list_path )
-        sched.run()
-        # print(p)
-            # p = d.construct_hub_path(network.hubs)
-            # print(p)
+
+        # for drone_id in range(1, network.nb_drones + 1):
+        #     # print(drone)
+        #     dr = Drone(f"D{drone_id}", list_path)
+        #     print(dr)
+        simulation = Simulation(network, list_path)
+        # run the simulation using the list of paths computed earlier
+        simulation.run_from_all_path(max_steps=50)
+
+        # --- Demo: reproduce requested per-turn sequence for D1 and D2 ---
+        # Build a Simulation using the Graph and plan explicit drone sequences
+        demo_sim = Simulation(network, graph)
+        for i in range(1, network.nb_drones + 1):
+            demo_sim.plan_drone(f"D{i}", list_path[0][1])
+        # demo_sim.plan_drone("D1", ["roof1", "roof2", "goal"])
+        # demo_sim.plan_drone("D2", ["corridorA", "tunnelB", "goal"])
+        # run exactly 3 turns to see: (turn1 roof1/corridorA, turn2 roof2/tunnelB, turn3 goal/goal)
+        demo_sim.run_turns()
+
+
         # simulation = Lancer(network, list_path)
         # simulation.run()
         # run(simulation)
