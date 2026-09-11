@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 12:09:02 by hery-rak            #+#    #+#            #
-#   Updated: 2026/08/27 16:24:01 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/11 22:06:31 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -26,14 +26,18 @@ class Platform(pygame.sprite.Sprite):
     ) -> None:
         super().__init__()
         self.network = network
+        if network.start_hub is None or network.end_hub is None:
+            raise ValueError("network must define start_hub and end_hub")
+        self.start_name = network.start_hub.name
+        self.end_name = network.end_hub.name
         self.hub = hub
         self.image = image
 
         self.x = hub.x
         self.y = hub.y
 
-        self.bar = 100
-        self.max_bar = 100
+        self.bar: float = 100
+        self.max_bar: float = 100
 
         self.max_drones = hub.max_drones
 
@@ -42,7 +46,7 @@ class Platform(pygame.sprite.Sprite):
         self.debut = time.time()
         self.paused = False
 
-    def check_capacity(self, flag: bool):
+    def check_capacity(self, flag: bool) -> None:
         amount = 100 / self.hub.max_drones
         if flag is True:
             self.bar -= amount
@@ -51,7 +55,9 @@ class Platform(pygame.sprite.Sprite):
             self.bar += amount
             # return -1
 
-    def update_bar_max_drone(self, surface: pygame.Surface, zoom: float):
+    def update_bar_max_drone(
+        self, surface: pygame.Surface, zoom: float
+    ) -> None:
         bar_color = pygame.Color("green")
         bg_bar_color = pygame.Color("grey")
 
@@ -118,8 +124,7 @@ class Platform(pygame.sprite.Sprite):
         h_name_hub = int(name_hub.get_height() * camera.zoom)
 
         name_hub = pygame.transform.scale(name_hub, (w_name_hub, h_name_hub))
-        if (self.hub.name == self.network.start_hub.name
-           or self.hub.name == self.network.end_hub.name):
+        if self.hub.name == self.start_name or self.hub.name == self.end_name:
             d = 10
         else:
             d = 25

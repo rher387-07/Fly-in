@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:36:11 by hery-rak            #+#    #+#            #
-#   Updated: 2026/08/27 16:22:09 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/11 21:59:33 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -60,12 +60,12 @@ class FlyInParser:
                 result: list[tuple[int, str]] = []
 
                 for number, raw_line in enumerate(file, 1):
-                    line = raw_line.strip()
+                    line = raw_line.split("#", 1)[0].strip()
 
                     if not line or line.startswith("#"):
                         continue
 
-                    result.append((number, line.split("#")[0]))
+                    result.append((number, line))
                 return result
 
         except OSError as e:

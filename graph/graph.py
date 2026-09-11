@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/19 12:46:42 by hery-rak            #+#    #+#            #
-#   Updated: 2026/08/27 14:17:54 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/11 21:59:33 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -23,7 +23,7 @@ graph = {
 }
 """
 # from .graph
-from heapq import heapify, heappush, heappop
+from heapq import heappop, heappush
 from parser.models import Hub
 # from parser.errors import BlockedZone
 # from ..parser.utils import VALID_ZONE_TYPES
@@ -41,17 +41,12 @@ class Graph:
     def add_summit(self, node1: str, node2: str, hub_: list[Hub]) -> None:
         # determine edge weight from node1's hub zone type without
         # mutating shared state (self.turn)
+        """Add a directed edge weighted by the destination zone."""
         weight = 1.0
         for hub in hub_:
-            if node1 == hub.name:
-                if hub.zone_type == "priority":
-                    weight = 0.99
-                elif hub.zone_type == "normal":
-                    weight = 1.0
-                elif hub.zone_type == "restricted":
+            if node2 == hub.name:
+                if hub.zone_type == "restricted":
                     weight = 2.0
-                elif hub.zone_type == "blocked":
-                    weight = 99.99
                 break
         # tmp_node1 = node1
         # print(tmp_node1, node1)
@@ -74,7 +69,6 @@ class Graph:
 
         distances: dict[str, float] = {start: 0}
         queue: list[tuple[float, str, list[str]]] = [(0, start, [start])]
-        heapify(queue)
         visited: set = set()
 
         while queue:

@@ -6,137 +6,76 @@
 #                                                      +:+ +:+         +:+    #
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
-#   Created: 2026/08/18 11:36:20 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/09 16:19:16 by hery-rak           ###   ########.fr      #
+#   Created: 2026/09/11 23:52:36 by hery-rak            #+#    #+#            #
+#   Updated: 2026/09/11 23:52:42 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
-from parser.errors import ParseError, DotenvError, BlockedZone
-from parser.parser import FlyInParser
-from parser.dotenv_parser import dot_parse
-from graph.graph import Graph
-from renderer.render import Lancer
-from parser.models import Hub
-from simulation.simulation import Simulation
+
+"""Command-line entry point for the Fly-in simulator."""
+
+import argparse
 import os
+from typing import Optional
+
+from graph.graph import Graph
+from parser.errors import ParseError
+from parser.models import Network
+from parser.parser import FlyInParser
+from simulation.simulation import Simulation
 
 
-def main() -> None:
+def build_graph(network: Network) -> Graph:
+    """Build a weighted graph from a parsed network."""
+    graph = Graph()
+    hubs = list(network.hubs.values())
+    for connection in network.connections:
+        if (network.hubs[connection.hub1].zone_type == "blocked"
+                or network.hubs[connection.hub2].zone_type == "blocked"):
+            continue
+        graph.add_summit(connection.hub1, connection.hub2, hubs)
+        graph.add_summit(connection.hub2, connection.hub1, hubs)
+    return graph
 
+
+def main(argv: Optional[list[str]] = None) -> int:
+    """Parse a map, find routes, and run the simulation."""
+    argument_parser = argparse.ArgumentParser(description="Run Fly-in.")
+    argument_parser.add_argument("map", nargs="?", help="map file path")
+    argument_parser.add_argument(
+        "--render", action="store_true", help="open the graphical simulation"
+    )
+    args = argument_parser.parse_args(argv)
+    filename = args.map or os.getenv("MAP")
+    if not filename:
+        argument_parser.error("provide a map path or set MAP")
     try:
-        load, find_path = dot_parse()
-        path = find_path()
-        if path == "":
-            print("[WARNING] Dotenv could not find the file '.env'.\n")
-            flag_load = load()
-            map_env_present = os.getenv("MAP") is not None
-            if not map_env_present and flag_load is False:
-                print(
-                      "[ERROR] Error loading environment variable\n"
-                      "Use 'cp .env_example .env'\n"
-                      "Or use the environment variable e.g.: MAP=<path>"
-                )
-                return
-        load()
-        filename = str(os.getenv("MAP"))
-        if filename == "":
-            print("[INVALID] The map path must not be empty")
-            return
+        network = FlyInParser(filename).parse()
+        if network.start_hub is None or network.end_hub is None:
+            raise ParseError("map must define start_hub and end_hub")
+        graph = build_graph(network)
+        paths = graph.yen(network.start_hub.name, network.end_hub.name, 20)
+        if not paths:
+            raise ParseError("no valid route from start_hub to end_hub")
+        simulation = Simulation(network, paths)
+        simulation.run_from_all_path()
+        if args.render:
+            try:
+                from renderer.render import Lancer
+            except ModuleNotFoundError as error:
+                if error.name != "pygame":
+                    raise
+                raise RuntimeError(
+                    "Pygame is required for --render; "
+                    "install project dependencies"
+                ) from error
 
-        dict_graph: dict[str, dict[str, float]] = {}
-        list_hub = []
-        list_path = []
-        list_hub_blocked = []
-        turn = 0
-
-        parser = FlyInParser(filename)
-        graph = Graph(turn, dict_graph)
-        network = parser.parse()
-
-        for hub in network.hubs.values():
-            if hub.zone_type != "blocked":
-                list_hub.append(hub)
-            if hub.zone_type == "blocked":
-                list_hub_blocked.append(hub.name)
-
-        if not list_hub:
-            raise BlockedZone(
-                "No available hubs"
-                " (all hubs are blocked or none defined)")
-
-        start_hub: Hub = list_hub[0]
-        end_hub: Hub = list_hub[-1]
-
-        if (network.start_hub is not None and network.end_hub is not None
-                and network.start_hub.name == start_hub.name
-                and network.end_hub.name == end_hub.name):
-            start = start_hub.name
-            end = end_hub.name
-        else:
-            raise BlockedZone(
-                "The hub 'start_hub/end_hub' zone is defined"
-                " as a blocked zone or mismatched")
-
-        for connect in network.connections:
-
-            if not (connect.hub1 in list_hub_blocked):
-                graph.add_summit(connect.hub1, connect.hub2, list_hub)
-
-        for key, value_dict in dict_graph.copy().items():
-            for value in value_dict:
-                if value == end:
-                    graph.add_summit(value, key, list_hub)
-
-        list_path = graph.yen(start, end, 20)
-        if not list_path:
-            raise BlockedZone("There is no possible solution. "
-                              "you have to look at the type of zone"
-                              " or the connection between the hubs")
-        # print(f"nr_drones: {network.nb_drones}")
-        # print(f"start_hub: {network.start_hub}")
-        # print(f"end_hub  : {network.end_hub}")
-        # # print(f"Hub:")
-        # for x in network.hubs.values():
-        #     print(f"    {x.name}: {x}")
-        # print(f"Path     : {list_path}")
-        # print(f"Turn min : {list_path[0][0]}")
-
-
-        # for drone_id in range(1, network.nb_drones + 1):
-        #     # print(drone)
-        #     dr = Drone(f"D{drone_id}", list_path)
-        #     print(dr)
-        simulation = Simulation(network, list_path)
-        # run the simulation using the list of paths computed earlier
-        simulation.run_from_all_path(max_steps=50)
-
-        # --- Demo: reproduce requested per-turn sequence for D1 and D2 ---
-        # Build a Simulation using the Graph and plan explicit drone sequences
-        demo_sim = Simulation(network, graph)
-        for i in range(1, network.nb_drones + 1):
-            demo_sim.plan_drone(f"D{i}", list_path[0][1])
-        # demo_sim.plan_drone("D1", ["roof1", "roof2", "goal"])
-        # demo_sim.plan_drone("D2", ["corridorA", "tunnelB", "goal"])
-        # run exactly 3 turns to see: (turn1 roof1/corridorA, turn2 roof2/tunnelB, turn3 goal/goal)
-        demo_sim.run_turns()
-
-
-        # simulation = Lancer(network, list_path)
-        # simulation.run()
-        # run(simulation)
-
-        # for y in list_path:
-        #     print(f"    {y}")
-
-    except DotenvError as e:
-        print(f"Dotenv error: {e}")
-    except ParseError as e:
-        print(f"Parse error: {e}")
-    except BlockedZone as e:
-        print(f"Zone Error: {e}")
-    except ValueError as e:
-        print(f"Error: {e}")
+            Lancer(network, simulation.scheduled_routes).run()
+    except (OSError, ParseError, RuntimeError) as error:
+        print(f"Error: {error}")
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
