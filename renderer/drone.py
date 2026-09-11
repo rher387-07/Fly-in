@@ -7,11 +7,10 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 11:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/11 23:39:31 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/11 23:59:59 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
-from math import sin
 
 import pygame
 from .platform import Platform
@@ -97,7 +96,6 @@ class Drone(pygame.sprite.Sprite):
         position: tuple[int, int],
         camera: Camera,
     ) -> None:
-        """Draw the animated asset slightly above the hub with gentle bobbing."""
         width = int(self.image.get_width() * camera.zoom)
         height = int(self.image.get_height() * camera.zoom)
         image = pygame.transform.scale(self.image, (width, height))

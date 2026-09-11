@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 12:09:02 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/11 22:06:31 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/12 00:02:21 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -108,6 +108,7 @@ class Platform(pygame.sprite.Sprite):
         screen.blit(image, self.rect)
 
         # print(self.hub.color)
+        color_hub: pygame.Color | tuple[int, int, int]
         try:
             if self.hub.color == "rainbow":
                 color_hub = self._get_color_rnadom()

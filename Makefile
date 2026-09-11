@@ -1,3 +1,4 @@
+# prototype
 PYTHON ?= python3
 MAP ?= maps/easy/01_linear_path.txt
 
