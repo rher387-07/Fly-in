@@ -7,12 +7,9 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/11 23:52:42 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/14 21:46:49 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
-
-
-"""Command-line entry point for the Fly-in simulator."""
 
 import argparse
 import os
@@ -26,7 +23,6 @@ from simulation.simulation import Simulation
 
 
 def build_graph(network: Network) -> Graph:
-    """Build a weighted graph from a parsed network."""
     graph = Graph()
     hubs = list(network.hubs.values())
     for connection in network.connections:
@@ -39,7 +35,6 @@ def build_graph(network: Network) -> Graph:
 
 
 def main(argv: Optional[list[str]] = None) -> int:
-    """Parse a map, find routes, and run the simulation."""
     argument_parser = argparse.ArgumentParser(description="Run Fly-in.")
     argument_parser.add_argument("map", nargs="?", help="map file path")
     argument_parser.add_argument(
@@ -73,9 +68,8 @@ def main(argv: Optional[list[str]] = None) -> int:
             Lancer(network, simulation.scheduled_routes).run()
     except (OSError, ParseError, RuntimeError) as error:
         print(f"Error: {error}")
-        return 1
-    return 0
+
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

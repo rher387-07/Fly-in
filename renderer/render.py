@@ -7,12 +7,9 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:06 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/11 23:52:10 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/14 21:39:58 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
-
-
-"""Pygame visualization synchronized with the simulation schedule."""
 
 from typing import Dict, List, Tuple
 
@@ -36,8 +33,6 @@ Schedule = Tuple[List[str], List[Tuple[str, str, int, int]]]
 
 
 class Lancer:
-    """Display the original assets while following scheduled drone moves."""
-
     def __init__(self, network: Network, schedules: List[Schedule]) -> None:
         if network.start_hub is None or network.end_hub is None:
             raise ValueError("network must define start_hub and end_hub")
@@ -74,14 +69,12 @@ class Lancer:
     def load_tile(
         self, path: str, x: int, y: int, width: int, height: int
     ) -> pygame.Surface:
-        """Extract one tile from the existing platform tileset."""
         tileset = pygame.image.load(path).convert_alpha()
         tile = pygame.Surface((width, height), pygame.SRCALPHA)
         tile.blit(tileset, (0, 0), pygame.Rect(x, y, width, height))
         return tile
 
     def _layout(self) -> Tuple[float, float, int, int]:
-        """Fit all map coordinates inside the visible window."""
         hubs = list(self.network.hubs.values())
         min_x = min(hub.x for hub in hubs)
         max_x = max(hub.x for hub in hubs)
@@ -102,14 +95,12 @@ class Lancer:
         return offset_x, offset_y, spacing_x, spacing_y
 
     def create_platform(self) -> None:
-        """Create one asset-backed platform for every hub."""
         for hub in self.network.hubs.values():
             platform = Platform(hub, self.platform_image, self.network)
             self.platforms.add(platform)
             self.platforms_by_name[hub.name] = platform
 
     def _screen_position(self, name: str) -> Tuple[int, int]:
-        """Return the current screen center of a hub platform."""
         platform = self.platforms_by_name[name]
         x = self.offset_x + platform.x * self.spacing_x
         y = self.offset_y + platform.y * self.spacing_y
@@ -123,7 +114,6 @@ class Lancer:
     def _drone_position(
         self, movements: List[Tuple[str, str, int, int]], time: float
     ) -> Tuple[int, int]:
-        """Interpolate one drone, including waits and restricted moves."""
         if not movements:
             return self._screen_position(self.start_name)
         first_name = movements[0][0]
@@ -143,7 +133,6 @@ class Lancer:
     def _drone_speed(
         self, movements: List[Tuple[str, str, int, int]], time: float
     ) -> float:
-        """Return half speed while a drone enters a restricted hub."""
         for _, second, departure, arrival in movements:
             if departure <= time <= arrival:
                 if self.network.hubs[second].zone_type == "restricted":
@@ -152,14 +141,12 @@ class Lancer:
         return 1.0
 
     def draw_background(self) -> None:
-        """Scale and draw the existing cloud background asset."""
         background = pygame.transform.scale(
             self.background, (W_FENETRE, H_FENETRE)
         )
         self.screen.blit(background, background.get_rect())
 
     def draw_connections(self) -> None:
-        """Draw connections and the existing restricted-zone tile marker."""
         for connection in self.network.connections:
             first = self._screen_position(connection.hub1)
             second = self._screen_position(connection.hub2)
@@ -189,7 +176,6 @@ class Lancer:
                 self.screen.blit(marker, marker_rect)
 
     def draw(self) -> None:
-        """Render hubs, connections, and all synchronized drones."""
         self.screen.fill((0, 0, 0))
         self.draw_background()
         self.draw_connections()
@@ -213,7 +199,6 @@ class Lancer:
         pygame.display.flip()
 
     def run(self) -> None:
-        """Run the synchronized graphical simulation loop."""
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
