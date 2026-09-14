@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:06 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/14 21:39:58 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/14 22:14:18 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -26,6 +26,7 @@ PATH_PLATF = "asset/platform/1_Industrial_Tileset_1B.png"
 PATH_DRONE = "asset/drone/Idle.png"
 PATH_DRONE_FORWARD = "asset/drone/Forward.png"
 BACKGROUND_PATH = "asset/cloud/1.png"
+MOON_PATH = "asset/cloud/2.png"
 TURN_SECONDS = 0.7
 MIN_SPACING_X = 200
 MIN_SPACING_Y = 200
@@ -55,6 +56,7 @@ class Lancer:
             PATH_DRONE_FORWARD
         ).convert_alpha()
         self.background = pygame.image.load(BACKGROUND_PATH).convert()
+        self.moon = pygame.image.load(MOON_PATH).convert_alpha()
         self.platforms: pygame.sprite.Group = pygame.sprite.Group()
         self.platforms_by_name: Dict[str, Platform] = {}
         self.drones = [
@@ -145,6 +147,8 @@ class Lancer:
             self.background, (W_FENETRE, H_FENETRE)
         )
         self.screen.blit(background, background.get_rect())
+        moon = pygame.transform.scale(self.moon, (640, 400))
+        self.screen.blit(moon, moon.get_rect())
 
     def draw_connections(self) -> None:
         for connection in self.network.connections:
