@@ -7,34 +7,36 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:26 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/14 21:10:56 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/15 15:37:36 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 from graph.graph import Graph
 from parser.models import Network
+from sys import maxsize
 
+GREEN = "\033[42m"
 
 @dataclass
 class DroneState:
     id: str
-    path: List[str]
+    path: list[str]
 
 
 class Simulation:
     def __init__(
         self,
         network: Network,
-        graph_or_paths: Graph | List[Tuple[float, List[str]]],
+        graph_or_paths: Graph | list[tuple[float, list[str]]],
     ) -> None:
         self.network = network
         if network.end_hub is None:
             raise RuntimeError("network has no end_hub")
         self.end_name = network.end_hub.name
-        self.all_path: Optional[List[Tuple[float, List[str]]]] = None
+        self.all_path: Optional[list[tuple[float, list[str]]]] = None
         if isinstance(graph_or_paths, Graph):
             self.graph = graph_or_paths
         else:
@@ -53,14 +55,14 @@ class Simulation:
                 self.graph.add_summit(connection.hub1, connection.hub2, hubs)
                 self.graph.add_summit(connection.hub2, connection.hub1, hubs)
 
-        self.node_reservations: Dict[str, Dict[int, int]] = {}
-        self.edge_reservations: Dict[Tuple[str, str], Dict[int, int]] = {}
-        self.drones: List[DroneState] = []
-        self.route_order: List[int] = []
-        self.scheduled_routes: List[
-            Tuple[List[str], List[Tuple[str, str, int, int]]]
+        self.node_reservations: dict[str, dict[int, int]] = {}
+        self.edge_reservations: dict[tuple[str, str], dict[int, int]] = {}
+        self.drones: list[DroneState] = []
+        self.route_order: list[int] = []
+        self.scheduled_routes: list[
+            tuple[list[str], list[tuple[str, str, int, int]]]
         ] = []
-        self._last_movements: List[Tuple[str, str, int, int]] = []
+        self._last_movements: list[tuple[str, str, int, int]] = []
 
     def _edge_capacity(self, first: str, second: str) -> int:
         for connection in self.network.connections:
@@ -107,7 +109,7 @@ class Simulation:
 
     def _reserve_node_occupancy(
         self,
-        movements: List[Tuple[str, str, int, int]],
+        movements: list[tuple[str, str, int, int]],
         max_turns: int,
     ) -> None:
         for index, (_, second, _, arrival) in enumerate(movements):
@@ -119,18 +121,19 @@ class Simulation:
                 else max_turns + 1
             )
             node_times = self.node_reservations.setdefault(second, {})
-            for turn in range(arrival, next_departure):
+            end_turn = max(next_departure, arrival + 1)
+            for turn in range(arrival, end_turn):
                 node_times[turn] = node_times.get(turn, 0) + 1
 
     def _schedule_path(
         self,
-        path: List[str],
+        path: list[str],
         earliest_start: int,
         max_turns: int,
-    ) -> Optional[Dict[int, List[str]]]:
+    ) -> Optional[dict[int, list[str]]]:
         for start in range(earliest_start, max_turns + 1):
             arrival = start
-            movements: List[Tuple[str, str, int, int]] = []
+            movements: list[tuple[str, str, int, int]] = []
             valid = True
             for first, second in zip(path, path[1:]):
                 travel_time = self._travel_time(second)
@@ -151,17 +154,19 @@ class Simulation:
                 self._reserve(first, second, departure, target)
             self._reserve_node_occupancy(movements, max_turns)
             self._last_movements = movements
-            events: Dict[int, List[str]] = {}
+            events: dict[int, list[str]] = {}
+            # print(f"mouv: {movements}")
             for first, second, departure, target in movements:
                 if target - departure == 2:
                     events.setdefault(departure + 1, []).append(
                         f"{first}-{second}"
                     )
+                # print(f"tar: {target}")
                 events.setdefault(target, []).append(second)
             return events
         return None
 
-    def run_from_all_path(self, max_steps: int = 100) -> None:
+    def run_from_all_path(self, max_steps: int = maxsize) -> None:
         if not self.all_path:
             raise RuntimeError("no paths available")
         paths = [path for _, path in self.all_path]
@@ -171,9 +176,10 @@ class Simulation:
         self.edge_reservations.clear()
         self.drones.clear()
         self.scheduled_routes.clear()
-        events: Dict[int, List[str]] = {}
+        events: dict[int, list[str]] = {}
         for number, chosen in enumerate(route_order, 1):
-            scheduled = self._schedule_path(paths[chosen], 1, max_steps)
+            # print
+            scheduled = self._schedule_path(paths[chosen], 0, max_steps)
             if scheduled is None:
                 raise RuntimeError("unable to schedule all drones")
             self.scheduled_routes.append(
@@ -181,21 +187,34 @@ class Simulation:
             )
             drone_id = f"D{number}"
             self.drones.append(DroneState(drone_id, paths[chosen]))
+            # print(scheduled)
             for turn, destinations in scheduled.items():
                 events.setdefault(turn, [])
+                # for destination in destinations:
+                #     if destination == self.end_name:
+                #         events[turn].extend(
+                #             f"{GREEN}{drone_id}-{destination}"
+                #         )
+                #     else:
+                #         events[turn].extend(
+                #             f"{drone_id}-{destination}"
+                #         )
+                #     # print(f"{drone_id}-{destination}")
+
                 events[turn].extend(
                     f"{drone_id}-{destination}" for destination in destinations
                 )
         for turn in sorted(events):
             print(f"{' '.join(events[turn])}")
         if events:
-            print(f"Max turn: {max(events) - 1}")
+            print(f"Max turn: {max(events)}\n")
+        # print(events)
 
     def _find_best_route_order(
         self,
-        paths: List[List[str]],
+        paths: list[list[str]],
         max_steps: int,
-    ) -> List[int]:
+    ) -> list[int]:
         best_order = [0] * self.network.nb_drones
         best_finish = max_steps + 1
         route_count = len(paths)
@@ -221,11 +240,11 @@ class Simulation:
                     best_order = order
         return best_order
 
-    # def plan_drone(self, drone_id: str, path: List[str]) -> None:
+    # def plan_drone(self, drone_id: str, path: list[str]) -> None:
     #     self.drones.append(DroneState(drone_id, path))
 
     # def run(self, max_steps: int = 100) -> None:
-    #     events: Dict[int, List[str]] = {}
+    #     events: dict[int, list[str]] = {}
     #     for drone in self.drones:
     #         scheduled = self._schedule_path(drone.path, 1, max_steps)
     #         if scheduled is None:

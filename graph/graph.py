@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/19 12:46:42 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/11 21:59:33 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/15 15:22:58 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -23,7 +23,7 @@ graph = {
 }
 """
 # from .graph
-from heapq import heappop, heappush
+from heapq import heapify ,heappop, heappush
 from parser.models import Hub
 # from parser.errors import BlockedZone
 # from ..parser.utils import VALID_ZONE_TYPES
@@ -39,9 +39,6 @@ class Graph:
         self.shortest_paths: list = []
 
     def add_summit(self, node1: str, node2: str, hub_: list[Hub]) -> None:
-        # determine edge weight from node1's hub zone type without
-        # mutating shared state (self.turn)
-        """Add a directed edge weighted by the destination zone."""
         weight = 1.0
         for hub in hub_:
             if node2 == hub.name:
@@ -69,6 +66,7 @@ class Graph:
 
         distances: dict[str, float] = {start: 0}
         queue: list[tuple[float, str, list[str]]] = [(0, start, [start])]
+        heapify(queue)
         visited: set = set()
 
         while queue:
@@ -102,48 +100,7 @@ class Graph:
         # for i in range(len(path) - 1):
         #     return sum(self.graph[path[i]][path[i + 1]])
 
-    # def yen(self, start, end, path_len):
-    #     shortest_paths = []
-    #     dist, path = self.dijkstra(start, end)
-    #     if not path:
-    #         return shortest_paths
 
-    #     shortest_paths.append((dist, path))
-    #     print(shortest_paths)
-
-    #     possible_paths = []
-    #     for _ in range(1, path_len):
-    #         prev_path = shortest_paths[-1][1]
-    #         # print(prev_path)
-    #         for i in range(len(prev_path) - 1):
-    #             alternative = prev_path[i]
-    #             accumulate_path = prev_path[:i + 1]
-    #             # print(accumulate_path)
-
-    #             ign_seq = set()
-    #             for (_, path_) in shortest_paths:
-    #                 if len(path_) > i and path_[:i + 1] == accumulate_path:
-    #                     ign_seq.add((path_[i], path_[i + 1]))
-    #             ign_summit = set(accumulate_path[:-1])
-
-    #             alternative_dist, alternative_path = self.dijkstra(alternativ
-    # e, end, ign_summit, ign_seq)
-
-    #             if alternative_path:
-    #                 total_path = accumulate_path[:-1] + alternative_path
-    #                 print(total_path)
-    #                 total_dist = self.sum_distance_path(total_path)
-    #                 possible_path = (total_dist, total_path)
-    #                 if possible_path not in shortest_paths and possible_p
-    # ath not in possible_paths:
-    #                     possible_paths.append(possible_path)
-
-    #             if not possible_paths:
-    #                 break
-
-    #             possible_paths.sort(key=lambda x: x[0])
-    #             # print(possible_paths)
-    #             shortest_paths.append(possible_paths.pop(0))
     def yen(
         self,
         source: str,

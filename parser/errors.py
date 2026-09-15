@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:35:49 by hery-rak            #+#    #+#            #
-#   Updated: 2026/08/20 15:38:56 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/15 11:48:43 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -27,5 +27,6 @@ class GraphError(Exception):
 class BlockedZone(Exception):
     """Raise"""
 
-
+class RenderError(Exception):
+    """Raise"""
 # class

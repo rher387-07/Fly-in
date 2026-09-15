@@ -7,11 +7,11 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:06 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/14 22:14:18 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/15 15:24:01 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
-from typing import Dict, List, Tuple
+# from typing import Dict, List, Tuple
 
 import pygame
 
@@ -30,11 +30,10 @@ MOON_PATH = "asset/cloud/2.png"
 TURN_SECONDS = 0.7
 MIN_SPACING_X = 200
 MIN_SPACING_Y = 200
-Schedule = Tuple[List[str], List[Tuple[str, str, int, int]]]
 
 
 class Lancer:
-    def __init__(self, network: Network, schedules: List[Schedule]) -> None:
+    def __init__(self, network: Network, schedules: list[tuple[list[str], list[tuple[str, str, int, int]]]]) -> None:
         if network.start_hub is None or network.end_hub is None:
             raise ValueError("network must define start_hub and end_hub")
         pygame.init()
@@ -58,7 +57,7 @@ class Lancer:
         self.background = pygame.image.load(BACKGROUND_PATH).convert()
         self.moon = pygame.image.load(MOON_PATH).convert_alpha()
         self.platforms: pygame.sprite.Group = pygame.sprite.Group()
-        self.platforms_by_name: Dict[str, Platform] = {}
+        self.platforms_by_name: dict[str, Platform] = {}
         self.drones = [
             Drone(self.drone_image, self.forward_image)
             for _ in schedules
@@ -76,7 +75,7 @@ class Lancer:
         tile.blit(tileset, (0, 0), pygame.Rect(x, y, width, height))
         return tile
 
-    def _layout(self) -> Tuple[float, float, int, int]:
+    def _layout(self) -> tuple[float, float, int, int]:
         hubs = list(self.network.hubs.values())
         min_x = min(hub.x for hub in hubs)
         max_x = max(hub.x for hub in hubs)
@@ -102,7 +101,7 @@ class Lancer:
             self.platforms.add(platform)
             self.platforms_by_name[hub.name] = platform
 
-    def _screen_position(self, name: str) -> Tuple[int, int]:
+    def _screen_position(self, name: str) -> tuple[int, int]:
         platform = self.platforms_by_name[name]
         x = self.offset_x + platform.x * self.spacing_x
         y = self.offset_y + platform.y * self.spacing_y
@@ -114,8 +113,8 @@ class Lancer:
         )
 
     def _drone_position(
-        self, movements: List[Tuple[str, str, int, int]], time: float
-    ) -> Tuple[int, int]:
+        self, movements: list[tuple[str, str, int, int]], time: float
+    ) -> tuple[int, int]:
         if not movements:
             return self._screen_position(self.start_name)
         first_name = movements[0][0]
@@ -133,7 +132,7 @@ class Lancer:
         return self._screen_position(first_name)
 
     def _drone_speed(
-        self, movements: List[Tuple[str, str, int, int]], time: float
+        self, movements: list[tuple[str, str, int, int]], time: float
     ) -> float:
         for _, second, departure, arrival in movements:
             if departure <= time <= arrival:

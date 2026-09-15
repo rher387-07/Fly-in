@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:36:11 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/11 21:59:33 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/15 15:34:12 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -101,6 +101,7 @@ class FlyInParser:
                 f"Line {line_number}: "
                 "nb_drones must be positive."
             )
+        # if nb_drones >
 
         self.network.nb_drones = nb_drones
 
