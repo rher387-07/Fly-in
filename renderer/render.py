@@ -7,29 +7,56 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:06 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/15 15:24:01 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/16 16:49:22 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
-# from typing import Dict, List, Tuple
-
 import pygame
+import sys
 
 from parser.models import Network
 from .camera import Camera
 from .drone import Drone
 from .platform import Platform
 
-W_FENETRE = 1280
-H_FENETRE = 800
+W_FENETRE = 1920
+H_FENETRE = 1080
 PATH_PLATF = "asset/platform/1_Industrial_Tileset_1B.png"
-PATH_DRONE = "asset/drone/Idle.png"
-PATH_DRONE_FORWARD = "asset/drone/Forward.png"
-BACKGROUND_PATH = "asset/cloud/1.png"
-MOON_PATH = "asset/cloud/2.png"
+PATH_DRONE_FORWARD = "asset/drone/free-drones-pack-pixel-art/1 Drones/2/Forward.png"
+BACKGROUND_PATH = "asset/back/cloud/background 4/1.png"
+MENU_BACKGROUND_PATH = "asset/menu/fond.jpeg"
+START_BUTTON_PATH = "asset/menu/Start_Button.png"
+SETTINGS_BUTTON_PATH = "asset/menu/Settings_Button.png"
+EXIT_BUTTON_PATH = "asset/menu/Exit_Button.png"
+
 TURN_SECONDS = 0.7
 MIN_SPACING_X = 200
 MIN_SPACING_Y = 200
+
+
+class BoutonImage:
+    def __init__(self, x, y, chemin_image, largeur, hauteur):
+        self.image_normale = pygame.image.load(chemin_image).convert_alpha()
+        self.image_normale = pygame.transform.smoothscale(self.image_normale, (largeur, hauteur))
+        self.image_survol = pygame.transform.smoothscale(
+            self.image_normale, (int(largeur * 1.08), int(hauteur * 1.08))
+        )
+        self.rect = self.image_normale.get_rect(topleft=(x, y))
+
+    def dessiner(self, surface):
+        souris = pygame.mouse.get_pos()
+        if self.rect.collidepoint(souris):
+            image = self.image_survol
+            rect = image.get_rect(center=self.rect.center)
+        else:
+            image = self.image_normale
+            rect = self.rect
+        surface.blit(image, rect)
+
+    def est_clique(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            return self.rect.collidepoint(event.pos)
+        return False
 
 
 class Lancer:
@@ -50,16 +77,14 @@ class Lancer:
         self.camera = Camera(W_FENETRE, H_FENETRE)
         self.platform_image = self.load_tile(PATH_PLATF, 0, 0, 96, 32)
         self.restricted_image = self.load_tile(PATH_PLATF, 96, 0, 32, 32)
-        self.drone_image = pygame.image.load(PATH_DRONE).convert_alpha()
         self.forward_image = pygame.image.load(
             PATH_DRONE_FORWARD
         ).convert_alpha()
         self.background = pygame.image.load(BACKGROUND_PATH).convert()
-        self.moon = pygame.image.load(MOON_PATH).convert_alpha()
         self.platforms: pygame.sprite.Group = pygame.sprite.Group()
         self.platforms_by_name: dict[str, Platform] = {}
         self.drones = [
-            Drone(self.drone_image, self.forward_image)
+            Drone(self.forward_image)
             for _ in schedules
         ]
         self.offset_x, self.offset_y, self.spacing_x, self.spacing_y = (
@@ -146,15 +171,13 @@ class Lancer:
             self.background, (W_FENETRE, H_FENETRE)
         )
         self.screen.blit(background, background.get_rect())
-        moon = pygame.transform.scale(self.moon, (640, 400))
-        self.screen.blit(moon, moon.get_rect())
 
     def draw_connections(self) -> None:
         for connection in self.network.connections:
             first = self._screen_position(connection.hub1)
             second = self._screen_position(connection.hub2)
             pygame.draw.line(
-                self.screen, (255, 255, 255), first, second, 2
+                self.screen, (255, 255, 255), first, second, 1
             )
             if self.network.hubs[connection.hub2].zone_type == "restricted":
                 marker = pygame.transform.scale(
@@ -201,7 +224,57 @@ class Lancer:
             )
         pygame.display.flip()
 
+
+    def menu_window(self) -> str:
+        menu_screen = pygame.display.set_mode((W_FENETRE, H_FENETRE))
+        pygame.display.set_caption("Menu Principal")
+
+        fond_image = pygame.image.load(MENU_BACKGROUND_PATH).convert()
+        fond_image = pygame.transform.smoothscale(fond_image, (W_FENETRE, H_FENETRE))
+
+        largeur_bouton = 260
+        hauteur_bouton = 86
+        marge_x = 60
+        espace = 20
+        y_depart = H_FENETRE - (hauteur_bouton * 3 + espace * 2) - 60
+
+        bouton_start = BoutonImage(marge_x, y_depart, START_BUTTON_PATH, largeur_bouton, hauteur_bouton)
+        # bouton_settings = BoutonImage(marge_x, y_depart + hauteur_bouton + espace, SETTINGS_BUTTON_PATH, largeur_bouton, hauteur_bouton)
+        bouton_exit = BoutonImage(marge_x, y_depart + (hauteur_bouton + espace), EXIT_BUTTON_PATH, largeur_bouton, hauteur_bouton)
+
+        en_menu = True
+        action = "quitter"
+        while en_menu:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    action = "quitter"
+                    en_menu = False
+                elif bouton_start.est_clique(event):
+                    action = "jouer"
+                    en_menu = False
+
+                elif bouton_exit.est_clique(event):
+                    action = "quitter"
+                    en_menu = False
+
+            menu_screen.blit(fond_image, (0, 0))
+            bouton_start.dessiner(menu_screen)
+            # bouton_settings.dessiner(menu_screen)
+            bouton_exit.dessiner(menu_screen)
+            pygame.display.flip()
+            self.clock.tick(60)
+
+        return action
+
     def run(self) -> None:
+        action = self.menu_window()
+        if action != "jouer":
+            pygame.quit()
+            return
+
+        self.screen = pygame.display.set_mode((W_FENETRE, H_FENETRE))
+        pygame.display.set_caption("Fly-in")
+
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

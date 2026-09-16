@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:26 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/15 15:37:36 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/16 13:24:54 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -135,6 +135,8 @@ class Simulation:
             arrival = start
             movements: list[tuple[str, str, int, int]] = []
             valid = True
+            # a = zip(path, path[1:])
+            # print(tuple(a))
             for first, second in zip(path, path[1:]):
                 travel_time = self._travel_time(second)
                 departure = arrival
@@ -148,6 +150,7 @@ class Simulation:
                     break
                 arrival = target
                 movements.append((first, second, departure, target))
+            # print("mouv: ", movements)
             if not valid or arrival > max_turns:
                 continue
             for first, second, departure, target in movements:
@@ -171,13 +174,16 @@ class Simulation:
             raise RuntimeError("no paths available")
         paths = [path for _, path in self.all_path]
         route_order = self._find_best_route_order(paths, max_steps)
+        # print("route order: ", route_order)
         self.route_order = route_order
+        # print(self.node_reservations)
         self.node_reservations.clear()
         self.edge_reservations.clear()
         self.drones.clear()
         self.scheduled_routes.clear()
         events: dict[int, list[str]] = {}
         for number, chosen in enumerate(route_order, 1):
+            # print(f"number: {number}, chosen: {chosen}")
             # print
             scheduled = self._schedule_path(paths[chosen], 0, max_steps)
             if scheduled is None:
@@ -238,6 +244,7 @@ class Simulation:
                 if feasible and finish < best_finish:
                     best_finish = finish
                     best_order = order
+                # print("best order:", best_order)
         return best_order
 
     # def plan_drone(self, drone_id: str, path: list[str]) -> None:

@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/19 12:46:42 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/15 15:22:58 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/16 11:55:59 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -20,6 +20,7 @@ graph = {
    "E": {"B": 2.8, "C": 2.8, "D": 3.1, "G": 7},
    "F": {"G": 2.5, "C": 3.5},
    "G": {"F": 2.5, "E": 7, "D": 10},
+   "s": {"rof1":2.0, }
 }
 """
 # from .graph
@@ -78,6 +79,7 @@ class Graph:
             if current == end:
                 return dist, path
 
+            """"B": {"A": 3, "D": 3.5, "E": 2.8},"""
             for neighbor, neig_dist in self.graph.get(current, {}).items():
                 if neighbor in ign_summit:
                     continue

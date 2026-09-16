@@ -1,11 +1,11 @@
-# Medium Level 2: Circular loop with restricted zones
-nb_drones: 92233720368547
+nb_drones:                                                                                                                                                                                                                  1
 
 start_hub: start 0 0 [color=green]
-hub: waypoint1 1 0 [color=blue]
+hub: waypoint1 1 0 [color=blue  max_drones=5]
 hub: waypoint2 2 0 [color=blue]
+
 end_hub: goal 3 0 [color=red]
 
-connection: start-waypoint1
-connection: waypoint1-waypoint2
+connection: start-waypoint1 [max_link_capacity=10]
+connection: waypoint1-waypoint2 [max_link_capacity=10]
 connection: waypoint2-goal

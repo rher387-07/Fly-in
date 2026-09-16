@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/15 15:25:50 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/16 16:05:25 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -73,12 +73,12 @@ def main() -> None:
         if render is not None:
             render = render.capitalize()
             if render == "True":
-                try:
-                    from renderer.render import Lancer
-                    lancer = Lancer(network, simulation.scheduled_routes)
-                    lancer.run()
-                except Exception as error:
-                    raise RuntimeError("Error dans l'importation de module") from error
+                # try:
+                from renderer.render import Lancer
+                lancer = Lancer(network, simulation.scheduled_routes)
+                lancer.run()
+                # except Exception as error:
+                #     raise RuntimeError("Error dans l'importation de module") from error
 
             elif render == "" or render == "False" or render is None:
                 pass
@@ -146,8 +146,8 @@ def main() -> None:
         print(f"Error: {e}")
     except KeyboardInterrupt as e:
         print(f"Interruption with '^C'")
-    except Exception as e:
-        print(f"Error: {e}")
+    # except Exception as e:
+    #     print(f"Error: {e}")
 
 
 
