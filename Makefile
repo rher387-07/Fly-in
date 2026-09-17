@@ -6,7 +6,7 @@
 #    By: hery-rak <hery-rak@student.42antananari    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/09/15 09:13:09 by hery-rak          #+#    #+#              #
-#    Updated: 2026/09/15 11:29:17 by hery-rak         ###   ########.fr        #
+#    Updated: 2026/09/17 13:23:50 by hery-rak         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,7 +29,6 @@ FLAG_MYPY = --warn-return-any --warn-unused-ignores --ignore-missing-imports --d
 FIND = find .
 
 install: $(DEPENDENCIE)
-	@echo "Dependencies are managed by pyproject.toml"
 	@$(POETRY) $(INSTALL)
 
 run: install
