@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:36:11 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/16 12:31:22 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/17 14:11:48 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -32,13 +32,27 @@ VALID_METADATA = {
 
 
 class FlyInParser:
-    """Parse and validate a Fly-in map."""
+    """_summary_
+    """
 
     def __init__(self, filename: str) -> None:
+        """_summary_
+
+        Args:
+            filename (str): _description_
+        """
         self.filename = filename
         self.network = Network(nb_drones=0)
 
     def parse(self) -> Network:
+        """_summary_
+
+        Raises:
+            ParseError: _description_
+
+        Returns:
+            Network: _description_
+        """
         lines = self._read_file()
 
         if not lines:
@@ -55,6 +69,14 @@ class FlyInParser:
         return self.network
 
     def _read_file(self) -> list[tuple[int, str]]:
+        """_summary_
+
+        Raises:
+            ParseError: _description_
+
+        Returns:
+            list[tuple[int, str]]: _description_
+        """
         try:
             with open(self.filename, "r") as file:
                 result: list[tuple[int, str]] = []
@@ -77,6 +99,16 @@ class FlyInParser:
         self,
         line_info: tuple[int, str],
     ) -> None:
+        """_summary_
+
+        Args:
+            line_info (tuple[int, str]): _description_
+
+        Raises:
+            ParseError: _description_
+            ParseError: _description_
+            ParseError: _description_
+        """
 
         line_number, line = line_info
 
@@ -110,6 +142,15 @@ class FlyInParser:
         line: str,
         line_number: int,
     ) -> None:
+        """_summary_
+
+        Args:
+            line (str): _description_
+            line_number (int): _description_
+
+        Raises:
+            ParseError: _description_
+        """
 
         if line.startswith("start_hub:"):
             self._parse_special_hub(
@@ -149,6 +190,18 @@ class FlyInParser:
         line_number: int,
         name: str,
     ) -> None:
+        """_summary_
+
+        Args:
+            line (str): _description_
+            line_number (int): _description_
+            name (str): _description_
+
+        Raises:
+            ParseError: _description_
+            ParseError: _description_
+            ParseError: _description_
+        """
 
         hub = self._create_hub(line, line_number)
 
@@ -183,6 +236,15 @@ class FlyInParser:
         line: str,
         line_number: int,
     ) -> None:
+        """_summary_
+
+        Args:
+            line (str): _description_
+            line_number (int): _description_
+
+        Raises:
+            ParseError: _description_
+        """
 
         hub = self._create_hub(line, line_number)
 
@@ -199,6 +261,21 @@ class FlyInParser:
         line: str,
         line_number: int,
     ) -> Hub:
+        """_summary_
+
+        Args:
+            line (str): _description_
+            line_number (int): _description_
+
+        Raises:
+            ParseError: _description_
+            ParseError: _description_
+            ParseError: _description_
+            ParseError: _description_
+
+        Returns:
+            Hub: _description_
+        """
 
         _, content = line.split(":", 1)
         content = content.strip()
@@ -274,6 +351,20 @@ class FlyInParser:
         line: str,
         line_number: int,
     ) -> None:
+        """_summary_
+
+        Args:
+            line (str): _description_
+            line_number (int): _description_
+
+        Raises:
+            ParseError: _description_
+            ParseError: _description_
+            ParseError: _description_
+            ParseError: _description_
+            ParseError: _description_
+            ParseError: _description_
+        """
 
         _, content = line.split(":", 1)
         content = content.strip()
@@ -345,6 +436,21 @@ class FlyInParser:
         content: str,
         line_number: int,
     ) -> dict[str, str]:
+        """_summary_
+
+        Args:
+            content (str): _description_
+            line_number (int): _description_
+
+        Raises:
+            ParseError: _description_
+            ParseError: _description_
+            ParseError: _description_
+            ParseError: _description_
+
+        Returns:
+            dict[str, str]: _description_
+        """
 
         if "[" not in content:
             return {}
@@ -393,6 +499,20 @@ class FlyInParser:
         name: str,
         line_number: int,
     ) -> int:
+        """_summary_
+
+        Args:
+            value (str): _description_
+            name (str): _description_
+            line_number (int): _description_
+
+        Raises:
+            ParseError: _description_
+            ParseError: _description_
+
+        Returns:
+            int: _description_
+        """
 
         try:
             result = int(value)
@@ -415,6 +535,15 @@ class FlyInParser:
         hub1: str,
         hub2: str,
     ) -> bool:
+        """_summary_
+
+        Args:
+            hub1 (str): _description_
+            hub2 (str): _description_
+
+        Returns:
+            bool: _description_
+        """
 
         return any(
             {
@@ -426,6 +555,12 @@ class FlyInParser:
         )
 
     def _validate_network(self) -> None:
+        """_summary_
+
+        Raises:
+            ParseError: _description_
+            ParseError: _description_
+        """
 
         if self.network.start_hub is None:
             raise ParseError(
@@ -438,6 +573,11 @@ class FlyInParser:
             )
 
     def _validate_cordo(self) -> None:
+        """_summary_
+
+        Raises:
+            ParseError: _description_
+        """
         tuple_coord = []
         res = self.network.hubs.values()
         for x in res:

@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:26 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/16 13:24:54 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/17 14:17:13 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -22,16 +22,29 @@ GREEN = "\033[42m"
 
 @dataclass
 class DroneState:
+    """_summary_
+    """
     id: str
     path: list[str]
 
 
 class Simulation:
+    """_summary_
+    """
     def __init__(
         self,
         network: Network,
         graph_or_paths: Graph | list[tuple[float, list[str]]],
     ) -> None:
+        """_summary_
+
+        Args:
+            network (Network): _description_
+            graph_or_paths (Graph | list[tuple[float, list[str]]]): _description_
+
+        Raises:
+            RuntimeError: _description_
+        """
         self.network = network
         if network.end_hub is None:
             raise RuntimeError("network has no end_hub")
@@ -65,12 +78,29 @@ class Simulation:
         self._last_movements: list[tuple[str, str, int, int]] = []
 
     def _edge_capacity(self, first: str, second: str) -> int:
+        """_summary_
+
+        Args:
+            first (str): _description_
+            second (str): _description_
+
+        Returns:
+            int: _description_
+        """
         for connection in self.network.connections:
             if {connection.hub1, connection.hub2} == {first, second}:
                 return connection.max_capacity
         return 0
 
     def _travel_time(self, destination: str) -> int:
+        """_summary_
+
+        Args:
+            destination (str): _description_
+
+        Returns:
+            int: _description_
+        """
         if self.network.hubs[destination].zone_type == "restricted":
             return 2
         return 1
@@ -82,6 +112,17 @@ class Simulation:
         departure: int,
         arrival: int,
     ) -> bool:
+        """_summary_
+
+        Args:
+            first (str): _description_
+            second (str): _description_
+            departure (int): _description_
+            arrival (int): _description_
+
+        Returns:
+            bool: _description_
+        """
         edge_capacity = self._edge_capacity(first, second)
         edge_times = self.edge_reservations.get((first, second), {})
         edge_is_full = any(
@@ -103,6 +144,14 @@ class Simulation:
         departure: int,
         arrival: int,
     ) -> None:
+        """_summary_
+
+        Args:
+            first (str): _description_
+            second (str): _description_
+            departure (int): _description_
+            arrival (int): _description_
+        """
         edge_times = self.edge_reservations.setdefault((first, second), {})
         for turn in range(departure, arrival):
             edge_times[turn] = edge_times.get(turn, 0) + 1
@@ -112,6 +161,12 @@ class Simulation:
         movements: list[tuple[str, str, int, int]],
         max_turns: int,
     ) -> None:
+        """_summary_
+
+        Args:
+            movements (list[tuple[str, str, int, int]]): _description_
+            max_turns (int): _description_
+        """
         for index, (_, second, _, arrival) in enumerate(movements):
             if second == self.end_name:
                 continue
@@ -131,6 +186,16 @@ class Simulation:
         earliest_start: int,
         max_turns: int,
     ) -> Optional[dict[int, list[str]]]:
+        """_summary_
+
+        Args:
+            path (list[str]): _description_
+            earliest_start (int): _description_
+            max_turns (int): _description_
+
+        Returns:
+            Optional[dict[int, list[str]]]: _description_
+        """
         for start in range(earliest_start, max_turns + 1):
             arrival = start
             movements: list[tuple[str, str, int, int]] = []
@@ -170,6 +235,15 @@ class Simulation:
         return None
 
     def run_from_all_path(self, max_steps: int = maxsize) -> None:
+        """_summary_
+
+        Args:
+            max_steps (int, optional): _description_. Defaults to maxsize.
+
+        Raises:
+            RuntimeError: _description_
+            RuntimeError: _description_
+        """
         if not self.all_path:
             raise RuntimeError("no paths available")
         paths = [path for _, path in self.all_path]
@@ -221,6 +295,15 @@ class Simulation:
         paths: list[list[str]],
         max_steps: int,
     ) -> list[int]:
+        """_summary_
+
+        Args:
+            paths (list[list[str]]): _description_
+            max_steps (int): _description_
+
+        Returns:
+            list[int]: _description_
+        """
         best_order = [0] * self.network.nb_drones
         best_finish = max_steps + 1
         route_count = len(paths)

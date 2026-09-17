@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/19 12:46:42 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/16 11:55:59 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/17 14:09:20 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -31,15 +31,30 @@ from parser.models import Hub
 
 
 class Graph:
+    """_summary_
+    """
     def __init__(
         self,
         turn: float = 0.0, graph: dict[str, dict[str, float]] | None = None
     ) -> None:
+        """_summary_
+
+        Args:
+            turn (float, optional): _description_. Defaults to 0.0.
+            graph (dict[str, dict[str, float]] | None, optional): _description_. Defaults to None.
+        """
         self.graph = graph if graph is not None else {}
         self.turn = turn
         self.shortest_paths: list = []
 
     def add_summit(self, node1: str, node2: str, hub_: list[Hub]) -> None:
+        """_summary_
+
+        Args:
+            node1 (str): _description_
+            node2 (str): _description_
+            hub_ (list[Hub]): _description_
+        """
         weight = 1.0
         for hub in hub_:
             if node2 == hub.name:
@@ -58,7 +73,17 @@ class Graph:
         end: str,
         ign_summit: set | None = None, ign_seq: set | None = None
     ) -> tuple[float, list[str]]:
-        # distances = {node: float('inf') for node in self.graph}
+        """_summary_
+
+        Args:
+            start (str): _description_
+            end (str): _description_
+            ign_summit (set | None, optional): _description_. Defaults to None.
+            ign_seq (set | None, optional): _description_. Defaults to None.
+
+        Returns:
+            tuple[float, list[str]]: _description_
+        """
         ign_seq = ign_seq or set()
         ign_summit = ign_summit or set()
 
@@ -79,7 +104,6 @@ class Graph:
             if current == end:
                 return dist, path
 
-            """"B": {"A": 3, "D": 3.5, "E": 2.8},"""
             for neighbor, neig_dist in self.graph.get(current, {}).items():
                 if neighbor in ign_summit:
                     continue
@@ -92,6 +116,14 @@ class Graph:
         return float("inf"), []
 
     def sum_distance_path(self, path: list[str]) -> float:
+        """_summary_
+
+        Args:
+            path (list[str]): _description_
+
+        Returns:
+            float: _description_
+        """
         # res = sum(self.graph[path[i]][path[i + 1]] for i
         # in range(len(path) - 1))
         return sum(
@@ -108,6 +140,16 @@ class Graph:
         source: str,
         destination: str, k: int
     ) -> list[tuple[float, list[str]]]:
+        """_summary_
+
+        Args:
+            source (str): _description_
+            destination (str): _description_
+            k (int): _description_
+
+        Returns:
+            list[tuple[float, list[str]]]: _description_
+        """
         self.shortest_paths = []
 
         dist, path = self.dijkstra(source, destination)

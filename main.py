@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/16 16:05:25 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/17 14:17:39 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -20,6 +20,14 @@ from simulation.simulation import Simulation
 import os
 
 def build_graph(network: Network) -> Graph:
+    """_summary_
+
+    Args:
+        network (Network): _description_
+
+    Returns:
+        Graph: _description_
+    """
     graph = Graph()
     hubs = list(network.hubs.values())
     for connection in network.connections:
@@ -32,6 +40,12 @@ def build_graph(network: Network) -> Graph:
 
 
 def main() -> None:
+    """_summary_
+
+    Raises:
+        ParseError: _description_
+        RenderError: _description_
+    """
 
     try:
         load, find_path = dot_parse()

@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 14:54:05 by hery-rak            #+#    #+#            #
-#   Updated: 2026/08/19 09:07:28 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/17 14:07:33 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -18,6 +18,11 @@ from typing import Any
 
 
 def dot_parse() -> list[Callable[..., Any]]:
+    """_summary_
+
+    Returns:
+        list[Callable[..., Any]]: _description_
+    """
     dotenv = import_module("dotenv")
 
     load_dotenv = dotenv.load_dotenv

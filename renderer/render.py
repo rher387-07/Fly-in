@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:06 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/17 13:19:53 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/17 14:16:08 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -34,7 +34,18 @@ MIN_SPACING_Y = 200
 
 
 class BoutonImage:
+    """_summary_
+    """
     def __init__(self, x, y, chemin_image, largeur, hauteur):
+        """_summary_
+
+        Args:
+            x (_type_): _description_
+            y (_type_): _description_
+            chemin_image (_type_): _description_
+            largeur (_type_): _description_
+            hauteur (_type_): _description_
+        """
         self.image_normale = pygame.image.load(chemin_image).convert_alpha()
         self.image_normale = pygame.transform.smoothscale(self.image_normale, (largeur, hauteur))
         self.image_survol = pygame.transform.smoothscale(
@@ -43,6 +54,11 @@ class BoutonImage:
         self.rect = self.image_normale.get_rect(topleft=(x, y))
 
     def draw(self, surface):
+        """_summary_
+
+        Args:
+            surface (_type_): _description_
+        """
         souris = pygame.mouse.get_pos()
         if self.rect.collidepoint(souris):
             image = self.image_survol
@@ -53,13 +69,32 @@ class BoutonImage:
         surface.blit(image, rect)
 
     def press(self, event):
+        """_summary_
+
+        Args:
+            event (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             return self.rect.collidepoint(event.pos)
         return False
 
 
 class Lancer:
+    """_summary_
+    """
     def __init__(self, network: Network, schedules: list[tuple[list[str], list[tuple[str, str, int, int]]]]) -> None:
+        """_summary_
+
+        Args:
+            network (Network): _description_
+            schedules (list[tuple[list[str], list[tuple[str, str, int, int]]]]): _description_
+
+        Raises:
+            ValueError: _description_
+        """
         if network.start_hub is None or network.end_hub is None:
             raise ValueError("network must define start_hub and end_hub")
         pygame.init()
@@ -94,12 +129,29 @@ class Lancer:
     def load_tile(
         self, path: str, x: int, y: int, width: int, height: int
     ) -> pygame.Surface:
+        """_summary_
+
+        Args:
+            path (str): _description_
+            x (int): _description_
+            y (int): _description_
+            width (int): _description_
+            height (int): _description_
+
+        Returns:
+            pygame.Surface: _description_
+        """
         tileset = pygame.image.load(path).convert_alpha()
         tile = pygame.Surface((width, height), pygame.SRCALPHA)
         tile.blit(tileset, (0, 0), pygame.Rect(x, y, width, height))
         return tile
 
     def _layout(self) -> tuple[float, float, int, int]:
+        """_summary_
+
+        Returns:
+            tuple[float, float, int, int]: _description_
+        """
         hubs = list(self.network.hubs.values())
         min_x = min(hub.x for hub in hubs)
         max_x = max(hub.x for hub in hubs)
@@ -120,12 +172,22 @@ class Lancer:
         return offset_x, offset_y, spacing_x, spacing_y
 
     def create_platform(self) -> None:
+        """_summary_
+        """
         for hub in self.network.hubs.values():
             platform = Platform(hub, self.platform_image, self.network)
             self.platforms.add(platform)
             self.platforms_by_name[hub.name] = platform
 
     def _screen_position(self, name: str) -> tuple[int, int]:
+        """_summary_
+
+        Args:
+            name (str): _description_
+
+        Returns:
+            tuple[int, int]: _description_
+        """
         platform = self.platforms_by_name[name]
         x = self.offset_x + platform.x * self.spacing_x
         y = self.offset_y + platform.y * self.spacing_y
@@ -139,6 +201,15 @@ class Lancer:
     def _drone_position(
         self, movements: list[tuple[str, str, int, int]], time: float
     ) -> tuple[int, int]:
+        """_summary_
+
+        Args:
+            movements (list[tuple[str, str, int, int]]): _description_
+            time (float): _description_
+
+        Returns:
+            tuple[int, int]: _description_
+        """
         if not movements:
             return self._screen_position(self.start_name)
         first_name = movements[0][0]
@@ -158,6 +229,15 @@ class Lancer:
     def _drone_speed(
         self, movements: list[tuple[str, str, int, int]], time: float
     ) -> float:
+        """_summary_
+
+        Args:
+            movements (list[tuple[str, str, int, int]]): _description_
+            time (float): _description_
+
+        Returns:
+            float: _description_
+        """
         for _, second, departure, arrival in movements:
             if departure <= time <= arrival:
                 if self.network.hubs[second].zone_type == "restricted":
@@ -166,12 +246,16 @@ class Lancer:
         return 1.0
 
     def draw_background(self) -> None:
+        """_summary_
+        """
         background = pygame.transform.scale(
             self.background, (W_FENETRE, H_FENETRE)
         )
         self.screen.blit(background, background.get_rect())
 
     def draw_connections(self) -> None:
+        """_summary_
+        """
         for connection in self.network.connections:
             first = self._screen_position(connection.hub1)
             second = self._screen_position(connection.hub2)
@@ -201,6 +285,8 @@ class Lancer:
                 self.screen.blit(marker, marker_rect)
 
     def draw(self) -> None:
+        """_summary_
+        """
         self.screen.fill((0, 0, 0))
         self.draw_background()
         self.draw_connections()
@@ -225,6 +311,11 @@ class Lancer:
 
 
     def menu_window(self) -> str:
+        """_summary_
+
+        Returns:
+            str: _description_
+        """
         w_fenetre = 1920//2
         h_fenetre = 1080//2
         menu_screen = pygame.display.set_mode((w_fenetre, h_fenetre))
@@ -266,6 +357,8 @@ class Lancer:
         return action
 
     def run(self) -> None:
+        """_summary_
+        """
         action = self.menu_window()
         if action != "jouer":
             pygame.quit()

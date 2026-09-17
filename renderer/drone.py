@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 11:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/11 23:59:59 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/17 14:12:49 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -18,11 +18,22 @@ from .camera import Camera
 
 
 class Drone(pygame.sprite.Sprite):
+    """_summary_
+
+    Args:
+        pygame (_type_): _description_
+    """
     def __init__(
         self,
         sprite: pygame.Surface,
         forward_sprite: pygame.Surface | None = None,
     ) -> None:
+        """_summary_
+
+        Args:
+            sprite (pygame.Surface): _description_
+            forward_sprite (pygame.Surface | None, optional): _description_. Defaults to None.
+        """
         self.sprite = sprite
 
         self.frame_w = 48
@@ -53,7 +64,11 @@ class Drone(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
     def update(self, speed_multiplier: float = 1.0) -> None:
-        """Advance the sprite animation at the requested movement speed."""
+        """_summary_
+
+        Args:
+            speed_multiplier (float, optional): _description_. Defaults to 1.0.
+        """
         if speed_multiplier <= 0:
             return
         now = pygame.time.get_ticks()
@@ -76,6 +91,13 @@ class Drone(pygame.sprite.Sprite):
         platform: Platform | None,
         camera: Camera
     ) -> None:
+        """_summary_
+
+        Args:
+            screen (pygame.Surface): _description_
+            platform (Platform | None): _description_
+            camera (Camera): _description_
+        """
         if platform is not None:
             x = platform.rect.centerx
             y = platform.rect.top + self.velocity
@@ -96,6 +118,13 @@ class Drone(pygame.sprite.Sprite):
         position: tuple[int, int],
         camera: Camera,
     ) -> None:
+        """_summary_
+
+        Args:
+            screen (pygame.Surface): _description_
+            position (tuple[int, int]): _description_
+            camera (Camera): _description_
+        """
         width = int(self.image.get_width() * camera.zoom)
         height = int(self.image.get_height() * camera.zoom)
         image = pygame.transform.scale(self.image, (width, height))

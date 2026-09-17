@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 12:09:02 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/16 17:18:50 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/17 14:14:15 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -18,12 +18,27 @@ from .camera import Camera
 
 
 class Platform(pygame.sprite.Sprite):
+    """_summary_
+
+    Args:
+        pygame (_type_): _description_
+    """
     def __init__(
         self,
         hub: Hub,
         image: pygame.Surface,
         network: Network
     ) -> None:
+        """_summary_
+
+        Args:
+            hub (Hub): _description_
+            image (pygame.Surface): _description_
+            network (Network): _description_
+
+        Raises:
+            ValueError: _description_
+        """
         super().__init__()
         self.network = network
         if network.start_hub is None or network.end_hub is None:
@@ -47,6 +62,11 @@ class Platform(pygame.sprite.Sprite):
         self.paused = False
 
     def check_capacity(self, flag: bool) -> None:
+        """_summary_
+
+        Args:
+            flag (bool): _description_
+        """
         amount = 100 / self.hub.max_drones
         if flag is True:
             self.bar -= amount
@@ -58,6 +78,12 @@ class Platform(pygame.sprite.Sprite):
     def update_bar_max_drone(
         self, surface: pygame.Surface, zoom: float
     ) -> None:
+        """_summary_
+
+        Args:
+            surface (pygame.Surface): _description_
+            zoom (float): _description_
+        """
         bar_color = pygame.Color("green")
         bg_bar_color = pygame.Color("grey")
 
@@ -74,7 +100,12 @@ class Platform(pygame.sprite.Sprite):
         pygame.draw.rect(surface, bg_bar_color, bg_rect)
         pygame.draw.rect(surface, bar_color, bar_rect)
 
-    def _get_color_rnadom(self) -> tuple[int, int, int]:
+    def _get_color_random(self) -> tuple[int, int, int]:
+        """_summary_
+
+        Returns:
+            tuple[int, int, int]: _description_
+        """
         from math import sin
         now = time.time()
         degr = self.debut - now
@@ -92,6 +123,19 @@ class Platform(pygame.sprite.Sprite):
         offset_y: int,
         camera: Camera
     ) -> None:
+        """_summary_
+
+        Args:
+            screen (pygame.Surface): _description_
+            space_x (int): _description_
+            space_y (int): _description_
+            offset_x (int): _description_
+            offset_y (int): _description_
+            camera (Camera): _description_
+
+        Raises:
+            ValueError: _description_
+        """
 
         window_x = offset_x + self.x * space_x
         window_y = offset_y + self.y * space_y
@@ -111,7 +155,7 @@ class Platform(pygame.sprite.Sprite):
         color_hub: pygame.Color | tuple[int, int, int]
         try:
             if self.hub.color == "rainbow":
-                color_hub = self._get_color_rnadom()
+                color_hub = self._get_color_random()
             elif self.hub.color:
                 color_hub = pygame.Color(self.hub.color)
             else:
