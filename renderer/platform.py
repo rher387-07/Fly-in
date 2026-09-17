@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 12:09:02 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/12 00:02:21 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/16 17:18:50 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -125,18 +125,18 @@ class Platform(pygame.sprite.Sprite):
         h_name_hub = int(name_hub.get_height() * camera.zoom)
 
         name_hub = pygame.transform.scale(name_hub, (w_name_hub, h_name_hub))
-        if self.hub.name == self.start_name or self.hub.name == self.end_name:
-            d = 10
-        else:
-            d = 25
+        # if self.hub.name == self.start_name or self.hub.name == self.end_name:
+        #     d = 10
+        # else:
+        #     d = 25
         name_hub_rect = name_hub.get_rect(
             midtop=(self.rect.centerx,
-                    self.rect.bottom + int(d * camera.zoom)
+                    self.rect.bottom + int(10 * camera.zoom)
                     )
         )
         screen.blit(name_hub, name_hub_rect)
 
-        if getattr(self, "paused", False):
-            platform = pygame.Surface((width, height), pygame.SRCALPHA)
-            platform.fill((255, 255, 0, 90))
-            screen.blit(platform, self.rect.topleft)
+        # if getattr(self, "paused", False):
+        #     platform = pygame.Surface((width, height), pygame.SRCALPHA)
+        #     platform.fill((255, 255, 0, 90))
+        #     screen.blit(platform, self.rect.topleft)

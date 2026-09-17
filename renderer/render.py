@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:06 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/16 16:49:22 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/17 13:19:53 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -20,16 +20,15 @@ from .drone import Drone
 from .platform import Platform
 
 W_FENETRE = 1920
-H_FENETRE = 1080
-PATH_PLATF = "asset/platform/1_Industrial_Tileset_1B.png"
-PATH_DRONE_FORWARD = "asset/drone/free-drones-pack-pixel-art/1 Drones/2/Forward.png"
-BACKGROUND_PATH = "asset/back/cloud/background 4/1.png"
-MENU_BACKGROUND_PATH = "asset/menu/fond.jpeg"
-START_BUTTON_PATH = "asset/menu/Start_Button.png"
-SETTINGS_BUTTON_PATH = "asset/menu/Settings_Button.png"
-EXIT_BUTTON_PATH = "asset/menu/Exit_Button.png"
+H_FENETRE = 1000
 
-TURN_SECONDS = 0.7
+PLATF = "asset/platform/1_Industrial_Tileset_1B.png"
+DRONE = "asset/drone/free-drones-pack-pixel-art/1 Drones/2/Forward.png"
+BACKGROUND = "asset/cloud/1.png"
+MENU_BACKGROUND = "asset/menu/fond.jpeg"
+START_BUTTON = "asset/menu/Start_Button.png"
+EXIT_BUTTON = "asset/menu/Exit_Button.png"
+
 MIN_SPACING_X = 200
 MIN_SPACING_Y = 200
 
@@ -43,7 +42,7 @@ class BoutonImage:
         )
         self.rect = self.image_normale.get_rect(topleft=(x, y))
 
-    def dessiner(self, surface):
+    def draw(self, surface):
         souris = pygame.mouse.get_pos()
         if self.rect.collidepoint(souris):
             image = self.image_survol
@@ -53,7 +52,7 @@ class BoutonImage:
             rect = self.rect
         surface.blit(image, rect)
 
-    def est_clique(self, event):
+    def press(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             return self.rect.collidepoint(event.pos)
         return False
@@ -75,12 +74,12 @@ class Lancer:
         self.paused = False
         self.simulation_time = 0.0
         self.camera = Camera(W_FENETRE, H_FENETRE)
-        self.platform_image = self.load_tile(PATH_PLATF, 0, 0, 96, 32)
-        self.restricted_image = self.load_tile(PATH_PLATF, 96, 0, 32, 32)
+        self.platform_image = self.load_tile(PLATF, 0, 0, 96, 32)
+        self.restricted_image = self.load_tile(PLATF, 96, 0, 32, 32)
         self.forward_image = pygame.image.load(
-            PATH_DRONE_FORWARD
+            DRONE
         ).convert_alpha()
-        self.background = pygame.image.load(BACKGROUND_PATH).convert()
+        self.background = pygame.image.load(BACKGROUND).convert()
         self.platforms: pygame.sprite.Group = pygame.sprite.Group()
         self.platforms_by_name: dict[str, Platform] = {}
         self.drones = [
@@ -226,21 +225,22 @@ class Lancer:
 
 
     def menu_window(self) -> str:
-        menu_screen = pygame.display.set_mode((W_FENETRE, H_FENETRE))
+        w_fenetre = 1920//2
+        h_fenetre = 1080//2
+        menu_screen = pygame.display.set_mode((w_fenetre, h_fenetre))
         pygame.display.set_caption("Menu Principal")
 
-        fond_image = pygame.image.load(MENU_BACKGROUND_PATH).convert()
-        fond_image = pygame.transform.smoothscale(fond_image, (W_FENETRE, H_FENETRE))
+        fond_image = pygame.image.load(MENU_BACKGROUND).convert()
+        fond_image = pygame.transform.smoothscale(fond_image, (w_fenetre, h_fenetre))
 
-        largeur_bouton = 260
-        hauteur_bouton = 86
-        marge_x = 60
-        espace = 20
-        y_depart = H_FENETRE - (hauteur_bouton * 3 + espace * 2) - 60
+        largeur_bouton = 100
+        hauteur_bouton = 50
+        espace = 25
+        marge_x = w_fenetre//2- 390
+        y_depart = h_fenetre//2 + 95
 
-        bouton_start = BoutonImage(marge_x, y_depart, START_BUTTON_PATH, largeur_bouton, hauteur_bouton)
-        # bouton_settings = BoutonImage(marge_x, y_depart + hauteur_bouton + espace, SETTINGS_BUTTON_PATH, largeur_bouton, hauteur_bouton)
-        bouton_exit = BoutonImage(marge_x, y_depart + (hauteur_bouton + espace), EXIT_BUTTON_PATH, largeur_bouton, hauteur_bouton)
+        bouton_start = BoutonImage(marge_x, y_depart, START_BUTTON, largeur_bouton, hauteur_bouton)
+        bouton_exit = BoutonImage(marge_x, y_depart + (hauteur_bouton + espace), EXIT_BUTTON, largeur_bouton, hauteur_bouton)
 
         en_menu = True
         action = "quitter"
@@ -249,18 +249,17 @@ class Lancer:
                 if event.type == pygame.QUIT:
                     action = "quitter"
                     en_menu = False
-                elif bouton_start.est_clique(event):
+                elif bouton_start.press(event):
                     action = "jouer"
                     en_menu = False
 
-                elif bouton_exit.est_clique(event):
+                elif bouton_exit.press(event):
                     action = "quitter"
                     en_menu = False
 
             menu_screen.blit(fond_image, (0, 0))
-            bouton_start.dessiner(menu_screen)
-            # bouton_settings.dessiner(menu_screen)
-            bouton_exit.dessiner(menu_screen)
+            bouton_start.draw(menu_screen)
+            bouton_exit.draw(menu_screen)
             pygame.display.flip()
             self.clock.tick(60)
 
@@ -290,7 +289,7 @@ class Lancer:
                         self.camera.zoom_in()
             if not self.paused:
                 self.simulation_time += (
-                    self.clock.get_time() / 1000 / TURN_SECONDS
+                    self.clock.get_time() / 1000 / 0.7
                 )
             self.camera.update()
             self.draw()
