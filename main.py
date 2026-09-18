@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/17 14:17:39 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/18 18:03:59 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -70,7 +70,7 @@ def main() -> None:
 
         # dict_graph: dict[str, dict[str, float]] = {}
         # list_hub = []
-        list_path = []
+        # list_path = []
         # list_hub_blocked = []
         # turn = 0
 
@@ -160,6 +160,8 @@ def main() -> None:
         print(f"Error: {e}")
     except KeyboardInterrupt as e:
         print(f"Interruption with '^C'")
+    # except MemoryError as e:
+    #         print(f"ekhjwfjhdsfjh")
     # except Exception as e:
     #     print(f"Error: {e}")
 

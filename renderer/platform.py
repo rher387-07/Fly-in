@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 12:09:02 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/17 14:14:15 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/17 15:48:03 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -61,44 +61,44 @@ class Platform(pygame.sprite.Sprite):
         self.debut = time.time()
         self.paused = False
 
-    def check_capacity(self, flag: bool) -> None:
-        """_summary_
+    # def check_capacity(self, flag: bool) -> None:
+    #     """_summary_
 
-        Args:
-            flag (bool): _description_
-        """
-        amount = 100 / self.hub.max_drones
-        if flag is True:
-            self.bar -= amount
-            # return 1
-        elif flag is False:
-            self.bar += amount
-            # return -1
+    #     Args:
+    #         flag (bool): _description_
+    #     """
+    #     amount = 100 / self.hub.max_drones
+    #     if flag is True:
+    #         self.bar -= amount
+    #         # return 1
+    #     elif flag is False:
+    #         self.bar += amount
+    #         # return -1
 
-    def update_bar_max_drone(
-        self, surface: pygame.Surface, zoom: float
-    ) -> None:
-        """_summary_
+    # def update_bar_max_drone(
+    #     self, surface: pygame.Surface, zoom: float
+    # ) -> None:
+    #     """_summary_
 
-        Args:
-            surface (pygame.Surface): _description_
-            zoom (float): _description_
-        """
-        bar_color = pygame.Color("green")
-        bg_bar_color = pygame.Color("grey")
+    #     Args:
+    #         surface (pygame.Surface): _description_
+    #         zoom (float): _description_
+    #     """
+    #     bar_color = pygame.Color("green")
+    #     bg_bar_color = pygame.Color("grey")
 
-        bar_w = self.max_bar * zoom
-        bar_h = 5 * zoom
-        offset_x = 50 * zoom
+    #     bar_w = self.max_bar * zoom
+    #     bar_h = 5 * zoom
+    #     offset_x = 50 * zoom
 
-        x = self.rect.centerx - offset_x
-        y = self.rect.top + 42 * zoom
+    #     x = self.rect.centerx - offset_x
+    #     y = self.rect.top + 42 * zoom
 
-        bg_rect = pygame.Rect(x, y, bar_w, bar_h)
-        bar_rect = pygame.Rect(x, y, self.bar * zoom, bar_h)
+    #     bg_rect = pygame.Rect(x, y, bar_w, bar_h)
+    #     bar_rect = pygame.Rect(x, y, self.bar * zoom, bar_h)
 
-        pygame.draw.rect(surface, bg_bar_color, bg_rect)
-        pygame.draw.rect(surface, bar_color, bar_rect)
+    #     pygame.draw.rect(surface, bg_bar_color, bg_rect)
+    #     pygame.draw.rect(surface, bar_color, bar_rect)
 
     def _get_color_random(self) -> tuple[int, int, int]:
         """_summary_
