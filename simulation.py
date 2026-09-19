@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:26 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/19 13:56:06 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/19 17:26:57 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -284,12 +284,19 @@ class Simulation:
                 events[turn].extend(
                     f"{drone_id}-{destination}" for destination in destinations
                 )
+        # for turn in sorted(events):
+        #     print(f"{' '.join(events[turn])}")
+        # if events:
+        #     print(f"Max turn: {max(events)}\n")
+        # # print(events)
+        return events
+
+    def render_terminal(self, events):
         for turn in sorted(events):
             print(f"{' '.join(events[turn])}")
         if events:
             print(f"Max turn: {max(events)}\n")
         # print(events)
-        return max(events)
 
     def _find_best_route_order(
         self,

@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/19 14:02:55 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/19 17:30:00 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -85,25 +85,27 @@ def main() -> None:
             raise ParseError("no valid route from start_hub to end_hub")
 
         simulation = Simulation(network, paths)
-
-        simulation.run_from_all_path()
+        events = simulation.run_from_all_path()
         if render is not None:
             render = render.capitalize()
             if render == "True":
                 # try:
                 from render import Lancer
+                turn = max(events)
                 # except ImportError as error:
                 #     raise ImportError("Error importing the 'Lancer' module") from error
-                lancer = Lancer(network, simulation.scheduled_routes, filename)
+                lancer = Lancer(network, simulation.scheduled_routes, filename, turn)
                 lancer.run()
+                simulation.render_terminal(events)
+                # return
 
-            elif render == "" or render == "False" or render is None:
-                pass
+            elif render == "False":
+                simulation.render_terminal(events)
             else:
-                print(render)
+                # print(render)
                 raise RenderError("The 'render' value in the configuration (.env/environment variable) must be a case-insensitive boolean.")
-        # else:
-        #     pass
+        else:
+            simulation.render_terminal(events)
 
 
         # for hub in network.hubs.values():
@@ -163,10 +165,10 @@ def main() -> None:
         print(f"Value Error: {e}")
     except KeyboardInterrupt as e:
         print(f"Program interruption")
-    # except MemoryError as e:
-    #         print(f"ekhjwfjhdsfjh")
-    # except Exception as e:
-    #     print(f"Error: {e}")
+    except ImportError as e:
+            print(f"Importation Error: {e}")
+    except Exception as e:
+        print(f"Error: {e}")
 
 
 

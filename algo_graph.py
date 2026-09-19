@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/19 12:46:42 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/19 13:55:19 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/19 15:27:25 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -24,7 +24,7 @@ graph = {
 }
 """
 # from .graph
-from heapq import heapify ,heappop, heappush
+from heapq import heapify, heappop, heappush
 from parser_models import Hub
 # from parser.errors import BlockedZone
 # from ..parser.utils import VALID_ZONE_TYPES

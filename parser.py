@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:36:11 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/19 13:57:59 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/19 16:24:45 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -23,10 +23,13 @@ VALID_ZONE_TYPES = {
     "priority",
 }
 
-VALID_METADATA = {
+VALID_METADATA_HUB = {
     "zone",
     "color",
     "max_drones",
+}
+
+VALID_METADATA_CONNEC = {
     "max_link_capacity"
 }
 
@@ -120,6 +123,7 @@ class FlyInParser:
 
         _, value = line.split(":", 1)
 
+        self._chech_special_character(value, line_number)
         try:
             nb_drones = int(value.strip())
         except ValueError as e:
@@ -140,6 +144,28 @@ class FlyInParser:
             )
 
         self.network.nb_drones = nb_drones
+
+    def _chech_special_character(self, value: str, line_number: int) -> None:
+        if "_" in value:
+            raise ParseError(
+                    f"Line {line_number}: "
+                    "The number of drones must be a valid number; "
+                    f"no special character '_'. Perhaps '{int(value)}' instead of '{value}'?"
+                )
+
+    def _check_color_valid(self, name_color: str, line_number: int) -> None:
+        try:
+            import webcolors  # type: ignore
+            webcolors.name_to_hex(name_color)
+        except ImportError as error:
+            raise ImportError("Webcolors module not found") from error
+        except ValueError as error:
+            raise ParseError(
+                f"Line {line_number}: "
+                "The accepted values for color are all valid single-word strings (e.g., red, blue, gray)."
+                f"Check your '{name_color}' value."
+            ) from error
+
 
     def _parse_line(
         self,
@@ -286,6 +312,7 @@ class FlyInParser:
 
         metadata = self._extract_metadata(
             content,
+            "hub",
             line_number,
         )
 
@@ -299,6 +326,8 @@ class FlyInParser:
             )
 
         name, x_value, y_value = parts
+        self._chech_special_character(x_value, line_number)
+        self._chech_special_character(y_value, line_number)
 
         try:
             x = int(x_value)
@@ -308,12 +337,6 @@ class FlyInParser:
                 f"Line {line_number}: "
                 "coordinates must be integers."
             ) from e
-
-        # if x > 10 or y > 10 or x < -10 or y < -10:
-        #     raise ParseError(
-        #         f"Line {line_number}: "
-        #         f"The coordinates must not exceed -10|10 on the y and x axes"
-        #     )
 
         if "-" in name or " " in name:
             raise ParseError(
@@ -338,6 +361,16 @@ class FlyInParser:
         )
 
         color = metadata.get("color")
+        if color:
+            self._check_color_valid(color, line_number)
+        # print(color)
+        # color.is
+        # if '-' in color or '_' in color:
+        #     raise ParseError(
+        #         f"Line {line_number}: "
+        #         "The accepted values for color are all valid single-word strings (e.g., red, blue, gray)."
+        #         f"Check your '{color}' value."
+        #     )
 
         return Hub(
             name=name,
@@ -375,7 +408,8 @@ class FlyInParser:
 
         metadata = self._extract_metadata(
             content,
-            line_number,
+            "connect",
+            line_number
         )
 
         connection_text = content.split("[", 1)[0].strip()
@@ -438,6 +472,7 @@ class FlyInParser:
     def _extract_metadata(
         self,
         content: str,
+        data: str,
         line_number: int,
     ) -> dict[str, str]:
         """_summary_
@@ -481,12 +516,18 @@ class FlyInParser:
 
             key, value = item.split("=", 1)
 
-            if (not key or not value) or not (key in VALID_METADATA):
-                raise ParseError(
-                    f"Line {line_number}: "
-                    f"invalid metadata '{item}'."
-                )
-
+            if data == "hub":
+                if (not key or not value) or not (key in VALID_METADATA_HUB):
+                    raise ParseError(
+                        f"Line {line_number}: "
+                        f"invalid metadata '{item}'."
+                    )
+            elif data == "connect":
+                if (not key or not value) or not (key in VALID_METADATA_CONNEC):
+                    raise ParseError(
+                        f"Line {line_number}: "
+                        f"invalid metadata '{item}'."
+                    )
             if key in result:
                 raise ParseError(
                     f"Line {line_number}: "
@@ -517,7 +558,7 @@ class FlyInParser:
         Returns:
             int: _description_
         """
-
+        self._chech_special_character(value, line_number)
         try:
             result = int(value)
         except ValueError as e:

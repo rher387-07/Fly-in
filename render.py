@@ -7,12 +7,11 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:06 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/19 14:01:32 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/19 17:19:59 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
 import pygame
-import sys
 
 from parser_models import Network
 from render_camera import Camera
@@ -85,7 +84,7 @@ class BoutonImage:
 class Lancer:
     """_summary_
     """
-    def __init__(self, network: Network, schedules: list[tuple[list[str], list[tuple[str, str, int, int]]]], filename: str) -> None:
+    def __init__(self, network: Network, schedules: list[tuple[list[str], list[tuple[str, str, int, int]]]], filename: str, turn: int) -> None:
         """_summary_
 
         Args:
@@ -106,7 +105,7 @@ class Lancer:
         self.end_name = network.end_hub.name
         self.schedules = schedules
         self.filename = filename
-        # self.turn = turn
+        self.turn = turn
         self.running = True
         self.paused = False
         self.simulation_time = 0.0
@@ -314,9 +313,9 @@ class Lancer:
 
     def draw_text_shadow(self, font: pygame.font.Font, message: str, screen_: pygame.Surface, width: int, height: int):
         blue_cyan = (0, 200, 200)
-        black = (0,0,0)
+        shadow = (54, 51, 46)
         msg = font.render(message, True, blue_cyan)
-        msg_shadow = font.render(message, True, black)
+        msg_shadow = font.render(message, True, shadow)
 
         screen_.blit(msg_shadow, (width+10, height+5))
         screen_.blit(msg, (width, height))
@@ -331,6 +330,8 @@ class Lancer:
         self.draw_text_shadow(font, f"Start area:   {self.network.start_hub.name}", screen_menu, 35, 160)
         self.draw_text_shadow(font, f"Finish area:  {self.network.end_hub.name}", screen_menu, 35,195)
         self.draw_text_shadow(font, f"Number of hubs:   {len(self.network.hubs)}", screen_menu, 35, 230)
+        self.draw_text_shadow(font, f"Turn:   {self.turn}", screen_menu, 35, 265)
+
         # self.draw_text_shadow(font, f"Turn: {self.turn}", screen_menu, 35, 265)
         # NOIR = (10, 10, 30)
         # BLANC = (255, 255, 255)
