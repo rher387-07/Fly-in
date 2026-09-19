@@ -7,15 +7,15 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:26 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/17 14:17:13 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/19 13:56:06 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
 from dataclasses import dataclass
 from typing import Optional
 
-from graph.graph import Graph
-from parser.models import Network
+from algo_graph import Graph
+from parser_models import Network
 from sys import maxsize
 
 GREEN = "\033[42m"
@@ -234,7 +234,7 @@ class Simulation:
             return events
         return None
 
-    def run_from_all_path(self, max_steps: int = maxsize) -> None:
+    def run_from_all_path(self, max_steps: int = maxsize) -> int:
         """_summary_
 
         Args:
@@ -289,6 +289,7 @@ class Simulation:
         if events:
             print(f"Max turn: {max(events)}\n")
         # print(events)
+        return max(events)
 
     def _find_best_route_order(
         self,

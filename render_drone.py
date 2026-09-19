@@ -2,19 +2,19 @@
 # ########################################################################### #
 #   shebang: 1                                                                #
 #                                                          :::      ::::::::  #
-#   drone.py                                             :+:      :+:    :+:  #
+#   render_drone.py                                      :+:      :+:    :+:  #
 #                                                      +:+ +:+         +:+    #
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 11:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/17 14:12:49 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/19 14:03:23 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
 
 import pygame
-from .platform import Platform
-from .camera import Camera
+from render_platform import Platform
+from render_camera import Camera
 
 
 class Drone(pygame.sprite.Sprite):

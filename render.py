@@ -7,17 +7,17 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:06 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/17 14:16:08 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/19 14:01:32 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
 import pygame
 import sys
 
-from parser.models import Network
-from .camera import Camera
-from .drone import Drone
-from .platform import Platform
+from parser_models import Network
+from render_camera import Camera
+from render_drone import Drone
+from render_platform import Platform
 
 W_FENETRE = 1920
 H_FENETRE = 1000
@@ -49,7 +49,7 @@ class BoutonImage:
         self.image_normale = pygame.image.load(chemin_image).convert_alpha()
         self.image_normale = pygame.transform.smoothscale(self.image_normale, (largeur, hauteur))
         self.image_survol = pygame.transform.smoothscale(
-            self.image_normale, (int(largeur * 1.08), int(hauteur * 1.08))
+            self.image_normale, (int(largeur * 1.5), int(hauteur))
         )
         self.rect = self.image_normale.get_rect(topleft=(x, y))
 
@@ -85,7 +85,7 @@ class BoutonImage:
 class Lancer:
     """_summary_
     """
-    def __init__(self, network: Network, schedules: list[tuple[list[str], list[tuple[str, str, int, int]]]]) -> None:
+    def __init__(self, network: Network, schedules: list[tuple[list[str], list[tuple[str, str, int, int]]]], filename: str) -> None:
         """_summary_
 
         Args:
@@ -105,6 +105,8 @@ class Lancer:
         self.start_name = network.start_hub.name
         self.end_name = network.end_hub.name
         self.schedules = schedules
+        self.filename = filename
+        # self.turn = turn
         self.running = True
         self.paused = False
         self.simulation_time = 0.0
@@ -310,6 +312,55 @@ class Lancer:
         pygame.display.flip()
 
 
+    def draw_text_shadow(self, font: pygame.font.Font, message: str, screen_: pygame.Surface, width: int, height: int):
+        blue_cyan = (0, 200, 200)
+        black = (0,0,0)
+        msg = font.render(message, True, blue_cyan)
+        msg_shadow = font.render(message, True, black)
+
+        screen_.blit(msg_shadow, (width+10, height+5))
+        screen_.blit(msg, (width, height))
+
+
+    def draw_menu(self, screen_menu: pygame.Surface):
+
+        font = pygame.font.SysFont("Arial", 24, bold=True)
+        self.draw_text_shadow(font, "[INFO]", screen_menu, 240, 30)
+        self.draw_text_shadow(font, f"Map: {self.filename}", screen_menu, 35, 90)
+        self.draw_text_shadow(font, f"Number of drones: {self.network.nb_drones}", screen_menu, 35, 125)
+        self.draw_text_shadow(font, f"Start area:   {self.network.start_hub.name}", screen_menu, 35, 160)
+        self.draw_text_shadow(font, f"Finish area:  {self.network.end_hub.name}", screen_menu, 35,195)
+        self.draw_text_shadow(font, f"Number of hubs:   {len(self.network.hubs)}", screen_menu, 35, 230)
+        # self.draw_text_shadow(font, f"Turn: {self.turn}", screen_menu, 35, 265)
+        # NOIR = (10, 10, 30)
+        # BLANC = (255, 255, 255)
+        # ROSE_NEON = (255, 20, 147)
+
+        # # name = self.filename.split("/")
+        # # # print(name)
+        # # if len(name) == 3:
+
+        # msg_info = "INFO"
+        # path_message = f"Map: {self.filename}"
+        # # w = int(path_file.get_width()*10)
+        # # print(w)
+        # # h = int(path_file.get_height() * 10)
+        # # print(h)
+
+        # # f = pygame.transform.scale(path_file, (w, h))
+        # # rect = path_file.get_rect(midtop=(rect.centerx,
+        # #                     self.rect.bottom + int(10)
+        # #                     ))
+
+        # path_file = font.render(path_message, True, (0,0,0))
+        # surface_ombre = font.render(path_message, True, (BLEU_CYAN))
+        # # rect_ombre = surface_ombre.get_rect(1, 201)
+
+
+        # screen_menu.blit(surface_ombre, (width, height))
+        # screen_menu.blit(path_file, (width-1, height-1))
+
+
     def menu_window(self) -> str:
         """_summary_
 
@@ -327,11 +378,12 @@ class Lancer:
         largeur_bouton = 100
         hauteur_bouton = 50
         espace = 25
-        marge_x = w_fenetre//2- 390
+        marge_x = 220
         y_depart = h_fenetre//2 + 95
 
         bouton_start = BoutonImage(marge_x, y_depart, START_BUTTON, largeur_bouton, hauteur_bouton)
         bouton_exit = BoutonImage(marge_x, y_depart + (hauteur_bouton + espace), EXIT_BUTTON, largeur_bouton, hauteur_bouton)
+
 
         en_menu = True
         action = "quitter"
@@ -340,6 +392,10 @@ class Lancer:
                 if event.type == pygame.QUIT:
                     action = "quitter"
                     en_menu = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        action = "quitter"
+                        en_menu = False
                 elif bouton_start.press(event):
                     action = "jouer"
                     en_menu = False
@@ -348,7 +404,9 @@ class Lancer:
                     action = "quitter"
                     en_menu = False
 
+
             menu_screen.blit(fond_image, (0, 0))
+            self.draw_menu(menu_screen)
             bouton_start.draw(menu_screen)
             bouton_exit.draw(menu_screen)
             pygame.display.flip()

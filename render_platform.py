@@ -2,19 +2,19 @@
 # ########################################################################### #
 #   shebang: 1                                                                #
 #                                                          :::      ::::::::  #
-#   platform.py                                          :+:      :+:    :+:  #
+#   render_platform.py                                   :+:      :+:    :+:  #
 #                                                      +:+ +:+         +:+    #
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 12:09:02 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/17 15:48:03 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/19 14:03:37 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
 import pygame
 import time
-from parser.models import Network, Hub
-from .camera import Camera
+from parser_models import Network, Hub
+from render_camera import Camera
 
 
 class Platform(pygame.sprite.Sprite):

@@ -7,16 +7,16 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/18 18:03:59 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/19 14:02:55 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
-from parser.errors import ParseError, DotenvError, BlockedZone, RenderError
-from parser.parser import FlyInParser
-from parser.dotenv_parser import dot_parse
-from graph.graph import Graph
-from parser.models import Network
-from simulation.simulation import Simulation
+from parser_errors import ParseError, DotenvError, BlockedZone, RenderError
+from parser import FlyInParser
+from parser_dotenv import dot_parse
+from algo_graph import Graph
+from parser_models import Network
+from simulation import Simulation
 import os
 
 def build_graph(network: Network) -> Graph:
@@ -63,10 +63,13 @@ def main() -> None:
                 return
         load()
         filename = str(os.getenv("MAP"))
+        # drone = str(os.getenv("DRONE"))
         render = os.getenv("RENDER")
         if filename == "":
             print("[INVALID] The map path must not be empty")
             return
+        # if drone == "":
+
 
         # dict_graph: dict[str, dict[str, float]] = {}
         # list_hub = []
@@ -82,17 +85,17 @@ def main() -> None:
             raise ParseError("no valid route from start_hub to end_hub")
 
         simulation = Simulation(network, paths)
-        simulation.run_from_all_path()
 
+        simulation.run_from_all_path()
         if render is not None:
             render = render.capitalize()
             if render == "True":
                 # try:
-                from renderer.render import Lancer
-                lancer = Lancer(network, simulation.scheduled_routes)
+                from render import Lancer
+                # except ImportError as error:
+                #     raise ImportError("Error importing the 'Lancer' module") from error
+                lancer = Lancer(network, simulation.scheduled_routes, filename)
                 lancer.run()
-                # except Exception as error:
-                #     raise RuntimeError("Error dans l'importation de module") from error
 
             elif render == "" or render == "False" or render is None:
                 pass
@@ -157,9 +160,9 @@ def main() -> None:
     except RenderError as e:
         print(f"Render Error: {e}")
     except ValueError as e:
-        print(f"Error: {e}")
+        print(f"Value Error: {e}")
     except KeyboardInterrupt as e:
-        print(f"Interruption with '^C'")
+        print(f"Program interruption")
     # except MemoryError as e:
     #         print(f"ekhjwfjhdsfjh")
     # except Exception as e:
