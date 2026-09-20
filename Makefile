@@ -6,11 +6,13 @@
 #    By: hery-rak <hery-rak@student.42antananari    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/09/15 09:13:09 by hery-rak          #+#    #+#              #
-#    Updated: 2026/09/21 00:12:35 by hery-rak         ###   ########.fr        #
+#    Updated: 2026/09/21 00:42:37 by hery-rak         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 INSTALL = install
+POETRY = poetry
+PYTHON = python
 RUN = run
 
 DEBUGGER = pdb
@@ -25,7 +27,7 @@ FLAG_MYPY = --warn-return-any --warn-unused-ignores --ignore-missing-imports --d
 FIND = find .
 
 BOLD_ITALIC = \033[1;3m
-
+	
 CLR_BLUE = \033[34m
 CLR_RED = \033[31m
 CLR_GREEN = \033[32m
@@ -48,7 +50,7 @@ debug:
 
 clean:
 	@echo "$(CLR_RED)$(BOLD_ITALIC)		Run Cleanup$(RESET)"
-	@$(FIND) -type d \( -name __pycache__ -o -name .mypy_cache -o -name .pytest_cache \) -prune -exec rm -rf {} +
+	$(FIND) -type d \( -name __pycache__ -o -name .mypy_cache -o -name .pytest_cache \) -prune -exec rm -rf {} +
 	@echo ""
 
 flake:
