@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 11:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/20 15:00:00 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/20 23:04:22 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -93,37 +93,37 @@ class Drone(pygame.sprite.Sprite):
 
         self.x = self.speed * self.direction
 
-    def draw(
-        self,
-        screen: pygame.Surface,
-        platform: Platform | None,
-        camera: Camera
-    ) -> None:
-        """Draws the drone on screen, scaled by the camera's zoom.
+    # def draw(
+    #     self,
+    #     screen: pygame.Surface,
+    #     platform: Platform | None,
+    #     camera: Camera
+    # ) -> None:
+    #     """Draws the drone on screen, scaled by the camera's zoom.
 
-        If `platform` is given, the drone is anchored just above the
-        platform's top-center. Otherwise, it is drawn at its own `x`
-        position and current vertical center.
+    #     If `platform` is given, the drone is anchored just above the
+    #     platform's top-center. Otherwise, it is drawn at its own `x`
+    #     position and current vertical center.
 
-        Args:
-            screen (pygame.Surface): Surface to draw the drone onto.
-            platform (Platform | None): The hub/platform to anchor the
-                drone to, or None to use the drone's own position.
-            camera (Camera): Camera providing the current zoom factor.
-        """
-        if platform is not None:
-            x = platform.rect.centerx
-            y = platform.rect.top + self.velocity
-        else:
-            x = int(self.x)
-            y = int(self.rect.centery)
+    #     Args:
+    #         screen (pygame.Surface): Surface to draw the drone onto.
+    #         platform (Platform | None): The hub/platform to anchor the
+    #             drone to, or None to use the drone's own position.
+    #         camera (Camera): Camera providing the current zoom factor.
+    #     """
+    #     if platform is not None:
+    #         x = platform.rect.centerx
+    #         y = platform.rect.top + self.velocity
+    #     else:
+    #         x = int(self.x)
+    #         y = int(self.rect.centery)
 
-        width = int(self.image.get_width() * camera.zoom)
-        height = int(self.image.get_height() * camera.zoom)
+    #     width = int(self.image.get_width() * camera.zoom)
+    #     height = int(self.image.get_height() * camera.zoom)
 
-        image = pygame.transform.scale(self.image, (width, height))
-        self.rect = image.get_rect(midbottom=(x, y))
-        screen.blit(image, self.rect)
+    #     image = pygame.transform.scale(self.image, (width, height))
+    #     self.rect = image.get_rect(midbottom=(x, y))
+    #     screen.blit(image, self.rect)
 
     def draw_at(
         self,

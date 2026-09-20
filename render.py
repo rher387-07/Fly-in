@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:06 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/20 15:26:56 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/20 23:30:07 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -18,8 +18,8 @@ from render_camera import Camera
 from render_drone import Drone
 from render_platform import Platform
 
-W_FENETRE = 1920
-H_FENETRE = 1000
+W_FENETRE = 1000
+H_FENETRE = 620
 
 PLATF = "asset/platform/1_Industrial_Tileset_1B.png"
 DRONE = "asset/drone/free-drones-pack-pixel-art/1 Drones/2/Forward.png"
@@ -142,6 +142,7 @@ class Lancer:
             self._layout()
         )
         self.create_platform()
+        self.hint_font = pygame.font.SysFont("Arial", 12, bold=True)
 
     def load_tile(
         self, path: str, x: int, y: int, width: int, height: int
@@ -331,13 +332,82 @@ class Lancer:
                 )
                 self.screen.blit(marker, marker_rect)
 
+    def draw_controls_hint(self) -> None:
+        """Draws a full-width bottom bar listing the keyboard controls.
+
+        Renders a single rounded-corner panel spanning the whole width
+        of the window, anchored to the bottom of the screen, and split
+        into as many equal columns as there are controls (like a table
+        row), each with a thin separator on its right edge. Shows:
+        Space to pause/resume, +/- (numpad) to zoom in/out, and the
+        arrow keys (or numpad 2/4/6/8) to pan the camera.
+        """
+        controls = [
+            ("Esc", "Quit"),
+            ("Space", "Pause / Resume"),
+            ("+ / -", "Zoom in / out"),
+            ("↓←→↑ / Numpad 2-4-6-8", "Move camera"),
+        ]
+
+        margin = 5
+        panel_height = 48
+        panel_width = W_FENETRE - margin * 2
+        panel_x = margin
+        panel_y = H_FENETRE - panel_height - margin + 5
+        border_radius = 14
+
+        panel = pygame.Surface((panel_width, panel_height), pygame.SRCALPHA)
+        pygame.draw.rect(
+            panel,
+            (20, 20, 20, 170),
+            panel.get_rect(),
+            border_radius=border_radius,
+        )
+        pygame.draw.rect(
+            panel,
+            (255, 255, 255, 60),
+            panel.get_rect(),
+            width=1,
+            border_radius=border_radius,
+        )
+
+        column_width = panel_width / len(controls)
+        for index in range(1, len(controls)):
+            x = int(column_width * index)
+            pygame.draw.line(
+                panel,
+                (255, 255, 255, 60),
+                (x, 10),
+                (x, panel_height - 10),
+                1,
+            )
+
+        self.screen.blit(panel, (panel_x, panel_y))
+
+        for index, (key, action) in enumerate(controls):
+            column_center = panel_x + int(column_width * (index + 0.5))
+
+            key_surface = self.hint_font.render(key, True, (0, 200, 200))
+            key_rect = key_surface.get_rect(
+                center=(column_center, panel_y + 18)
+            )
+            self.screen.blit(key_surface, key_rect)
+
+            action_surface = self.hint_font.render(
+                action, True, (230, 230, 230)
+            )
+            action_rect = action_surface.get_rect(
+                center=(column_center, panel_y + 38)
+            )
+            self.screen.blit(action_surface, action_rect)
+
     def draw(self) -> None:
         """Renders a full simulation frame: background, hubs, and drones.
 
         Clears the screen, draws the background, the connections between
         hubs, every platform, then every drone at its interpolated
-        position for `self.simulation_time`, and finally flips the
-        display.
+        position for `self.simulation_time`, the controls hint panel,
+        and finally flips the display.
         """
         self.screen.fill((0, 0, 0))
         self.draw_background()
@@ -359,6 +429,7 @@ class Lancer:
                 self._drone_position(movements, self.simulation_time),
                 self.camera,
             )
+        self.draw_controls_hint()
         pygame.display.flip()
 
 
@@ -392,7 +463,7 @@ class Lancer:
 
         Args:
             screen_menu (pygame.Surface): Surface (the menu screen) to
-                draw the info panel.
+                draw the info panel onto.
         """
         font = pygame.font.SysFont("Arial", 24, bold=True)
         self.draw_text_shadow(font, "[INFO]", screen_menu, 240, 30)

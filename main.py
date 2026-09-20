@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/20 16:03:29 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/20 23:51:32 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -83,6 +83,7 @@ def main() -> None:
 
             elif render == "False" or render == "false":
                 simulation.render_terminal(events)
+                # simulation.render_capacity_terminal()
             else:
                 print(render)
                 raise RenderError("The 'RENDER' value in the configuration (.env/environment variable) must be 'True', 'False', or entirely lowercase.")

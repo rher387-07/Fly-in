@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:26 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/20 16:11:26 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/20 23:51:13 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -16,6 +16,21 @@ from typing import Optional
 from algo_graph import Graph
 from parser_models import Network, DroneState
 from sys import maxsize
+import time
+
+GREEN = "\033[42m"
+RESET_CLR = "\033[0m"
+
+# @dataclass
+# class DroneState:
+#     """Tracks a single drone's assigned identifier and route.
+
+#     Attributes:
+#         id: The drone's display identifier (e.g. "D1").
+#         path: Ordered list of hub names the drone travels through.
+#     """
+#     id: str
+#     path: list[str]
 
 
 class Simulation:
@@ -328,15 +343,86 @@ class Simulation:
     def render_terminal(self, events):
         """Prints the simulation's events to the terminal, turn by turn.
 
+        Each event is colored according to the `color` of the hub it
+        refers to (using the same color name as the graphical render,
+        including the special "rainbow" value), so the terminal output
+        mirrors the pygame view's hub colors. Events for a hub with no
+        color set are printed uncolored.
+
         Args:
             events (dict[int, list[str]]): Mapping of turn number to the
                 list of event strings occurring at that turn, as
                 returned by `run_from_all_path`.
         """
         for turn in sorted(events):
-            print(f"{' '.join(events[turn])}")
+            colored_events = [
+                self._colorize_event(event) for event in events[turn]
+            ]
+            print(f"{' '.join(colored_events)}")
         if events:
             print(f"Max turn: {max(events)}\n")
+
+    def _colorize_event(self, event: str) -> str:
+        """Colors only the destination part of an event, by its hub's color.
+
+        An event is formatted as "{drone_id}-{destination}", where
+        `destination` is either a single hub name, or a "hub1-hub2"
+        pair (for a mid-transit event on a two-turn/restricted leg). In
+        the pair case, the second hub (the one being entered) is used
+        to pick the color. The drone id keeps the terminal's normal
+        (uncolored) text.
+
+        Args:
+            event (str): The raw event string, as produced by
+                `_schedule_path` (e.g. "D1-B" or "D1-A-B").
+
+        Returns:
+            str: `event` with its destination part wrapped in the ANSI
+            escape codes for its target hub's color (drone id left
+            unchanged). Returned unchanged if the event cannot be
+            parsed or its hub has no color set.
+        """
+        drone_id, separator, destination = event.partition("-")
+        if not destination:
+            return event
+        hub_name = destination.rsplit("-", 1)[-1]
+        hub = self.network.hubs.get(hub_name)
+        color_code = self._ansi_color(hub.color if hub else None)
+        if not color_code:
+            return event
+        return f"{drone_id}{separator}{color_code}{destination}{RESET_CLR}"
+
+    def _ansi_color(self, color_name: str | None) -> str:
+        """Converts a hub color name to a 24-bit ANSI foreground escape code.
+
+        Mirrors the coloring used by the graphical render: "rainbow"
+        cycles smoothly over time (same sine-based formula as
+        `Platform._get_color_random`), and any other name is resolved
+        to RGB via `webcolors`.
+
+        Args:
+            color_name (str | None): The hub's `color` value, "rainbow",
+                or None.
+
+        Returns:
+            str: A "\\033[38;2;R;G;Bm" ANSI escape code, or an empty
+            string if `color_name` is None or cannot be resolved.
+        """
+        if not color_name:
+            return ""
+        if color_name == "rainbow":
+            from math import sin
+            now = time.time()
+            r = int(sin(now) * 127 + 128)
+            g = int(sin(now + 2) * 127 + 128)
+            b = int(sin(now + 4) * 127 + 128)
+            return f"\033[38;2;{r};{g};{b}m"
+        try:
+            import webcolors  # type: ignore
+            r, g, b = webcolors.name_to_rgb(color_name)
+            return f"\033[38;2;{r};{g};{b}m"
+        except (ImportError, ValueError):
+            return ""
 
     def _choose_best_path(
         self,
@@ -366,26 +452,51 @@ class Simulation:
         """
         best: Optional[
             tuple[int, int, list[tuple[str, str, int, int]], dict[int, list[str]]]
-        ] = None
+        ] = None  # (finish, path_index, movements, events)
 
         for index, path in enumerate(paths):
-            process = Simulation(self.network, self.graph)
-            process.node_reservations = {
+            trial = Simulation(self.network, self.graph)
+            trial.node_reservations = {
                 key: dict(value) for key, value in self.node_reservations.items()
             }
-            process.edge_reservations = {
+            trial.edge_reservations = {
                 key: dict(value) for key, value in self.edge_reservations.items()
             }
 
-            scheduled = process._schedule_path(path, 0, max_steps)
+            scheduled = trial._schedule_path(path, 0, max_steps)
             if scheduled is None:
                 continue
 
             finish = max(scheduled)
             if best is None or finish < best[0]:
-                best = (finish, index, process._last_movements, scheduled)
+                best = (finish, index, trial._last_movements, scheduled)
 
         if best is None:
             return None
         _, index, movements, scheduled = best
         return index, movements, scheduled
+    
+    
+    def render_capacity_terminal(self) -> None:
+        if not self.node_reservations:
+            return
+
+        all_turns = sorted(
+            {
+                turn
+                for occupancy in self.node_reservations.values()
+                for turn in occupancy
+            }
+        )
+
+        for turn in all_turns:
+            entries = []
+            for hub_name, occupancy in self.node_reservations.items():
+                count = occupancy.get(turn, 0)
+                if count <= 0:
+                    continue
+                entries.append(f'{hub_name}-{count}')
+            if entries:
+                print(" ".join(entries))
+
+        print(f"Max turn: {all_turns[-1]}\n")
