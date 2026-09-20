@@ -7,65 +7,96 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/19 12:46:42 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/19 15:27:25 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/20 14:28:38 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
-"""
-graph = {
-   "A": {"B": 3, "C": 3},
-   "B": {"A": 3, "D": 3.5, "E": 2.8},
-   "C": {"A": 3, "E": 2.8, "F": 3.5},
-   "D": {"B": 3.5, "E": 3.1, "G": 10},
-   "E": {"B": 2.8, "C": 2.8, "D": 3.1, "G": 7},
-   "F": {"G": 2.5, "C": 3.5},
-   "G": {"F": 2.5, "E": 7, "D": 10},
-   "s": {"rof1":2.0, }
-}
-"""
-# from .graph
+
 from heapq import heapify, heappop, heappush
-from parser_models import Hub
-# from parser.errors import BlockedZone
-# from ..parser.utils import VALID_ZONE_TYPES
+from parser_models import Hub, Network
 
 
 class Graph:
-    """_summary_
+    """Represents a weighted graph and provides pathfinding utilities.
+
+    The graph is stored as an adjacency dict mapping each node to a dict
+    of its neighbors and the corresponding edge weights.
+
+    Example:
+        graph = {
+            "A": {"B": 3, "C": 3},
+            "B": {"A": 3, "D": 3.5, "E": 2.8}
+        }
+
+    Attributes:
+        graph (dict[str, dict[str, float]]): Adjacency list of the graph.
+        shortest_paths (list): The K shortest paths found by `yen`,
+            populated after calling that method.
     """
     def __init__(
         self,
-        turn: float = 0.0, graph: dict[str, dict[str, float]] | None = None
+        graph: dict[str, dict[str, float]] | None = None
     ) -> None:
-        """_summary_
+        """Initializes the Graph.
 
         Args:
-            turn (float, optional): _description_. Defaults to 0.0.
-            graph (dict[str, dict[str, float]] | None, optional): _description_. Defaults to None.
+            graph (dict[str, dict[str, float]] | None, optional): A set of
+                vertices and the associated distances (or weights) that
+                characterize a weighted graph. Defaults to None, in which
+                case an empty graph is created.
         """
         self.graph = graph if graph is not None else {}
-        self.turn = turn
         self.shortest_paths: list = []
 
     def add_summit(self, node1: str, node2: str, hub_: list[Hub]) -> None:
-        """_summary_
+        """Adds a directed edge between two nodes, weighted by zone type.
+
+        The edge weight defaults to 1.0, but is adjusted depending on the
+        zone type of `node2`'s corresponding hub: 2.0 for a "restricted"
+        zone, or 0.99 for a "priority" zone.
 
         Args:
-            node1 (str): _description_
-            node2 (str): _description_
-            hub_ (list[Hub]): _description_
+            node1 (str): First node of the edge (source).
+            node2 (str): Second node of the edge (destination).
+            hub_ (list[Hub]): List of all hubs, used to look up `node2`'s
+                zone type.
         """
         weight = 1.0
         for hub in hub_:
             if node2 == hub.name:
                 if hub.zone_type == "restricted":
                     weight = 2.0
+                if hub.zone_type == "priority":
+                    weight = 0.99
                 break
-        # tmp_node1 = node1
-        # print(tmp_node1, node1)
         if node1 not in self.graph:
             self.graph[node1] = {}
         self.graph[node1][node2] = weight
+
+    @staticmethod
+    def build_graph(network: Network) -> 'Graph':
+        """Builds a complete graph from a network's hubs and connections.
+
+        Connections involving a "blocked" hub (on either end) are skipped.
+        Every remaining connection is added as two directed edges (one in
+        each direction) so the resulting graph is effectively undirected.
+
+        Args:
+            network (Network): Object containing all the data (i.e. all
+                hubs and all connections) used to build the graph.
+
+        Returns:
+            Graph: A new Graph instance populated with the network's data.
+        """
+        graph = Graph()
+        hubs = list(network.hubs.values())
+        for connection in network.connections:
+            if (network.hubs[connection.hub1].zone_type == "blocked"
+                    or network.hubs[connection.hub2].zone_type == "blocked"):
+                continue
+            graph.add_summit(connection.hub1, connection.hub2, hubs)
+            graph.add_summit(connection.hub2, connection.hub1, hubs)
+        return graph
 
     def dijkstra(
         self,
@@ -73,16 +104,26 @@ class Graph:
         end: str,
         ign_summit: set | None = None, ign_seq: set | None = None
     ) -> tuple[float, list[str]]:
-        """_summary_
+        """Computes the shortest path between two nodes.
+
+        Uses Dijkstra's algorithm on the internal adjacency graph, with
+        optional support for excluding specific nodes and/or specific
+        directed edges (sequences) from consideration.
 
         Args:
-            start (str): _description_
-            end (str): _description_
-            ign_summit (set | None, optional): _description_. Defaults to None.
-            ign_seq (set | None, optional): _description_. Defaults to None.
+            start (str): Starting node.
+            end (str): Destination node.
+            ign_summit (set | None, optional): Nodes to ignore entirely.
+                Defaults to None (no nodes ignored).
+            ign_seq (set | None, optional): Directed edges, as
+                (from_node, to_node) tuples, to ignore. Defaults to None
+                (no edges ignored).
 
         Returns:
-            tuple[float, list[str]]: _description_
+            tuple[float, list[str]]: The total distance and the ordered
+            list of nodes forming the shortest path from `start` to `end`.
+            If no path exists (or `start`/`end` is ignored), returns
+            (float("inf"), []).
         """
         ign_seq = ign_seq or set()
         ign_summit = ign_summit or set()
@@ -116,39 +157,41 @@ class Graph:
         return float("inf"), []
 
     def sum_distance_path(self, path: list[str]) -> float:
-        """_summary_
+        """Calculates the total length of a specific path.
 
         Args:
-            path (list[str]): _description_
+            path (list[str]): Ordered list of nodes forming the path.
 
         Returns:
-            float: _description_
+            float: The sum of the edge weights along the path.
         """
-        # res = sum(self.graph[path[i]][path[i + 1]] for i
-        # in range(len(path) - 1))
         return sum(
             self.graph[path[i]][path[i + 1]]
             for i in range(len(path) - 1)
             )
-
-        # for i in range(len(path) - 1):
-        #     return sum(self.graph[path[i]][path[i + 1]])
-
 
     def yen(
         self,
         source: str,
         destination: str, k: int
     ) -> list[tuple[float, list[str]]]:
-        """_summary_
+        """Finds the K shortest loopless paths between two nodes.
+
+        This is a direct extension of Dijkstra's algorithm. While Dijkstra
+        finds only the shortest (best) path, Yen's algorithm finds the K
+        shortest paths (1st, 2nd, 3rd best, etc.) without any of them
+        containing loops.
 
         Args:
-            source (str): _description_
-            destination (str): _description_
-            k (int): _description_
+            source (str): Starting node.
+            destination (str): Destination node.
+            k (int): Number of paths to find (if that many exist).
 
         Returns:
-            list[tuple[float, list[str]]]: _description_
+            list[tuple[float, list[str]]]: A list of (distance, path)
+            tuples, sorted from shortest to longest, containing up to `k`
+            paths. Also stored on `self.shortest_paths`. Returns an empty
+            list if no path exists between `source` and `destination`.
         """
         self.shortest_paths = []
 
@@ -158,14 +201,11 @@ class Graph:
         self.shortest_paths.append((dist, path))
 
         all_path = []
-        # print(self.shortest_paths)
         for _ in range(1, k):
             prev_path = self.shortest_paths[-1][1]
-            # print(len(prev_path))
             for i in range(len(prev_path) - 1):
                 alternative_summit = prev_path[i]
                 accumulate = prev_path[:i + 1]
-                # print(accumulate)
 
                 sequence_ignore = set()
                 for (_, p) in self.shortest_paths:
@@ -173,13 +213,12 @@ class Graph:
                         sequence_ignore.add((p[i], p[i + 1]))
                 ignored_summit = set(accumulate[:-1])
 
-                alt_dist, alternative_path = self.dijkstra(alternative_summit,
+                _, alternative_path = self.dijkstra(alternative_summit,
                                                            destination,
                                                            ignored_summit,
                                                            sequence_ignore)
                 if alternative_path:
                     total_path = accumulate[:-1] + alternative_path
-                    # print(total_path)
                     total_dist = self.sum_distance_path(total_path)
                     alt_path = (total_dist, total_path)
                     if (alt_path not in self.shortest_paths
@@ -192,5 +231,4 @@ class Graph:
             all_path.sort(key=lambda x: x[0])
             self.shortest_paths.append(all_path.pop(0))
 
-        # print(type(self.shortest_paths))
         return self.shortest_paths

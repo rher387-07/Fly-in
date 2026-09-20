@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:06 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/19 17:19:59 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/20 15:26:56 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -33,17 +33,18 @@ MIN_SPACING_Y = 200
 
 
 class BoutonImage:
-    """_summary_
+    """A clickable image button with a "hover" (mouse-over) image state.
     """
     def __init__(self, x, y, chemin_image, largeur, hauteur):
-        """_summary_
+        """Initializes the button and loads/scales its images.
 
         Args:
-            x (_type_): _description_
-            y (_type_): _description_
-            chemin_image (_type_): _description_
-            largeur (_type_): _description_
-            hauteur (_type_): _description_
+            x (int): X position (top-left) of the button.
+            y (int): Y position (top-left) of the button.
+            chemin_image (str): Path to the button's image file.
+            largeur (int): Width, in pixels, the normal image is scaled
+                to. The hover image is scaled to 1.5x this width.
+            hauteur (int): Height, in pixels, both images are scaled to.
         """
         self.image_normale = pygame.image.load(chemin_image).convert_alpha()
         self.image_normale = pygame.transform.smoothscale(self.image_normale, (largeur, hauteur))
@@ -53,10 +54,10 @@ class BoutonImage:
         self.rect = self.image_normale.get_rect(topleft=(x, y))
 
     def draw(self, surface):
-        """_summary_
+        """Draws the button, swapping to the hover image under the mouse.
 
         Args:
-            surface (_type_): _description_
+            surface (pygame.Surface): Surface to draw the button onto.
         """
         souris = pygame.mouse.get_pos()
         if self.rect.collidepoint(souris):
@@ -68,13 +69,15 @@ class BoutonImage:
         surface.blit(image, rect)
 
     def press(self, event):
-        """_summary_
+        """Checks whether an event is a left click on this button.
 
         Args:
-            event (_type_): _description_
+            event (pygame.event.Event): The pygame event to check.
 
         Returns:
-            _type_: _description_
+            bool: True if `event` is a left mouse button-down click
+            landing inside the button's (normal, non-hover) rect, False
+            otherwise.
         """
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             return self.rect.collidepoint(event.pos)
@@ -82,17 +85,30 @@ class BoutonImage:
 
 
 class Lancer:
-    """_summary_
+    """Runs the pygame menu and the graphical rendering of the simulation.
+
+    Owns the pygame window, camera, sprites (platforms and drones), and
+    the main menu/game loops.
     """
     def __init__(self, network: Network, schedules: list[tuple[list[str], list[tuple[str, str, int, int]]]], filename: str, turn: int) -> None:
-        """_summary_
+        """Initializes pygame, loads assets, and lays out the network.
 
         Args:
-            network (Network): _description_
-            schedules (list[tuple[list[str], list[tuple[str, str, int, int]]]]): _description_
+            network (Network): The network to render (hubs and
+                connections).
+            schedules (list[tuple[list[str], list[tuple[str, str, int, int]]]]):
+                Per-drone schedules. Each entry pairs a path (list of
+                hub names) with its list of movements, where each
+                movement is (from_hub, to_hub, departure_time,
+                arrival_time).
+            filename (str): Path of the map file being rendered, shown
+                in the on-screen info panel.
+            turn (int): Total number of turns in the simulation, shown
+                in the on-screen info panel.
 
         Raises:
-            ValueError: _description_
+            ValueError: If `network` does not define both a `start_hub`
+                and an `end_hub`.
         """
         if network.start_hub is None or network.end_hub is None:
             raise ValueError("network must define start_hub and end_hub")
@@ -130,17 +146,20 @@ class Lancer:
     def load_tile(
         self, path: str, x: int, y: int, width: int, height: int
     ) -> pygame.Surface:
-        """_summary_
+        """Extracts a single tile from a tileset image.
 
         Args:
-            path (str): _description_
-            x (int): _description_
-            y (int): _description_
-            width (int): _description_
-            height (int): _description_
+            path (str): Path to the tileset image file.
+            x (int): X offset, in pixels, of the tile within the
+                tileset.
+            y (int): Y offset, in pixels, of the tile within the
+                tileset.
+            width (int): Width, in pixels, of the tile to extract.
+            height (int): Height, in pixels, of the tile to extract.
 
         Returns:
-            pygame.Surface: _description_
+            pygame.Surface: A new surface containing just the extracted
+            tile, with per-pixel alpha.
         """
         tileset = pygame.image.load(path).convert_alpha()
         tile = pygame.Surface((width, height), pygame.SRCALPHA)
@@ -148,10 +167,17 @@ class Lancer:
         return tile
 
     def _layout(self) -> tuple[float, float, int, int]:
-        """_summary_
+        """Computes the camera zoom and offsets needed to fit the map.
+
+        Finds the bounding box of all hub coordinates and sets
+        `self.camera.zoom` (capped at 1.0) so the whole network fits
+        within the window, then derives the pixel offsets needed to
+        position it.
 
         Returns:
-            tuple[float, float, int, int]: _description_
+            tuple[float, float, int, int]: The (offset_x, offset_y,
+            spacing_x, spacing_y) values used to convert hub grid
+            coordinates to window coordinates.
         """
         hubs = list(self.network.hubs.values())
         min_x = min(hub.x for hub in hubs)
@@ -173,7 +199,7 @@ class Lancer:
         return offset_x, offset_y, spacing_x, spacing_y
 
     def create_platform(self) -> None:
-        """_summary_
+        """Creates and registers a `Platform` sprite for each network hub.
         """
         for hub in self.network.hubs.values():
             platform = Platform(hub, self.platform_image, self.network)
@@ -181,13 +207,15 @@ class Lancer:
             self.platforms_by_name[hub.name] = platform
 
     def _screen_position(self, name: str) -> tuple[int, int]:
-        """_summary_
+        """Computes the on-screen center position of a named platform.
 
         Args:
-            name (str): _description_
+            name (str): Name of the hub/platform to locate.
 
         Returns:
-            tuple[int, int]: _description_
+            tuple[int, int]: The (x, y) screen coordinates of the
+            platform's center, after applying layout spacing/offsets
+            and the camera's pan and zoom.
         """
         platform = self.platforms_by_name[name]
         x = self.offset_x + platform.x * self.spacing_x
@@ -202,14 +230,23 @@ class Lancer:
     def _drone_position(
         self, movements: list[tuple[str, str, int, int]], time: float
     ) -> tuple[int, int]:
-        """_summary_
+        """Computes a drone's interpolated on-screen position at a given time.
+
+        Walks the drone's list of movements to find which leg `time`
+        falls into, then linearly interpolates its screen position
+        between the leg's start and end hubs. Before the drone's first
+        departure, or after its last arrival, it stays put at the
+        corresponding hub.
 
         Args:
-            movements (list[tuple[str, str, int, int]]): _description_
-            time (float): _description_
+            movements (list[tuple[str, str, int, int]]): The drone's
+                movements, each as (from_hub, to_hub, departure_time,
+                arrival_time).
+            time (float): Current simulation time.
 
         Returns:
-            tuple[int, int]: _description_
+            tuple[int, int]: The drone's (x, y) screen coordinates at
+            `time`.
         """
         if not movements:
             return self._screen_position(self.start_name)
@@ -230,14 +267,20 @@ class Lancer:
     def _drone_speed(
         self, movements: list[tuple[str, str, int, int]], time: float
     ) -> float:
-        """_summary_
+        """Computes a drone's animation speed multiplier at a given time.
+
+        The multiplier is halved while the drone is flying into a
+        "restricted" zone hub, and 1.0 otherwise.
 
         Args:
-            movements (list[tuple[str, str, int, int]]): _description_
-            time (float): _description_
+            movements (list[tuple[str, str, int, int]]): The drone's
+                movements, each as (from_hub, to_hub, departure_time,
+                arrival_time).
+            time (float): Current simulation time.
 
         Returns:
-            float: _description_
+            float: 0.5 if `time` falls within a leg arriving at a
+            "restricted" hub, 1.0 otherwise.
         """
         for _, second, departure, arrival in movements:
             if departure <= time <= arrival:
@@ -247,7 +290,7 @@ class Lancer:
         return 1.0
 
     def draw_background(self) -> None:
-        """_summary_
+        """Draws the background image, scaled to fill the window.
         """
         background = pygame.transform.scale(
             self.background, (W_FENETRE, H_FENETRE)
@@ -255,7 +298,10 @@ class Lancer:
         self.screen.blit(background, background.get_rect())
 
     def draw_connections(self) -> None:
-        """_summary_
+        """Draws every connection as a line, with a marker on restricted legs.
+
+        For each connection whose second hub is a "restricted" zone, a
+        warning marker is also drawn at the connection's midpoint.
         """
         for connection in self.network.connections:
             first = self._screen_position(connection.hub1)
@@ -286,7 +332,12 @@ class Lancer:
                 self.screen.blit(marker, marker_rect)
 
     def draw(self) -> None:
-        """_summary_
+        """Renders a full simulation frame: background, hubs, and drones.
+
+        Clears the screen, draws the background, the connections between
+        hubs, every platform, then every drone at its interpolated
+        position for `self.simulation_time`, and finally flips the
+        display.
         """
         self.screen.fill((0, 0, 0))
         self.draw_background()
@@ -312,6 +363,18 @@ class Lancer:
 
 
     def draw_text_shadow(self, font: pygame.font.Font, message: str, screen_: pygame.Surface, width: int, height: int):
+        """Draws text with a drop shadow for readability.
+
+        Renders `message` twice: once offset in a dark shadow color,
+        then once on top in the main color, at (width, height).
+
+        Args:
+            font (pygame.font.Font): Font used to render the text.
+            message (str): Text to draw.
+            screen_ (pygame.Surface): Surface to draw the text onto.
+            width (int): X position of the main (non-shadow) text.
+            height (int): Y position of the main (non-shadow) text.
+        """
         blue_cyan = (0, 200, 200)
         shadow = (54, 51, 46)
         msg = font.render(message, True, blue_cyan)
@@ -322,7 +385,15 @@ class Lancer:
 
 
     def draw_menu(self, screen_menu: pygame.Surface):
+        """Draws the info panel shown on the main menu screen.
 
+        Displays the map filename, number of drones, start/end hub
+        names, hub count, and total turn count, each with a drop shadow.
+
+        Args:
+            screen_menu (pygame.Surface): Surface (the menu screen) to
+                draw the info panel.
+        """
         font = pygame.font.SysFont("Arial", 24, bold=True)
         self.draw_text_shadow(font, "[INFO]", screen_menu, 240, 30)
         self.draw_text_shadow(font, f"Map: {self.filename}", screen_menu, 35, 90)
@@ -332,41 +403,16 @@ class Lancer:
         self.draw_text_shadow(font, f"Number of hubs:   {len(self.network.hubs)}", screen_menu, 35, 230)
         self.draw_text_shadow(font, f"Turn:   {self.turn}", screen_menu, 35, 265)
 
-        # self.draw_text_shadow(font, f"Turn: {self.turn}", screen_menu, 35, 265)
-        # NOIR = (10, 10, 30)
-        # BLANC = (255, 255, 255)
-        # ROSE_NEON = (255, 20, 147)
-
-        # # name = self.filename.split("/")
-        # # # print(name)
-        # # if len(name) == 3:
-
-        # msg_info = "INFO"
-        # path_message = f"Map: {self.filename}"
-        # # w = int(path_file.get_width()*10)
-        # # print(w)
-        # # h = int(path_file.get_height() * 10)
-        # # print(h)
-
-        # # f = pygame.transform.scale(path_file, (w, h))
-        # # rect = path_file.get_rect(midtop=(rect.centerx,
-        # #                     self.rect.bottom + int(10)
-        # #                     ))
-
-        # path_file = font.render(path_message, True, (0,0,0))
-        # surface_ombre = font.render(path_message, True, (BLEU_CYAN))
-        # # rect_ombre = surface_ombre.get_rect(1, 201)
-
-
-        # screen_menu.blit(surface_ombre, (width, height))
-        # screen_menu.blit(path_file, (width-1, height-1))
-
 
     def menu_window(self) -> str:
-        """_summary_
+        """Runs the main menu loop until the user picks an action.
+
+        Displays the menu background, the info panel, and Start/Exit
+        buttons, and reacts to quit events, Escape, and button clicks.
 
         Returns:
-            str: _description_
+            str: "jouer" if the user clicked Start, "quitter" if they
+            quit the window, pressed Escape, or clicked Exit.
         """
         w_fenetre = 1920//2
         h_fenetre = 1080//2
@@ -416,7 +462,14 @@ class Lancer:
         return action
 
     def run(self) -> None:
-        """_summary_
+        """Shows the menu, then runs the simulation's main loop.
+
+        If the menu is dismissed without choosing "jouer" (play), exits
+        immediately after shutting down pygame. Otherwise, reopens the
+        simulation window and loops: handling input (quit, Escape,
+        Space to pause, +/- on the numpad to zoom), advancing simulation
+        time while unpaused, updating the camera, and drawing each
+        frame, until the window is closed.
         """
         action = self.menu_window()
         if action != "jouer":
