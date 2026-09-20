@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 11:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/19 14:03:23 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/20 15:00:00 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -18,21 +18,22 @@ from render_camera import Camera
 
 
 class Drone(pygame.sprite.Sprite):
-    """_summary_
-
-    Args:
-        pygame (_type_): _description_
+    """An animated drone sprite, rendered either on a platform or in flight.
     """
     def __init__(
         self,
         sprite: pygame.Surface,
         forward_sprite: pygame.Surface | None = None,
     ) -> None:
-        """_summary_
+        """Initializes the drone and slices its spritesheet into frames.
 
         Args:
-            sprite (pygame.Surface): _description_
-            forward_sprite (pygame.Surface | None, optional): _description_. Defaults to None.
+            sprite (pygame.Surface): Default spritesheet used for the
+                drone's animation frames.
+            forward_sprite (pygame.Surface | None, optional): Spritesheet
+                used instead of `sprite` when the drone is moving forward
+                (e.g. a distinct "in flight" animation). Defaults to
+                None, in which case `sprite` is used for both.
         """
         self.sprite = sprite
 
@@ -64,10 +65,17 @@ class Drone(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
     def update(self, speed_multiplier: float = 1.0) -> None:
-        """_summary_
+        """Advances the drone's animation frame and horizontal position.
+
+        Frame advancement is time-based: a new frame is shown roughly
+        every `self.speed / speed_multiplier` milliseconds, looping back
+        to the first frame after the last one.
 
         Args:
-            speed_multiplier (float, optional): _description_. Defaults to 1.0.
+            speed_multiplier (float, optional): Factor controlling how
+                fast the animation plays; higher values shorten the
+                delay between frames. Values at or below 0 leave the
+                drone unchanged (no-op). Defaults to 1.0.
         """
         if speed_multiplier <= 0:
             return
@@ -91,12 +99,17 @@ class Drone(pygame.sprite.Sprite):
         platform: Platform | None,
         camera: Camera
     ) -> None:
-        """_summary_
+        """Draws the drone on screen, scaled by the camera's zoom.
+
+        If `platform` is given, the drone is anchored just above the
+        platform's top-center. Otherwise, it is drawn at its own `x`
+        position and current vertical center.
 
         Args:
-            screen (pygame.Surface): _description_
-            platform (Platform | None): _description_
-            camera (Camera): _description_
+            screen (pygame.Surface): Surface to draw the drone onto.
+            platform (Platform | None): The hub/platform to anchor the
+                drone to, or None to use the drone's own position.
+            camera (Camera): Camera providing the current zoom factor.
         """
         if platform is not None:
             x = platform.rect.centerx
@@ -118,12 +131,18 @@ class Drone(pygame.sprite.Sprite):
         position: tuple[int, int],
         camera: Camera,
     ) -> None:
-        """_summary_
+        """Draws the drone at an explicit screen position, zoom-scaled.
+
+        Used to place the drone along a path (e.g. mid-flight between
+        two hubs) rather than anchored to a platform. The drone is
+        offset slightly upward from `position` so it appears to hover
+        above it.
 
         Args:
-            screen (pygame.Surface): _description_
-            position (tuple[int, int]): _description_
-            camera (Camera): _description_
+            screen (pygame.Surface): Surface to draw the drone onto.
+            position (tuple[int, int]): Target (x, y) screen position to
+                center the drone above.
+            camera (Camera): Camera providing the current zoom factor.
         """
         width = int(self.image.get_width() * camera.zoom)
         height = int(self.image.get_height() * camera.zoom)

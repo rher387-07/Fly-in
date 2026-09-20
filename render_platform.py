@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 12:09:02 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/19 14:03:37 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/20 15:04:57 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -18,10 +18,7 @@ from render_camera import Camera
 
 
 class Platform(pygame.sprite.Sprite):
-    """_summary_
-
-    Args:
-        pygame (_type_): _description_
+    """A hub sprite, rendered as a platform with its name label.
     """
     def __init__(
         self,
@@ -29,15 +26,18 @@ class Platform(pygame.sprite.Sprite):
         image: pygame.Surface,
         network: Network
     ) -> None:
-        """_summary_
+        """Initializes the platform sprite for a given hub.
 
         Args:
-            hub (Hub): _description_
-            image (pygame.Surface): _description_
-            network (Network): _description_
+            hub (Hub): The hub this platform represents.
+            image (pygame.Surface): Base image used to render the
+                platform.
+            network (Network): The network the hub belongs to; used to
+                identify whether this hub is the start or end hub.
 
         Raises:
-            ValueError: _description_
+            ValueError: If `network` does not define both a `start_hub`
+                and an `end_hub`.
         """
         super().__init__()
         self.network = network
@@ -61,50 +61,16 @@ class Platform(pygame.sprite.Sprite):
         self.debut = time.time()
         self.paused = False
 
-    # def check_capacity(self, flag: bool) -> None:
-    #     """_summary_
-
-    #     Args:
-    #         flag (bool): _description_
-    #     """
-    #     amount = 100 / self.hub.max_drones
-    #     if flag is True:
-    #         self.bar -= amount
-    #         # return 1
-    #     elif flag is False:
-    #         self.bar += amount
-    #         # return -1
-
-    # def update_bar_max_drone(
-    #     self, surface: pygame.Surface, zoom: float
-    # ) -> None:
-    #     """_summary_
-
-    #     Args:
-    #         surface (pygame.Surface): _description_
-    #         zoom (float): _description_
-    #     """
-    #     bar_color = pygame.Color("green")
-    #     bg_bar_color = pygame.Color("grey")
-
-    #     bar_w = self.max_bar * zoom
-    #     bar_h = 5 * zoom
-    #     offset_x = 50 * zoom
-
-    #     x = self.rect.centerx - offset_x
-    #     y = self.rect.top + 42 * zoom
-
-    #     bg_rect = pygame.Rect(x, y, bar_w, bar_h)
-    #     bar_rect = pygame.Rect(x, y, self.bar * zoom, bar_h)
-
-    #     pygame.draw.rect(surface, bg_bar_color, bg_rect)
-    #     pygame.draw.rect(surface, bar_color, bar_rect)
 
     def _get_color_random(self) -> tuple[int, int, int]:
-        """_summary_
+        """Generates a smoothly cycling RGB color based on elapsed time.
+
+        Used for hubs with `zone_type` (or color) "rainbow", so their
+        label color shifts continuously over time.
 
         Returns:
-            tuple[int, int, int]: _description_
+            tuple[int, int, int]: An (r, g, b) color, each channel in
+            the 0-255 range.
         """
         from math import sin
         now = time.time()
@@ -123,18 +89,27 @@ class Platform(pygame.sprite.Sprite):
         offset_y: int,
         camera: Camera
     ) -> None:
-        """_summary_
+        """Draws the platform and its hub name label on screen.
+
+        Converts the hub's grid coordinates to screen coordinates using
+        the given spacing/offset and the camera's pan and zoom, then
+        renders the platform image followed by the hub's name (colored
+        according to `hub.color`, or cycling if "rainbow") just below it.
 
         Args:
-            screen (pygame.Surface): _description_
-            space_x (int): _description_
-            space_y (int): _description_
-            offset_x (int): _description_
-            offset_y (int): _description_
-            camera (Camera): _description_
+            screen (pygame.Surface): Surface to draw the platform onto.
+            space_x (int): Horizontal pixel spacing between grid units.
+            space_y (int): Vertical pixel spacing between grid units.
+            offset_x (int): Horizontal pixel offset applied before
+                scaling by `space_x`.
+            offset_y (int): Vertical pixel offset applied before scaling
+                by `space_y`.
+            camera (Camera): Camera providing the current pan offset and
+                zoom factor.
 
         Raises:
-            ValueError: _description_
+            ValueError: If `hub.color` is not a valid color name or
+                value recognized by `pygame.Color`.
         """
 
         window_x = offset_x + self.x * space_x
@@ -151,7 +126,6 @@ class Platform(pygame.sprite.Sprite):
 
         screen.blit(image, self.rect)
 
-        # print(self.hub.color)
         color_hub: pygame.Color | tuple[int, int, int]
         try:
             if self.hub.color == "rainbow":
@@ -169,18 +143,9 @@ class Platform(pygame.sprite.Sprite):
         h_name_hub = int(name_hub.get_height() * camera.zoom)
 
         name_hub = pygame.transform.scale(name_hub, (w_name_hub, h_name_hub))
-        # if self.hub.name == self.start_name or self.hub.name == self.end_name:
-        #     d = 10
-        # else:
-        #     d = 25
         name_hub_rect = name_hub.get_rect(
             midtop=(self.rect.centerx,
                     self.rect.bottom + int(10 * camera.zoom)
                     )
         )
         screen.blit(name_hub, name_hub_rect)
-
-        # if getattr(self, "paused", False):
-        #     platform = pygame.Surface((width, height), pygame.SRCALPHA)
-        #     platform.fill((255, 255, 0, 90))
-        #     screen.blit(platform, self.rect.topleft)

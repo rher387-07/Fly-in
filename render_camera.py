@@ -2,12 +2,12 @@
 # ########################################################################### #
 #   shebang: 1                                                                #
 #                                                          :::      ::::::::  #
-#   camera.py                                            :+:      :+:    :+:  #
+#   render_camera.py                                     :+:      :+:    :+:  #
 #                                                      +:+ +:+         +:+    #
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 11:33:09 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/17 14:12:19 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/20 14:55:29 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -15,14 +15,27 @@ import pygame
 
 
 class Camera:
-    """_summary_
+    """A 2D camera handling panning and zooming for the rendered view.
+
+    Attributes:
+        width (int): Width of the viewport, in pixels.
+        height (int): Height of the viewport, in pixels.
+        x (int): Camera's horizontal offset (panning position).
+        y (int): Camera's vertical offset (panning position).
+        speed (int): Number of pixels the camera moves per `update` call
+            when a directional key is held.
+        zoom (float): Current zoom factor.
+        zoom_step (float): Amount added to or subtracted from `zoom` by
+            `zoom_in`/`zoom_out`.
+        zoom_min (float): Minimum allowed zoom factor.
+        zoom_max (float): Maximum allowed zoom factor.
     """
     def __init__(self, width: int, height: int) -> None:
-        """_summary_
+        """Initializes the camera.
 
         Args:
-            width (int): _description_
-            height (int): _description_
+            width (int): Width of the viewport, in pixels.
+            height (int): Height of the viewport, in pixels.
         """
         self.width = width
         self.height = height
@@ -36,7 +49,11 @@ class Camera:
         self.zoom_max = 2.0
 
     def update(self) -> None:
-        """_summary_
+        """Moves the camera based on currently pressed directional keys.
+
+        Reads the keyboard state and pans the camera (arrow keys or
+        numpad 2/4/6/8) at `self.speed` pixels per call. Intended to be
+        called once per frame.
         """
         key = pygame.key.get_pressed()
 
@@ -53,23 +70,27 @@ class Camera:
             self.y += self.speed
 
     def zoom_in(self) -> None:
-        """_summary_
+        """Increases the zoom factor by `zoom_step`, capped at `zoom_max`.
         """
         self.zoom = min(self.zoom + self.zoom_step, self.zoom_max)
 
     def zoom_out(self) -> None:
-        """_summary_
+        """Decreases the zoom factor by `zoom_step`, floored at `zoom_min`.
         """
         self.zoom = max(self.zoom - self.zoom_step, self.zoom_min)
 
     def apply(self, x: int, y: int) -> tuple[float, float]:
-        """_summary_
+        """Converts world coordinates to screen coordinates.
+
+        Applies the camera's current pan offset and zoom factor to a
+        point in world space.
 
         Args:
-            x (int): _description_
-            y (int): _description_
+            x (int): X coordinate in world space.
+            y (int): Y coordinate in world space.
 
         Returns:
-            tuple[float, float]: _description_
+            tuple[float, float]: The corresponding (x, y) coordinates in
+            screen space.
         """
         return ((x - self.x) * self.zoom, (y - self.y) * self.zoom)
