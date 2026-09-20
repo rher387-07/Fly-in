@@ -6,7 +6,7 @@
 #    By: hery-rak <hery-rak@student.42antananari    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/09/15 09:13:09 by hery-rak          #+#    #+#              #
-#    Updated: 2026/09/19 14:39:28 by hery-rak         ###   ########.fr        #
+#    Updated: 2026/09/20 10:39:37 by hery-rak         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,9 +29,6 @@ FLAG_MYPY = --warn-return-any --warn-unused-ignores --ignore-missing-imports --d
 FIND = find .
 
 BOLD_ITALIC = \033[1;3m
-
-# BG_RED = \033[41m
-# BG_GREEN = \033[42m
 
 CLR_BLUE = \033[34m
 CLR_RED = \033[31m
