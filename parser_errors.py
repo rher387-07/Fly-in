@@ -2,31 +2,30 @@
 # ########################################################################### #
 #   shebang: 1                                                                #
 #                                                          :::      ::::::::  #
-#   errors.py                                            :+:      :+:    :+:  #
+#   parser_errors.py                                     :+:      :+:    :+:  #
 #                                                      +:+ +:+         +:+    #
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:35:49 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/15 11:48:43 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/20 10:52:59 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
 
 class ParseError(Exception):
-    """Raise"""
+    """Triggered primarily when a parsing error occurs."""
 
 
 class DotenvError(Exception):
-    """Raise"""
+    """Triggered primarily when a dotenv error occurs."""
 
 
 class GraphError(Exception):
-    """Raise"""
+    """Triggered primarily when a graph error occurs."""
 
 
 class BlockedZone(Exception):
-    """Raise"""
+    """Triggered primarily by a zone error or a blockage."""
 
 class RenderError(Exception):
-    """Raise"""
-# class
+    """Triggered primarily by a render flag error."""
