@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:26 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/20 23:51:13 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/21 15:30:12 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -19,18 +19,7 @@ from sys import maxsize
 import time
 
 GREEN = "\033[42m"
-RESET_CLR = "\033[0m"
-
-# @dataclass
-# class DroneState:
-#     """Tracks a single drone's assigned identifier and route.
-
-#     Attributes:
-#         id: The drone's display identifier (e.g. "D1").
-#         path: Ordered list of hub names the drone travels through.
-#     """
-#     id: str
-#     path: list[str]
+RST_CLR = "\033[0m"
 
 
 class Simulation:
@@ -65,6 +54,7 @@ class Simulation:
         self.network = network
         if network.end_hub is None:
             raise RuntimeError("network has no end_hub")
+
         self.end_name = network.end_hub.name
         self.all_path: Optional[list[tuple[float, list[str]]]] = None
         if isinstance(graph_or_paths, Graph):
@@ -73,15 +63,15 @@ class Simulation:
             self.all_path = graph_or_paths
             self.graph = Graph()
             hubs = list(network.hubs.values())
+
             for connection in network.connections:
                 first_blocked = (
-                    network.hubs[connection.hub1].zone_type == "blocked"
-                )
+                    network.hubs[connection.hub1].zone_type == "blocked")
                 second_blocked = (
-                    network.hubs[connection.hub2].zone_type == "blocked"
-                )
+                    network.hubs[connection.hub2].zone_type == "blocked")
                 if first_blocked or second_blocked:
                     continue
+
                 self.graph.add_summit(connection.hub1, connection.hub2, hubs)
                 self.graph.add_summit(connection.hub2, connection.hub1, hubs)
 
@@ -90,8 +80,10 @@ class Simulation:
         self.drones: list[DroneState] = []
         self.route_order: list[int] = []
         self.scheduled_routes: list[
-            tuple[list[str], list[tuple[str, str, int, int]]]
-        ] = []
+            tuple[list[str],
+                  list[tuple[str, str, int, int]]
+                  ]
+            ] = []
         self._last_movements: list[tuple[str, str, int, int]] = []
 
     def _edge_capacity(self, first: str, second: str) -> int:
@@ -108,6 +100,7 @@ class Simulation:
         for connection in self.network.connections:
             if {connection.hub1, connection.hub2} == {first, second}:
                 return connection.max_capacity
+
         return 0
 
     def _travel_time(self, destination: str) -> int:
@@ -122,6 +115,7 @@ class Simulation:
         """
         if self.network.hubs[destination].zone_type == "restricted":
             return 2
+
         return 1
 
     def _can_schedule(
@@ -149,14 +143,16 @@ class Simulation:
         edge_times = self.edge_reservations.get((first, second), {})
         edge_is_full = any(
             edge_times.get(turn, 0) >= edge_capacity
-            for turn in range(departure, arrival)
-        )
+            for turn in range(departure, arrival))
+
         if edge_is_full:
             return False
         if second == self.end_name:
             return True
+
         capacity = self.network.hubs[second].max_drones
         reserved = self.node_reservations.get(second, {}).get(arrival, 0)
+
         return reserved < capacity
 
     def _reserve(
@@ -178,6 +174,7 @@ class Simulation:
             arrival (int): Turn the leg arrives at `second`.
         """
         edge_times = self.edge_reservations.setdefault((first, second), {})
+
         for turn in range(departure, arrival):
             edge_times[turn] = edge_times.get(turn, 0) + 1
 
@@ -202,13 +199,13 @@ class Simulation:
         for index, (_, second, _, arrival) in enumerate(movements):
             if second == self.end_name:
                 continue
+
             next_departure = (
                 movements[index + 1][2]
-                if index + 1 < len(movements)
-                else max_turns + 1
-            )
+                if index + 1 < len(movements) else max_turns + 1)
             node_times = self.node_reservations.setdefault(second, {})
             end_turn = max(next_departure, arrival + 1)
+
             for turn in range(arrival, end_turn):
                 node_times[turn] = node_times.get(turn, 0) + 1
 
@@ -255,13 +252,16 @@ class Simulation:
                 else:
                     valid = False
                     break
+
                 arrival = target
                 movements.append((first, second, departure, target))
 
             if not valid or arrival > max_turns:
                 continue
+
             for first, second, departure, target in movements:
                 self._reserve(first, second, departure, target)
+
             self._reserve_node_occupancy(movements, max_turns)
             self._last_movements = movements
             events: dict[int, list[str]] = {}
@@ -269,13 +269,15 @@ class Simulation:
             for first, second, departure, target in movements:
                 if target - departure == 2:
                     events.setdefault(departure + 1, []).append(
-                        f"{first}-{second}"
-                    )
+                        f"{first}-{second}")
                 events.setdefault(target, []).append(second)
             return events
+
         return None
 
-    def run_from_all_path(self, max_steps: int = maxsize) -> dict[int, list[str]]:
+    def run_from_all_path(self,
+                          max_steps: int = maxsize
+                          ) -> dict[int, list[str]]:
         """Schedules every drone and builds the full simulation event log.
 
         Assigns each drone's route dynamically, one drone at a time: for
@@ -338,9 +340,10 @@ class Simulation:
                 events[turn].extend(
                     f"{drone_id}-{destination}" for destination in destinations
                 )
+
         return events
 
-    def render_terminal(self, events):
+    def render_terminal(self, events: dict[int, list[str]]) -> None:
         """Prints the simulation's events to the terminal, turn by turn.
 
         Each event is colored according to the `color` of the hub it
@@ -354,15 +357,19 @@ class Simulation:
                 list of event strings occurring at that turn, as
                 returned by `run_from_all_path`.
         """
+        color_t = "\033[90m"
+        color_max_t = "\033[34m"
+        reset = "\033[0m"
+        print()
+
         for turn in sorted(events):
             colored_events = [
-                self._colorize_event(event) for event in events[turn]
-            ]
-            print(f"{' '.join(colored_events)}")
+                self._color_event(event) for event in events[turn]]
+            print(f"{color_t}Turn {turn}: {reset}{' '.join(colored_events)}")
         if events:
-            print(f"Max turn: {max(events)}\n")
+            print(f"\n{color_max_t}Max turn: {max(events)}{reset}\n")
 
-    def _colorize_event(self, event: str) -> str:
+    def _color_event(self, event: str) -> str:
         """Colors only the destination part of an event, by its hub's color.
 
         An event is formatted as "{drone_id}-{destination}", where
@@ -382,15 +389,18 @@ class Simulation:
             unchanged). Returned unchanged if the event cannot be
             parsed or its hub has no color set.
         """
-        drone_id, separator, destination = event.partition("-")
-        if not destination:
+        d_id, sep, dest = event.partition("-")
+        if not dest:
             return event
-        hub_name = destination.rsplit("-", 1)[-1]
+
+        hub_name = dest.rsplit("-", 1)[-1]
         hub = self.network.hubs.get(hub_name)
         color_code = self._ansi_color(hub.color if hub else None)
+        color_drone = "\033[37m"
         if not color_code:
             return event
-        return f"{drone_id}{separator}{color_code}{destination}{RESET_CLR}"
+
+        return f"{color_drone}{d_id}{RST_CLR}{sep}{color_code}{dest}{RST_CLR}"
 
     def _ansi_color(self, color_name: str | None) -> str:
         """Converts a hub color name to a 24-bit ANSI foreground escape code.
@@ -410,6 +420,7 @@ class Simulation:
         """
         if not color_name:
             return ""
+
         if color_name == "rainbow":
             from math import sin
             now = time.time()
@@ -417,10 +428,13 @@ class Simulation:
             g = int(sin(now + 2) * 127 + 128)
             b = int(sin(now + 4) * 127 + 128)
             return f"\033[38;2;{r};{g};{b}m"
+
         try:
-            import webcolors  # type: ignore
+            from importlib import import_module
+            webcolors = import_module("webcolors")
             r, g, b = webcolors.name_to_rgb(color_name)
             return f"\033[38;2;{r};{g};{b}m"
+
         except (ImportError, ValueError):
             return ""
 
@@ -445,58 +459,37 @@ class Simulation:
             max_steps (int): Maximum number of turns the drone may take.
 
         Returns:
-            Optional[tuple[int, list[tuple[str, str, int, int]], dict[int, list[str]]]]:
+            Optional[tuple[int,
+                           list[tuple[str, str, int, int]],
+                           dict[int, list[str]]]]:
             A (path_index, movements, events) tuple for the best
             feasible candidate, or None if no candidate path can be
             scheduled within `max_steps` given the current reservations.
         """
         best: Optional[
-            tuple[int, int, list[tuple[str, str, int, int]], dict[int, list[str]]]
-        ] = None  # (finish, path_index, movements, events)
+            tuple[int, int,
+                  list[tuple[str, str, int, int]], dict[int, list[str]]]
+        ] = None
 
         for index, path in enumerate(paths):
-            trial = Simulation(self.network, self.graph)
-            trial.node_reservations = {
-                key: dict(value) for key, value in self.node_reservations.items()
-            }
-            trial.edge_reservations = {
-                key: dict(value) for key, value in self.edge_reservations.items()
-            }
+            process = Simulation(self.network, self.graph)
+            process.node_reservations = {
+                k: dict(value) for k, value in self.node_reservations.items()}
 
-            scheduled = trial._schedule_path(path, 0, max_steps)
+            process.edge_reservations = {
+                k: dict(value) for k, value in self.edge_reservations.items()}
+
+            scheduled = process._schedule_path(path, 0, max_steps)
             if scheduled is None:
                 continue
 
             finish = max(scheduled)
             if best is None or finish < best[0]:
-                best = (finish, index, trial._last_movements, scheduled)
+                best = (finish, index, process._last_movements, scheduled)
 
         if best is None:
             return None
+
         _, index, movements, scheduled = best
+
         return index, movements, scheduled
-    
-    
-    def render_capacity_terminal(self) -> None:
-        if not self.node_reservations:
-            return
-
-        all_turns = sorted(
-            {
-                turn
-                for occupancy in self.node_reservations.values()
-                for turn in occupancy
-            }
-        )
-
-        for turn in all_turns:
-            entries = []
-            for hub_name, occupancy in self.node_reservations.items():
-                count = occupancy.get(turn, 0)
-                if count <= 0:
-                    continue
-                entries.append(f'{hub_name}-{count}')
-            if entries:
-                print(" ".join(entries))
-
-        print(f"Max turn: {all_turns[-1]}\n")

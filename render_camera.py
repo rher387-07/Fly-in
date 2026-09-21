@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 11:33:09 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/20 14:55:29 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/21 15:35:59 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -79,7 +79,7 @@ class Camera:
         """
         self.zoom = max(self.zoom - self.zoom_step, self.zoom_min)
 
-    def apply(self, x: int, y: int) -> tuple[float, float]:
+    def apply(self, x: float, y: float) -> tuple[float, float]:
         """Converts world coordinates to screen coordinates.
 
         Applies the camera's current pan offset and zoom factor to a

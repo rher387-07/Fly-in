@@ -7,25 +7,42 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:35:49 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/20 10:52:59 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/21 16:25:40 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
+class Error(Exception):
+    def __init__(self, msg: str):
+        super().__init__(msg)
+        ERROR_CLR = '\033[31m'
+        error = """
+░▒▓████████▓▒░▒▓███████▓▒░░▒▓███████▓▒░ ░▒▓██████▓▒░░▒▓███████▓▒░
+░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░
+░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░
+░▒▓██████▓▒░ ░▒▓███████▓▒░░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓███████▓▒░
+░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░
+░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░
+░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░
 
-class ParseError(Exception):
+"""
+        print(f"{ERROR_CLR}{error}")
+
+
+class ParseError(Error):
     """Triggered primarily when a parsing error occurs."""
 
 
-class DotenvError(Exception):
+class DotenvError(Error):
     """Triggered primarily when a dotenv error occurs."""
 
 
-class GraphError(Exception):
+class GraphError(Error):
     """Triggered primarily when a graph error occurs."""
 
 
-class BlockedZone(Exception):
+class BlockedZone(Error):
     """Triggered primarily by a zone error or a blockage."""
 
-class RenderError(Exception):
+
+class RenderError(Error):
     """Triggered primarily by a render flag error."""

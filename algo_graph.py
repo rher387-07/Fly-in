@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/19 12:46:42 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/20 14:28:38 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/21 15:28:38 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -46,7 +46,6 @@ class Graph:
                 case an empty graph is created.
         """
         self.graph = graph if graph is not None else {}
-        self.shortest_paths: list = []
 
     def add_summit(self, node1: str, node2: str, hub_: list[Hub]) -> None:
         """Adds a directed edge between two nodes, weighted by zone type.
@@ -102,7 +101,8 @@ class Graph:
         self,
         start: str,
         end: str,
-        ign_summit: set | None = None, ign_seq: set | None = None
+        ign_summit: set[str] | None = None,
+        ign_seq: set[tuple[str, str]] | None = None
     ) -> tuple[float, list[str]]:
         """Computes the shortest path between two nodes.
 
@@ -134,7 +134,7 @@ class Graph:
         distances: dict[str, float] = {start: 0}
         queue: list[tuple[float, str, list[str]]] = [(0, start, [start])]
         heapify(queue)
-        visited: set = set()
+        visited: set[str] = set()
 
         while queue:
             dist, current, path = heappop(queue)
@@ -193,7 +193,7 @@ class Graph:
             paths. Also stored on `self.shortest_paths`. Returns an empty
             list if no path exists between `source` and `destination`.
         """
-        self.shortest_paths = []
+        self.shortest_paths: list[tuple[float, list[str]]] = []
 
         dist, path = self.dijkstra(source, destination)
         if not path:
@@ -214,9 +214,9 @@ class Graph:
                 ignored_summit = set(accumulate[:-1])
 
                 _, alternative_path = self.dijkstra(alternative_summit,
-                                                           destination,
-                                                           ignored_summit,
-                                                           sequence_ignore)
+                                                    destination,
+                                                    ignored_summit,
+                                                    sequence_ignore)
                 if alternative_path:
                     total_path = accumulate[:-1] + alternative_path
                     total_dist = self.sum_distance_path(total_path)

@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:36:00 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/20 15:31:34 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/21 15:38:33 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -34,6 +34,7 @@ class Hub:
     color: str | None = None
     max_drones: int = 1
 
+
 @dataclass
 class Connection:
     """Represents a bidirectional or unidirectional link between two hubs.
@@ -51,7 +52,8 @@ class Connection:
 
 @dataclass
 class Network:
-    """Manages the entire network topology, including hubs, links, and the number of drones.
+    """Manages the entire network topology, including hubs,
+    links, and the number of drones.
 
     Attributes:
         nb_drones: Total number of drones.
@@ -85,6 +87,7 @@ class Drone:
     next_hub: Hub
     path_index: int = 0
     position_path: int = 0
+
 
 @dataclass
 class DroneState:

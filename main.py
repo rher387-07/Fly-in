@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/20 23:51:32 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/21 17:39:13 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -40,6 +40,63 @@ def main() -> None:
     WARNING_CLR = '\033[33m'
     ERROR_CLR = '\033[31m'
     RESET_CLR = '\033[0m'
+    color_ascii = "\033[32m"
+    ascii_art = """
+              ░▒▓████████▓▒░▒▓█▓▒░   ░▒▓█▓▒░░▒▓█▓▒░               \
+░▒▓█▓▒░▒▓███████▓▒░
+              ░▒▓█▓▒░      ░▒▓█▓▒░   ░▒▓█▓▒░░▒▓█▓▒░               \
+░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░
+              ░▒▓█▓▒░      ░▒▓█▓▒░   ░▒▓█▓▒░░▒▓█▓▒░               \
+░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░
+              ░▒▓██████▓▒░ ░▒▓█▓▒░    ░▒▓██████▓▒░░    ▒▓█▓▒░     \
+░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░
+              ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░                   \
+░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░
+              ░▒▓█▓▒░      ░▒▓█▓▒░      ░▒▓█▓▒░                   \
+░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░
+              ░▒▓█▓▒░      ░▒▓████████▓▒░▒▓█▓▒░                   \
+░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░
+
+
+                       ░▒▒░░░░░░░░░░░░░                      ░░░░░\
+░░░░░░░░▒▒░
+            ░░░▒▒▒▒▓▓▓▓▓▓▓▒░░░                                    \
+    ░░▒▒▓▓▓▓▓▓▓▒▒▒▒░░░
+          ░ ░░░░░░░░ ░▒▓▓▓▒                                       \
+      ░▒▓▓▓▒░ ░░░░░░░
+           ░░░░░▒▓▓▒░░▒▓▓▓▓░░                                     \
+     ░░▓▓▓▓▒░░▒▓▓▒░░░░░
+            ░░▒▒▓█▓▓▓▓▓▓▓▓▓▒░░░░                                  \
+  ░░░░▒▓▓▓▓▓▓▓█▓█▓▒▒░░
+               ▒▓▓▓▓▒▒▓▓█▓▓░                                      \
+      ░▓▓█▓▓▒▒▓▓▓▓▒
+              ░▒▓▓▓▓▓▓████▓░░                  ░░░░░░             \
+     ░░▓████▓▓▓▓▓▓▒
+              ░▓█████▓▓███▓█▓▓▓▒░░           ▒▓██████▓▒           \
+░░▒▓▓▓▓▓███▓▓█████▓░
+              ░▓▓▓▓█▓▒░▒▓▒░░▒▒▓▓█▓▓▓▒░░     ▒▓████████▓▒     ░░▒▓▓\
+██▓▓▒▒░░▒▓▒░▒▓█▓▓▓▓░
+              ░▒▓▓▓▓▒░ ░▓▒▒░░░░░░▒▒▓▓██▓▓▒░▒▒▓████████▓▒▒░▒▓▓▓█▓▓▒\
+▒░░░░░░▒▒▓░ ░▒▓▓▓▓▒░
+                ▒▓▓▒   ▒▓░    ░░░░░░░░▒▒▓▓▓██▓████████▓██▓▓▓▒░░░░░\
+░░░░    ░▓▒   ▒▓▓▒
+                ▒█▓▒   ░▒         ░░░░░░ ░░▒▓▓████████▓▓▒░░ ░░░░░░\
+         ▒░   ▒▓█▒
+                ░▓▓▒                   ░░▒░░░▓████████▓░░░▒░░     \
+              ▒▓▓░
+                ░▓▓▒                       ░░▓▓██████▓▓░░         \
+              ▒▓▓░
+                ░▓▓▒                         ▒████████▒           \
+              ▒▓▓░
+                 ▒▓▒                         ░▓▓▓▓▓▓▓▓░           \
+              ▒▓▒
+                 ░▓▓                          ▒▓▓▓▓▓▓▒            \
+              ▓▓░
+                  ░▒                           ░▒▓▒▒░             \
+              ▒░
+
+"""
+
     try:
         dotenv = import_module("dotenv")
 
@@ -48,15 +105,16 @@ def main() -> None:
 
         path = find_path_conf()
         if path == "":
-            print(f"\n{WARNING_CLR}[WARNING]: Dotenv could not find the file '.env'.{RESET_CLR}\n")
+            print(f"\n{WARNING_CLR}[WARNING]: Dotenv could not find "
+                  f"the file '.env'.{RESET_CLR}\n")
             flag_load = load()
             map = os.getenv("MAP") is not None
             if map is False and flag_load is False:
                 raise DotenvError(
                       "Error loading environment variable\n"
                       "Use 'cp .env_example .env'\n"
-                      "Or use the environment variable e.g.: MAP=<path> and RENDER=<flag>"
-                )
+                      "Or use the environment variable "
+                      "e.g.: MAP=<path> and RENDER=<flag>")
         load()
         filename = str(os.getenv("MAP"))
         render = os.getenv("RENDER")
@@ -67,33 +125,42 @@ def main() -> None:
         network = parser.parse()
 
         graph = Graph.build_graph(network)
-        paths = graph.yen(network.start_hub.name, network.end_hub.name, 20)
-        if not paths:
-            raise BlockedZone("No valid route from start_hub to end_hub")
+        if network.start_hub and network.end_hub:
+            paths = graph.yen(network.start_hub.name, network.end_hub.name, 20)
+            if not paths:
+                raise BlockedZone("No valid route from start_hub to end_hub")
 
         simulation = Simulation(network, paths)
+
         events = simulation.run_from_all_path()
+        turn = max(events)
         if render is not None:
             if render == "True" or render == "true":
+                print(f"{color_ascii}{ascii_art}{RESET_CLR}")
+
                 from render import Lancer
-                turn = max(events)
-                lancer = Lancer(network, simulation.scheduled_routes, filename, turn)
+                lancer = Lancer(network,
+                                simulation.scheduled_routes,
+                                filename,
+                                turn)
                 lancer.run()
                 simulation.render_terminal(events)
 
             elif render == "False" or render == "false":
+                print(f"{color_ascii}{ascii_art}{RESET_CLR}")
                 simulation.render_terminal(events)
-                # simulation.render_capacity_terminal()
             else:
-                print(render)
-                raise RenderError("The 'RENDER' value in the configuration (.env/environment variable) must be 'True', 'False', or entirely lowercase.")
+                raise RenderError("The 'RENDER' value in the configuration "
+                                  "(.env/environment variable) must be "
+                                  "'True', 'False', or entirely lowercase.")
         else:
+            print(f"{color_ascii}{ascii_art}{RESET_CLR}")
             simulation.render_terminal(events)
 
     except DotenvError as e:
         print(f"{ERROR_CLR}[DOTENV ERROR]: {e}{RESET_CLR}\n")
     except ParseError as e:
-        print(f"{ERROR_CLR}[PARSE ERROR]: {e}{RESET_CLR}\n")
+        print(f"[PARSE ERROR]: {e}{RESET_CLR}\n")
     except BlockedZone as e:
         print(f"{ERROR_CLR}[ZONE ERROR]: {e}{RESET_CLR}\n")
     except RenderError as e:
@@ -102,7 +169,7 @@ def main() -> None:
         print(f"{ERROR_CLR}[VALUE ERROR]: {e}{RESET_CLR}\n")
     except ImportError as e:
         print(f"{ERROR_CLR}[IMPORTATION ERROR]: {e}{RESET_CLR}\n")
-    except KeyboardInterrupt as e:
+    except KeyboardInterrupt:
         print(f"{ERROR_CLR}[PROGRAM INTERRUPTED]{RESET_CLR}\n")
     except Exception as e:
         print(f"{ERROR_CLR}[ERROR]: {e}{RESET_CLR}\n")

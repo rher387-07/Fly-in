@@ -7,13 +7,12 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 11:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/20 23:04:22 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/21 17:43:31 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
 
 import pygame
-from render_platform import Platform
 from render_camera import Camera
 
 
@@ -147,6 +146,9 @@ class Drone(pygame.sprite.Sprite):
         width = int(self.image.get_width() * camera.zoom)
         height = int(self.image.get_height() * camera.zoom)
         image = pygame.transform.scale(self.image, (width, height))
-        position_drone = (position[0], position[1] - 30*camera.zoom)
+        position_drone = (position[0], position[1] - 30 * camera.zoom)
         self.rect = image.get_rect(center=position_drone)
         screen.blit(image, self.rect)
+
+        # print(f"drone: {self.rect.x} {self.rect.y}")
+        # return (self.rect.x, self.rect.y)

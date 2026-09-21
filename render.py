@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:06 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/20 23:30:07 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/21 17:51:58 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -18,85 +18,37 @@ from render_camera import Camera
 from render_drone import Drone
 from render_platform import Platform
 
-W_FENETRE = 1000
-H_FENETRE = 620
+W_FENETRE = 1800
+H_FENETRE = 900
 
 PLATF = "asset/platform/1_Industrial_Tileset_1B.png"
 DRONE = "asset/drone/free-drones-pack-pixel-art/1 Drones/2/Forward.png"
 BACKGROUND = "asset/cloud/1.png"
-MENU_BACKGROUND = "asset/menu/fond.jpeg"
-START_BUTTON = "asset/menu/Start_Button.png"
-EXIT_BUTTON = "asset/menu/Exit_Button.png"
+
 
 MIN_SPACING_X = 200
 MIN_SPACING_Y = 200
 
 
-class BoutonImage:
-    """A clickable image button with a "hover" (mouse-over) image state.
-    """
-    def __init__(self, x, y, chemin_image, largeur, hauteur):
-        """Initializes the button and loads/scales its images.
-
-        Args:
-            x (int): X position (top-left) of the button.
-            y (int): Y position (top-left) of the button.
-            chemin_image (str): Path to the button's image file.
-            largeur (int): Width, in pixels, the normal image is scaled
-                to. The hover image is scaled to 1.5x this width.
-            hauteur (int): Height, in pixels, both images are scaled to.
-        """
-        self.image_normale = pygame.image.load(chemin_image).convert_alpha()
-        self.image_normale = pygame.transform.smoothscale(self.image_normale, (largeur, hauteur))
-        self.image_survol = pygame.transform.smoothscale(
-            self.image_normale, (int(largeur * 1.5), int(hauteur))
-        )
-        self.rect = self.image_normale.get_rect(topleft=(x, y))
-
-    def draw(self, surface):
-        """Draws the button, swapping to the hover image under the mouse.
-
-        Args:
-            surface (pygame.Surface): Surface to draw the button onto.
-        """
-        souris = pygame.mouse.get_pos()
-        if self.rect.collidepoint(souris):
-            image = self.image_survol
-            rect = image.get_rect(center=self.rect.center)
-        else:
-            image = self.image_normale
-            rect = self.rect
-        surface.blit(image, rect)
-
-    def press(self, event):
-        """Checks whether an event is a left click on this button.
-
-        Args:
-            event (pygame.event.Event): The pygame event to check.
-
-        Returns:
-            bool: True if `event` is a left mouse button-down click
-            landing inside the button's (normal, non-hover) rect, False
-            otherwise.
-        """
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            return self.rect.collidepoint(event.pos)
-        return False
-
-
 class Lancer:
-    """Runs the pygame menu and the graphical rendering of the simulation.
+    """Manages the graphical rendering of the simulation using Pygame.
 
-    Owns the pygame window, camera, sprites (platforms and drones), and
-    the main menu/game loops.
+    Handles the Pygame window, the camera,
+    the sprites (platforms and drones), as well as
+    the main loop and the game loop.
     """
-    def __init__(self, network: Network, schedules: list[tuple[list[str], list[tuple[str, str, int, int]]]], filename: str, turn: int) -> None:
+    def __init__(self,
+                 network: Network,
+                 schedules: list[tuple[list[str],
+                                       list[tuple[str, str, int, int]]]],
+                 filename: str, turn: int) -> None:
         """Initializes pygame, loads assets, and lays out the network.
 
         Args:
             network (Network): The network to render (hubs and
                 connections).
-            schedules (list[tuple[list[str], list[tuple[str, str, int, int]]]]):
+            schedules (list[tuple[list[str],
+                       list[tuple[str, str, int, int]]]]):
                 Per-drone schedules. Each entry pairs a path (list of
                 hub names) with its list of movements, where each
                 movement is (from_hub, to_hub, departure_time,
@@ -128,21 +80,18 @@ class Lancer:
         self.camera = Camera(W_FENETRE, H_FENETRE)
         self.platform_image = self.load_tile(PLATF, 0, 0, 96, 32)
         self.restricted_image = self.load_tile(PLATF, 96, 0, 32, 32)
-        self.forward_image = pygame.image.load(
-            DRONE
-        ).convert_alpha()
+        self.forward_image = pygame.image.load(DRONE).convert_alpha()
         self.background = pygame.image.load(BACKGROUND).convert()
-        self.platforms: pygame.sprite.Group = pygame.sprite.Group()
+        self.platforms: pygame.sprite.Group[
+            Platform] = pygame.sprite.Group()
         self.platforms_by_name: dict[str, Platform] = {}
-        self.drones = [
-            Drone(self.forward_image)
-            for _ in schedules
-        ]
-        self.offset_x, self.offset_y, self.spacing_x, self.spacing_y = (
-            self._layout()
-        )
+        self.drones = [Drone(self.forward_image) for _ in schedules]
+        (self.offset_x, self.offset_y,
+         self.spacing_x, self.spacing_y) = (self._layout())
         self.create_platform()
-        self.hint_font = pygame.font.SysFont("Arial", 12, bold=True)
+        self.hint_font = pygame.font.SysFont("Arial", 15, bold=True)
+
+        # self.terminus: bool
 
     def load_tile(
         self, path: str, x: int, y: int, width: int, height: int
@@ -342,18 +291,23 @@ class Lancer:
         Space to pause/resume, +/- (numpad) to zoom in/out, and the
         arrow keys (or numpad 2/4/6/8) to pan the camera.
         """
-        controls = [
-            ("Esc", "Quit"),
-            ("Space", "Pause / Resume"),
-            ("+ / -", "Zoom in / out"),
-            ("↓←→↑ / Numpad 2-4-6-8", "Move camera"),
+        all_command = "(ESC)   (SPACE)   (+ -)   (↓ ← → ↑)   (Numpad 2-4-6-8)"
+        info = [
+            # ("Esc", "Quit"),
+            # ("Space", "Pause / Resume"),
+            # ("+ / -", "Zoom in / out"),
+            # ("↓←→↑ / Numpad 2-4-6-8", "Move camera"),
+            ("Turn", f"{self.turn}"),
+            ("number of drones", f"{self.network.nb_drones}"),
+            ("map", f"{self.filename}"),
+            ("All command", f"{all_command}")
         ]
 
-        margin = 5
+        margin = 50
         panel_height = 48
         panel_width = W_FENETRE - margin * 2
         panel_x = margin
-        panel_y = H_FENETRE - panel_height - margin + 5
+        panel_y = H_FENETRE - panel_height - 10
         border_radius = 14
 
         panel = pygame.Surface((panel_width, panel_height), pygame.SRCALPHA)
@@ -367,29 +321,29 @@ class Lancer:
             panel,
             (255, 255, 255, 60),
             panel.get_rect(),
-            width=1,
+            width=2,
             border_radius=border_radius,
         )
 
-        column_width = panel_width / len(controls)
-        for index in range(1, len(controls)):
+        column_width = panel_width / len(info)
+        for index in range(1, len(info)):
             x = int(column_width * index)
             pygame.draw.line(
                 panel,
                 (255, 255, 255, 60),
                 (x, 10),
                 (x, panel_height - 10),
-                1,
+                2,
             )
 
         self.screen.blit(panel, (panel_x, panel_y))
 
-        for index, (key, action) in enumerate(controls):
+        for index, (key, action) in enumerate(info):
             column_center = panel_x + int(column_width * (index + 0.5))
 
             key_surface = self.hint_font.render(key, True, (0, 200, 200))
             key_rect = key_surface.get_rect(
-                center=(column_center, panel_y + 18)
+                center=(column_center, panel_y+13)
             )
             self.screen.blit(key_surface, key_rect)
 
@@ -397,7 +351,7 @@ class Lancer:
                 action, True, (230, 230, 230)
             )
             action_rect = action_surface.get_rect(
-                center=(column_center, panel_y + 38)
+                center=(column_center, panel_y + 35)
             )
             self.screen.blit(action_surface, action_rect)
 
@@ -421,6 +375,7 @@ class Lancer:
                 self.offset_y,
                 self.camera,
             )
+
         for drone, (_, movements) in zip(self.drones, self.schedules):
             speed = self._drone_speed(movements, self.simulation_time)
             drone.update(speed)
@@ -429,126 +384,21 @@ class Lancer:
                 self._drone_position(movements, self.simulation_time),
                 self.camera,
             )
+        # self.terminus = (cordo_plat == coordo_drone)
+
         self.draw_controls_hint()
         pygame.display.flip()
 
-
-    def draw_text_shadow(self, font: pygame.font.Font, message: str, screen_: pygame.Surface, width: int, height: int):
-        """Draws text with a drop shadow for readability.
-
-        Renders `message` twice: once offset in a dark shadow color,
-        then once on top in the main color, at (width, height).
-
-        Args:
-            font (pygame.font.Font): Font used to render the text.
-            message (str): Text to draw.
-            screen_ (pygame.Surface): Surface to draw the text onto.
-            width (int): X position of the main (non-shadow) text.
-            height (int): Y position of the main (non-shadow) text.
-        """
-        blue_cyan = (0, 200, 200)
-        shadow = (54, 51, 46)
-        msg = font.render(message, True, blue_cyan)
-        msg_shadow = font.render(message, True, shadow)
-
-        screen_.blit(msg_shadow, (width+10, height+5))
-        screen_.blit(msg, (width, height))
-
-
-    def draw_menu(self, screen_menu: pygame.Surface):
-        """Draws the info panel shown on the main menu screen.
-
-        Displays the map filename, number of drones, start/end hub
-        names, hub count, and total turn count, each with a drop shadow.
-
-        Args:
-            screen_menu (pygame.Surface): Surface (the menu screen) to
-                draw the info panel onto.
-        """
-        font = pygame.font.SysFont("Arial", 24, bold=True)
-        self.draw_text_shadow(font, "[INFO]", screen_menu, 240, 30)
-        self.draw_text_shadow(font, f"Map: {self.filename}", screen_menu, 35, 90)
-        self.draw_text_shadow(font, f"Number of drones: {self.network.nb_drones}", screen_menu, 35, 125)
-        self.draw_text_shadow(font, f"Start area:   {self.network.start_hub.name}", screen_menu, 35, 160)
-        self.draw_text_shadow(font, f"Finish area:  {self.network.end_hub.name}", screen_menu, 35,195)
-        self.draw_text_shadow(font, f"Number of hubs:   {len(self.network.hubs)}", screen_menu, 35, 230)
-        self.draw_text_shadow(font, f"Turn:   {self.turn}", screen_menu, 35, 265)
-
-
-    def menu_window(self) -> str:
-        """Runs the main menu loop until the user picks an action.
-
-        Displays the menu background, the info panel, and Start/Exit
-        buttons, and reacts to quit events, Escape, and button clicks.
-
-        Returns:
-            str: "jouer" if the user clicked Start, "quitter" if they
-            quit the window, pressed Escape, or clicked Exit.
-        """
-        w_fenetre = 1920//2
-        h_fenetre = 1080//2
-        menu_screen = pygame.display.set_mode((w_fenetre, h_fenetre))
-        pygame.display.set_caption("Menu Principal")
-
-        fond_image = pygame.image.load(MENU_BACKGROUND).convert()
-        fond_image = pygame.transform.smoothscale(fond_image, (w_fenetre, h_fenetre))
-
-        largeur_bouton = 100
-        hauteur_bouton = 50
-        espace = 25
-        marge_x = 220
-        y_depart = h_fenetre//2 + 95
-
-        bouton_start = BoutonImage(marge_x, y_depart, START_BUTTON, largeur_bouton, hauteur_bouton)
-        bouton_exit = BoutonImage(marge_x, y_depart + (hauteur_bouton + espace), EXIT_BUTTON, largeur_bouton, hauteur_bouton)
-
-
-        en_menu = True
-        action = "quitter"
-        while en_menu:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    action = "quitter"
-                    en_menu = False
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        action = "quitter"
-                        en_menu = False
-                elif bouton_start.press(event):
-                    action = "jouer"
-                    en_menu = False
-
-                elif bouton_exit.press(event):
-                    action = "quitter"
-                    en_menu = False
-
-
-            menu_screen.blit(fond_image, (0, 0))
-            self.draw_menu(menu_screen)
-            bouton_start.draw(menu_screen)
-            bouton_exit.draw(menu_screen)
-            pygame.display.flip()
-            self.clock.tick(60)
-
-        return action
+        # print(ter)
 
     def run(self) -> None:
-        """Shows the menu, then runs the simulation's main loop.
+        """executes the simulation's main loop.
 
-        If the menu is dismissed without choosing "jouer" (play), exits
-        immediately after shutting down pygame. Otherwise, reopens the
-        simulation window and loops: handling input (quit, Escape,
-        Space to pause, +/- on the numpad to zoom), advancing simulation
-        time while unpaused, updating the camera, and drawing each
-        frame, until the window is closed.
+        The simulation window opens and the loop begins: handling input
+        (Quit, Esc, Space to pause, Numpad +/- to zoom), advancing
+        simulation time (unless paused), updating the camera,
+        and rendering each frame, until the window is closed.
         """
-        action = self.menu_window()
-        if action != "jouer":
-            pygame.quit()
-            return
-
-        self.screen = pygame.display.set_mode((W_FENETRE, H_FENETRE))
-        pygame.display.set_caption("Fly-in")
 
         while self.running:
             for event in pygame.event.get():
@@ -570,4 +420,6 @@ class Lancer:
             self.camera.update()
             self.draw()
             self.clock.tick(60)
+            # if self.terminus:
+            #     self.running = False
         pygame.quit()

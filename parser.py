@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:36:11 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/20 16:17:23 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/21 17:59:16 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -23,13 +23,13 @@ VALID_ZONE_TYPES = {
     "priority",
 }
 
-VALID_METADATA_HUB = {
+VALID_MTD_HUB = {
     "zone",
     "color",
     "max_drones",
 }
 
-VALID_METADATA_CONNEC = {
+VALID_MTD_CONNEC = {
     "max_link_capacity"
 }
 
@@ -58,11 +58,13 @@ class FlyInParser:
         lines = self._read_file()
         if not lines:
             raise ParseError("The map is empty.")
+
         self._parse_nb_drones(lines[0])
         for line_number, line in lines[1:]:
             self._parse_line(line, line_number)
         self._validate_network()
         self._validate_cordo()
+
         return self.network
 
     def _read_file(self) -> list[tuple[int, str]]:
@@ -81,13 +83,14 @@ class FlyInParser:
         try:
             with open(self.filename, "r") as file:
                 result: list[tuple[int, str]] = []
+
                 for number, raw_line in enumerate(file, 1):
                     line = raw_line.split("#", 1)[0].strip()
-
                     if not line or line.startswith("#"):
                         continue
                     result.append((number, line))
                 return result
+
         except OSError as e:
             raise ParseError(
                 f"Cannot open '{self.filename}'."
@@ -115,8 +118,8 @@ class FlyInParser:
         if not line.startswith("nb_drones:"):
             raise ParseError(
                 f"Line {line_number}: "
-                "first line must be nb_drones."
-            )
+                "first line must be nb_drones.")
+
         _, value = line.split(":", 1)
         self._chech_special_character(value, line_number)
         try:
@@ -126,20 +129,25 @@ class FlyInParser:
                 f"Line {line_number}: "
                 "nb_drones must be an integer."
             ) from e
+
         if nb_drones <= 0:
             raise ParseError(
                 f"Line {line_number}: "
-                "nb_drones must be positive."
-            )
+                "nb_drones must be positive.")
+
         if nb_drones > 1500:
             warning_color = '\033[33m'
             reset_color = '\033[0m'
-            print(f"{warning_color}[WARNING] The number of drones exceeds 1500, and it takes a little time.{reset_color}\n")
+            print(
+                f"{warning_color}[WARNING] The number of drones exceeds 1500,"
+                f"and it takes a little time.{reset_color}\n")
+
             if nb_drones > 3000:
                 raise ParseError(
                     f"Line {line_number}: "
-                    "The number of drones must not exceed 3,000 to avoid memory issues and processor overload."
-                )
+                    "The number of drones must not exceed 3,000 "
+                    "to avoid memory issues and processor overload.")
+
         self.network.nb_drones = nb_drones
 
     def _chech_special_character(self, value: str, line_number: int) -> None:
@@ -160,8 +168,8 @@ class FlyInParser:
             raise ParseError(
                     f"Line {line_number}: "
                     "The number of drones must be a valid number; "
-                    f"no special character '_'. Perhaps '{int(value)}' instead of '{value}'?"
-                )
+                    f"no special character '_'. Perhaps '{int(value)}' "
+                    f"instead of '{value}'?")
 
     def _check_color_valid(self, name_color: str, line_number: int) -> None:
         """Checks that a color name is valid.
@@ -180,18 +188,18 @@ class FlyInParser:
         """
         if name_color != "rainbow":
             try:
-                ####################################3
-                import webcolors  # type: ignore
+                from importlib import import_module
+                webcolors = import_module("webcolors")
                 webcolors.name_to_hex(name_color)
             except ImportError as error:
-                raise ImportError("Webcolors module not found") from error
+                raise ImportError("module not found") from error
             except ValueError as error:
                 raise ParseError(
                     f"Line {line_number}: "
-                    "The accepted values for color are all valid single-word strings (e.g., red, blue, gray)."
+                    "Accepted color values are colors supported by Pygame"
+                    "and valid single-word strings (e.g., red, blue, gray)."
                     f"Check your '{name_color}' value."
                 ) from error
-
 
     def _parse_line(
         self,
@@ -217,33 +225,24 @@ class FlyInParser:
             self._parse_special_hub(
                 line,
                 line_number,
-                "start",
-            )
-
+                "start")
         elif line.startswith("end_hub:"):
             self._parse_special_hub(
                 line,
                 line_number,
-                "end",
-            )
-
+                "end")
         elif line.startswith("hub:"):
             self._parse_regular_hub(
                 line,
-                line_number,
-            )
-
+                line_number)
         elif line.startswith("connection:"):
             self._parse_connection(
                 line,
-                line_number,
-            )
-
+                line_number)
         else:
             raise ParseError(
                 f"Line {line_number}: "
-                f"unknown instruction '{line}'."
-            )
+                f"unknown instruction '{line}'.")
 
     def _parse_special_hub(
         self,
@@ -273,29 +272,23 @@ class FlyInParser:
         if hub.name in self.network.hubs:
             raise ParseError(
                 f"Line {line_number}: "
-                f"duplicate hub '{hub.name}'."
-            )
+                f"duplicate hub '{hub.name}'.")
 
         if name == "start":
             if self.network.start_hub is not None:
                 raise ParseError(
                     f"Line {line_number}: "
-                    "multiple start_hub definitions."
-                )
-
+                    "multiple start_hub definitions.")
             self.network.start_hub = hub
 
         else:
             if self.network.end_hub is not None:
                 raise ParseError(
                     f"Line {line_number}: "
-                    "multiple end_hub definitions."
-                )
+                    "multiple end_hub definitions.")
 
             self.network.end_hub = hub
-
         self.network.hubs[hub.name] = hub
-
 
     def _parse_regular_hub(
         self,
@@ -318,8 +311,7 @@ class FlyInParser:
         if hub.name in self.network.hubs:
             raise ParseError(
                 f"Line {line_number}: "
-                f"duplicate hub '{hub.name}'."
-            )
+                f"duplicate hub '{hub.name}'.")
 
         self.network.hubs[hub.name] = hub
 
@@ -327,7 +319,7 @@ class FlyInParser:
         self,
         line: str,
         line_number: int,
-        flag: bool=True
+        flag: bool = True
     ) -> Hub:
         """Builds a `Hub` object from a `hub:`/`start_hub:`/`end_hub:` line.
 
@@ -358,12 +350,10 @@ class FlyInParser:
 
         _, content = line.split(":", 1)
         content = content.strip()
-
         metadata = self._extract_metadata(
             content,
             "hub",
-            line_number,
-        )
+            line_number)
 
         main_content = content.split("[", 1)[0].strip()
         parts = main_content.split()
@@ -371,8 +361,7 @@ class FlyInParser:
         if len(parts) != 3:
             raise ParseError(
                 f"Line {line_number}: "
-                "hub requires name, x and y."
-            )
+                "hub requires name, x and y.")
 
         name, x_value, y_value = parts
         self._chech_special_character(x_value, line_number)
@@ -390,27 +379,21 @@ class FlyInParser:
         if "-" in name or " " in name:
             raise ParseError(
                 f"Line {line_number}: "
-                f"invalid hub name '{name}'."
-            )
+                f"invalid hub name '{name}'.")
 
-        zone_type = metadata.get(
-            "zone",
-            "normal",
-        )
-
+        zone_type = metadata.get("zone", "normal",)
         if zone_type not in VALID_ZONE_TYPES:
             raise ParseError(
                 f"Line {line_number}: "
-                f"invalid zone type '{zone_type}'."
-            )
+                f"invalid zone type '{zone_type}'.")
+
         if flag:
             max_drones = maxsize
         else:
             max_drones = self._positive_int(
                 metadata.get("max_drones", "1"),
                 "max_drones",
-                line_number,
-            )
+                line_number)
 
         color = metadata.get("color")
         if color:
@@ -422,9 +405,7 @@ class FlyInParser:
             y=y * -1,
             zone_type=zone_type,
             color=color,
-            max_drones=max_drones,
-
-        )
+            max_drones=max_drones)
 
     def _parse_connection(
         self,
@@ -453,60 +434,48 @@ class FlyInParser:
         _, content = line.split(":", 1)
         content = content.strip()
 
-        metadata = self._extract_metadata(
-            content,
-            "connect",
-            line_number
-        )
+        metadata = self._extract_metadata(content, "connect", line_number)
 
         connection_text = content.split("[", 1)[0].strip()
-
         parts = connection_text.split("-")
 
         if len(parts) != 2:
             raise ParseError(
                 f"Line {line_number}: "
-                "invalid connection format."
-            )
+                "invalid connection format.")
 
         hub1, hub2 = parts
 
         if not hub1 or not hub2:
             raise ParseError(
                 f"Line {line_number}: "
-                "connection contains an empty hub."
-            )
+                "connection contains an empty hub.")
 
         if hub1 not in self.network.hubs:
             raise ParseError(
                 f"Line {line_number}: "
-                f"unknown hub '{hub1}'."
-            )
+                f"unknown hub '{hub1}'.")
 
         if hub2 not in self.network.hubs:
             raise ParseError(
                 f"Line {line_number}: "
-                f"unknown hub '{hub2}'."
-            )
+                f"unknown hub '{hub2}'.")
 
         if hub1 == hub2:
             raise ParseError(
                 f"Line {line_number}: "
-                "a hub cannot connect to itself."
-            )
+                "a hub cannot connect to itself.")
 
         if self._connection_exists(hub1, hub2):
             raise ParseError(
                 f"Line {line_number}: "
                 f"duplicate connection "
-                f"'{hub1}-{hub2}'."
-            )
+                f"'{hub1}-{hub2}'.")
 
         capacity = self._positive_int(
             metadata.get("max_link_capacity", "1"),
             "max_link_capacity",
-            line_number,
-        )
+            line_number)
 
         self.network.connections.append(
             Connection(
@@ -553,11 +522,9 @@ class FlyInParser:
         if not content.endswith("]"):
             raise ParseError(
                 f"Line {line_number}: "
-                "invalid metadata block."
-            )
+                "invalid metadata block.")
 
         metadata_text = content.split("[", 1)[1][:-1].strip()
-
         if not metadata_text:
             return {}
 
@@ -567,19 +534,18 @@ class FlyInParser:
             if "=" not in item:
                 raise ParseError(
                     f"Line {line_number}: "
-                    f"invalid metadata '{item}'."
-                )
+                    f"invalid metadata '{item}'.")
 
             key, value = item.split("=", 1)
 
             if data == "hub":
-                if (not key or not value) or not (key in VALID_METADATA_HUB):
+                if (not key or not value) or not (key in VALID_MTD_HUB):
                     raise ParseError(
                         f"Line {line_number}: "
-                        f"invalid metadata '{item}'."
-                    )
+                        f"invalid metadata '{item}'.")
+
             elif data == "connect":
-                if (not key or not value) or not (key in VALID_METADATA_CONNEC):
+                if (not key or not value) or not (key in VALID_MTD_CONNEC):
                     raise ParseError(
                         f"Line {line_number}: "
                         f"invalid metadata '{item}'."

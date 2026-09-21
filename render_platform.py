@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 12:09:02 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/20 15:04:57 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/21 18:02:35 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -58,9 +58,10 @@ class Platform(pygame.sprite.Sprite):
 
         self.rect = self.image.get_rect()
         self.font = pygame.font.Font(None, 22)
-        self.debut = time.time()
         self.paused = False
 
+    def __str__(self) -> str:
+        return self.hub.name
 
     def _get_color_random(self) -> tuple[int, int, int]:
         """Generates a smoothly cycling RGB color based on elapsed time.
@@ -74,10 +75,9 @@ class Platform(pygame.sprite.Sprite):
         """
         from math import sin
         now = time.time()
-        degr = self.debut - now
-        r = int((sin(degr) * 127 + 127))
-        g = int(sin(degr + 2) * 127 + 127)
-        b = int(sin(degr + 4) * 127 + 127)
+        r = int((sin(now) * 127 + 127))
+        g = int(sin(now + 2) * 127 + 127)
+        b = int(sin(now + 4) * 127 + 127)
         return (r, g, b)
 
     def draw_platform(
@@ -85,8 +85,8 @@ class Platform(pygame.sprite.Sprite):
         screen: pygame.Surface,
         space_x: int,
         space_y: int,
-        offset_x: int,
-        offset_y: int,
+        offset_x: float,
+        offset_y: float,
         camera: Camera
     ) -> None:
         """Draws the platform and its hub name label on screen.
@@ -124,6 +124,9 @@ class Platform(pygame.sprite.Sprite):
 
         self.rect = image.get_rect(topleft=(screen_x, screen_y))
 
+        # ajust_x = 24
+        # ajust_y = 38
+
         screen.blit(image, self.rect)
 
         color_hub: pygame.Color | tuple[int, int, int]
@@ -149,3 +152,5 @@ class Platform(pygame.sprite.Sprite):
                     )
         )
         screen.blit(name_hub, name_hub_rect)
+
+        # return (self.rect.x + ajust_x, self.rect.y - ajust_y)
