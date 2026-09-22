@@ -1,0 +1,108 @@
+# COMPLEX LEVEL 17: THE BINARY TREE OF CHOICES
+# A perfect binary tree fanning out from start, where each split has
+# an asymmetric capacity (one branch always cheaper than the other).
+# All 16 leaves reconverge into a single narrow goal corridor.
+# Tests whether an algorithm favors the cheap branch consistently
+# without starving the tree of throughput.
+
+nb_drones: 64
+
+start_hub: start 0 0 [color=green]
+
+# === Tree depth 1 (2 nodes) ===
+hub: d1_0 2 -8 [color=blue max_drones=32]
+hub: d1_1 2 8 [color=blue max_drones=32]
+
+# === Tree depth 2 (4 nodes) ===
+hub: d2_0 4 -12 [color=blue max_drones=16]
+hub: d2_1 4 -4 [color=blue max_drones=16]
+hub: d2_2 4 4 [color=blue max_drones=16]
+hub: d2_3 4 12 [color=blue max_drones=16]
+
+# === Tree depth 3 (8 nodes) ===
+hub: d3_0 6 -14 [color=blue max_drones=8]
+hub: d3_1 6 -10 [color=blue max_drones=8]
+hub: d3_2 6 -6 [color=blue max_drones=8]
+hub: d3_3 6 -2 [color=blue max_drones=8]
+hub: d3_4 6 2 [color=blue max_drones=8]
+hub: d3_5 6 6 [color=blue max_drones=8]
+hub: d3_6 6 10 [color=blue max_drones=8]
+hub: d3_7 6 14 [color=blue max_drones=8]
+
+# === Tree depth 4 (16 nodes) ===
+hub: d4_0 8 -15 [color=blue max_drones=4]
+hub: d4_1 8 -13 [color=blue max_drones=4]
+hub: d4_2 8 -11 [color=blue max_drones=4]
+hub: d4_3 8 -9 [color=blue max_drones=4]
+hub: d4_4 8 -7 [color=blue max_drones=4]
+hub: d4_5 8 -5 [color=blue max_drones=4]
+hub: d4_6 8 -3 [color=blue max_drones=4]
+hub: d4_7 8 -1 [color=blue max_drones=4]
+hub: d4_8 8 1 [color=blue max_drones=4]
+hub: d4_9 8 3 [color=blue max_drones=4]
+hub: d4_10 8 5 [color=blue max_drones=4]
+hub: d4_11 8 7 [color=blue max_drones=4]
+hub: d4_12 8 9 [color=blue max_drones=4]
+hub: d4_13 8 11 [color=blue max_drones=4]
+hub: d4_14 8 13 [color=blue max_drones=4]
+hub: d4_15 8 15 [color=blue max_drones=4]
+
+# === Reconvergence corridor from all 16 leaves ===
+hub: merge1 10 4 [zone=priority color=gold max_drones=30]
+hub: merge2 10 -4 [zone=priority color=gold max_drones=30]
+
+hub: corridor1 12 0 [color=crimson max_drones=20]
+hub: corridor2 14 0 [color=crimson max_drones=8]
+end_hub: goal 16 0 [color=rainbow]
+
+# === CONNECTIONS ===
+connection: start-d1_0
+connection: start-d1_1
+connection: d1_0-d2_0 [max_link_capacity=10]
+connection: d1_0-d2_1 [max_link_capacity=3]
+connection: d1_1-d2_2 [max_link_capacity=10]
+connection: d1_1-d2_3 [max_link_capacity=3]
+connection: d2_0-d3_0 [max_link_capacity=5]
+connection: d2_0-d3_1 [max_link_capacity=1]
+connection: d2_1-d3_2 [max_link_capacity=5]
+connection: d2_1-d3_3 [max_link_capacity=1]
+connection: d2_2-d3_4 [max_link_capacity=5]
+connection: d2_2-d3_5 [max_link_capacity=1]
+connection: d2_3-d3_6 [max_link_capacity=5]
+connection: d2_3-d3_7 [max_link_capacity=1]
+connection: d3_0-d4_0 [max_link_capacity=2]
+connection: d3_0-d4_1 [max_link_capacity=1]
+connection: d3_1-d4_2 [max_link_capacity=2]
+connection: d3_1-d4_3 [max_link_capacity=1]
+connection: d3_2-d4_4 [max_link_capacity=2]
+connection: d3_2-d4_5 [max_link_capacity=1]
+connection: d3_3-d4_6 [max_link_capacity=2]
+connection: d3_3-d4_7 [max_link_capacity=1]
+connection: d3_4-d4_8 [max_link_capacity=2]
+connection: d3_4-d4_9 [max_link_capacity=1]
+connection: d3_5-d4_10 [max_link_capacity=2]
+connection: d3_5-d4_11 [max_link_capacity=1]
+connection: d3_6-d4_12 [max_link_capacity=2]
+connection: d3_6-d4_13 [max_link_capacity=1]
+connection: d3_7-d4_14 [max_link_capacity=2]
+connection: d3_7-d4_15 [max_link_capacity=1]
+connection: d4_0-merge1
+connection: d4_1-merge1
+connection: d4_2-merge1
+connection: d4_3-merge1
+connection: d4_4-merge1
+connection: d4_5-merge1
+connection: d4_6-merge1
+connection: d4_7-merge1
+connection: d4_8-merge2
+connection: d4_9-merge2
+connection: d4_10-merge2
+connection: d4_11-merge2
+connection: d4_12-merge2
+connection: d4_13-merge2
+connection: d4_14-merge2
+connection: d4_15-merge2
+connection: merge1-corridor1 [max_link_capacity=25]
+connection: merge2-corridor1 [max_link_capacity=25]
+connection: corridor1-corridor2 [max_link_capacity=10]
+connection: corridor2-goal [max_link_capacity=10]

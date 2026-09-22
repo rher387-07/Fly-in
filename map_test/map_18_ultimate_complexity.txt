@@ -1,0 +1,90 @@
+# SPIDERWEB OCTAGON LEVEL 21: THE CENTER OF THE WEB
+# Two concentric octagonal loops (double path) connected by a full set
+# of 8 radial spokes, like a spider web. A triangular gate sits inside
+# the web with several extra cross-links to the inner ring, creating
+# many internal intersections. The single goal sits exactly at the
+# center of the whole structure.
+
+nb_drones: 35
+
+start_hub: start 0 8 [color=green]
+
+# === Outer octagon ring (8 vertices) ===
+hub: outer1 4 2 [color=blue max_drones=6]
+hub: outer2 2 4 [color=blue max_drones=6]
+hub: outer3 -2 4 [color=blue max_drones=6]
+hub: outer4 -4 2 [color=blue max_drones=6]
+hub: outer5 -4 -2 [color=blue max_drones=6]
+hub: outer6 -2 -4 [color=blue max_drones=6]
+hub: outer7 2 -4 [color=blue max_drones=6]
+hub: outer8 4 -2 [color=blue max_drones=6]
+
+
+# === Inner octagon ring (8 vertices) ===
+hub: inner1 2 1 [zone=restricted color=orange max_drones=4]
+hub: inner2 1 2 [zone=restricted color=orange max_drones=4]
+hub: inner3 -1 2 [zone=restricted color=orange max_drones=4]
+hub: inner4 -2 1 [zone=restricted color=orange max_drones=4]
+hub: inner5 -2 -1 [zone=restricted color=orange max_drones=4]
+hub: inner6 -1 -2 [zone=restricted color=orange max_drones=4]
+hub: inner7 1 -2 [zone=restricted color=orange max_drones=4]
+hub: inner8 2 -1 [zone=restricted color=orange max_drones=4]
+
+
+# === Radial spokes (full spider-web set, outer -> inner) ===
+
+# === Diagonal web threads across the inner ring ===
+
+# === Central triangular gate ===
+hub: tri_a 0 1 [zone=priority color=gold max_drones=6]
+hub: tri_b 1 -1 [zone=priority color=gold max_drones=6]
+hub: tri_c -1 -1 [zone=priority color=gold max_drones=6]
+
+# === Web threads from inner ring into the triangle (multiple intersections) ===
+
+# === Goal at the exact center (single end_hub) ===
+end_hub: goal 0 0 [color=rainbow]
+
+# === CONNECTIONS ===
+connection: start-outer2 [max_link_capacity=5]
+connection: start-outer3 [max_link_capacity=5]
+connection: outer1-outer2 [max_link_capacity=6]
+connection: outer2-outer3 [max_link_capacity=6]
+connection: outer3-outer4 [max_link_capacity=6]
+connection: outer4-outer5 [max_link_capacity=6]
+connection: outer5-outer6 [max_link_capacity=6]
+connection: outer6-outer7 [max_link_capacity=6]
+connection: outer7-outer8 [max_link_capacity=6]
+connection: outer8-outer1 [max_link_capacity=6]
+connection: inner1-inner2 [max_link_capacity=4]
+connection: inner2-inner3 [max_link_capacity=4]
+connection: inner3-inner4 [max_link_capacity=4]
+connection: inner4-inner5 [max_link_capacity=4]
+connection: inner5-inner6 [max_link_capacity=4]
+connection: inner6-inner7 [max_link_capacity=4]
+connection: inner7-inner8 [max_link_capacity=4]
+connection: inner8-inner1 [max_link_capacity=4]
+connection: outer1-inner1 [max_link_capacity=2]
+connection: outer2-inner2 [max_link_capacity=2]
+connection: outer3-inner3 [max_link_capacity=2]
+connection: outer4-inner4 [max_link_capacity=2]
+connection: outer5-inner5 [max_link_capacity=2]
+connection: outer6-inner6 [max_link_capacity=2]
+connection: outer7-inner7 [max_link_capacity=2]
+connection: outer8-inner8 [max_link_capacity=2]
+connection: inner1-inner5 [max_link_capacity=1]
+connection: inner2-inner6 [max_link_capacity=1]
+connection: inner3-inner7 [max_link_capacity=1]
+connection: inner4-inner8 [max_link_capacity=1]
+connection: tri_a-tri_b [max_link_capacity=6]
+connection: tri_b-tri_c [max_link_capacity=6]
+connection: tri_c-tri_a [max_link_capacity=6]
+connection: inner1-tri_a [max_link_capacity=2]
+connection: inner3-tri_a [max_link_capacity=2]
+connection: inner5-tri_b [max_link_capacity=2]
+connection: inner7-tri_b [max_link_capacity=2]
+connection: inner2-tri_c [max_link_capacity=2]
+connection: inner6-tri_c [max_link_capacity=2]
+connection: tri_a-goal [max_link_capacity=6]
+connection: tri_b-goal [max_link_capacity=6]
+connection: tri_c-goal [max_link_capacity=6]

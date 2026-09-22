@@ -1,0 +1,62 @@
+# COMPLEX LEVEL 16: THE SHATTERED ARCHIPELAGO
+# Several sub-networks ('islands') are only connected to the main graph
+# through single narrow bridges. Some islands are genuine shortcuts,
+# others are traps with no bridge onward. Tests careful evaluation of
+# each island before committing drones to it.
+
+nb_drones: 70
+
+start_hub: start 0 0 [color=green]
+
+# === Mainland spine ===
+hub: main1 2 0 [color=blue max_drones=20]
+hub: main2 5 0 [color=blue max_drones=20]
+hub: main3 8 0 [color=blue max_drones=20]
+hub: main4 11 0 [color=blue max_drones=20]
+
+# === Island A: real shortcut, narrow bridges both ways ===
+hub: bridgeA_in 3 4 [color=orange max_drones=1]
+hub: islandA1 4 5 [color=teal max_drones=12]
+hub: islandA2 5 6 [color=teal max_drones=12]
+hub: bridgeA_out 6 4 [color=orange max_drones=1]
+
+# === Island B: trap, bridge in but no bridge out ===
+hub: bridgeB_in 5 -4 [color=orange max_drones=1]
+hub: islandB1 6 -5 [color=purple]
+hub: islandB2 7 -6 [color=purple]
+hub: islandB_dead 8 -5 [color=black]
+
+# === Island C: real shortcut but very costly (low capacity throughout) ===
+hub: bridgeC_in 9 4 [color=orange max_drones=1]
+hub: islandC1 10 5 [zone=restricted color=darkred max_drones=2]
+hub: bridgeC_out 11 4 [color=orange max_drones=1]
+
+# === Island D: fully isolated, unreachable from start ===
+hub: islandD1 -4 4 [color=purple]
+hub: islandD2 -5 5 [color=purple]
+
+# === Final stretch ===
+hub: final1 14 0 [color=crimson max_drones=15]
+end_hub: goal 17 0 [color=rainbow]
+
+# === CONNECTIONS ===
+connection: start-main1 [max_link_capacity=40]
+connection: main1-main2 [max_link_capacity=15]
+connection: main2-main3 [max_link_capacity=15]
+connection: main3-main4 [max_link_capacity=15]
+connection: main1-bridgeA_in [max_link_capacity=1]
+connection: bridgeA_in-islandA1
+connection: islandA1-islandA2
+connection: islandA2-bridgeA_out
+connection: bridgeA_out-main3 [max_link_capacity=1]
+connection: main2-bridgeB_in [max_link_capacity=1]
+connection: bridgeB_in-islandB1
+connection: islandB1-islandB2
+connection: islandB2-islandB_dead
+connection: main3-bridgeC_in [max_link_capacity=1]
+connection: bridgeC_in-islandC1 [max_link_capacity=2]
+connection: islandC1-bridgeC_out [max_link_capacity=2]
+connection: bridgeC_out-main4 [max_link_capacity=1]
+connection: islandD1-islandD2
+connection: main4-final1 [max_link_capacity=20]
+connection: final1-goal [max_link_capacity=20]
