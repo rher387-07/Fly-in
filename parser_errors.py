@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:35:49 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/21 16:25:40 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/22 16:37:33 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -46,3 +46,7 @@ class BlockedZone(Error):
 
 class RenderError(Error):
     """Triggered primarily by a render flag error."""
+
+
+class VelocityError(Error):
+    """"""
