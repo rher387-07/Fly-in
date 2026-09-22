@@ -1,0 +1,37 @@
+# CHAIN LEVEL: THE SINGLE THREAD
+# One long linear path with no alternate routes at all. Every hub is a
+# strict single point of failure. Tests worst-case throughput when the
+# graph offers zero flexibility.
+
+nb_drones: 30
+
+start_hub: start 0 0 [color=green]
+
+hub: link01 1 0 [color=red max_drones=2]
+hub: link02 2 0 [color=red max_drones=2]
+hub: link03 3 0 [color=red max_drones=2]
+hub: link04 4 0 [color=red max_drones=2]
+hub: link05 5 0 [color=red max_drones=2]
+hub: link06 6 0 [color=red max_drones=2]
+hub: link07 7 0 [color=red max_drones=2]
+hub: link08 8 0 [color=red max_drones=2]
+hub: link09 9 0 [color=red max_drones=2]
+hub: link10 10 0 [color=red max_drones=2]
+hub: link11 11 0 [color=red max_drones=2]
+hub: link12 12 0 [color=red max_drones=2]
+
+end_hub: goal 13 0 [color=gold]
+
+connection: start-link01 [max_link_capacity=2]
+connection: link01-link02 [max_link_capacity=2]
+connection: link02-link03 [max_link_capacity=2]
+connection: link03-link04 [max_link_capacity=2]
+connection: link04-link05 [max_link_capacity=2]
+connection: link05-link06 [max_link_capacity=2]
+connection: link06-link07 [max_link_capacity=2]
+connection: link07-link08 [max_link_capacity=2]
+connection: link08-link09 [max_link_capacity=2]
+connection: link09-link10 [max_link_capacity=2]
+connection: link10-link11 [max_link_capacity=2]
+connection: link11-link12 [max_link_capacity=2]
+connection: link12-goal [max_link_capacity=2]

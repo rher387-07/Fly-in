@@ -1,0 +1,98 @@
+# COMPLEX LEVEL 15: THE SIEGE TOWER
+# A vertical multi-floor structure: each floor is a small congested
+# cluster, and drones must climb through narrow stairwells (single
+# hubs of capacity 1) to reach the next floor. Tests strict sequential
+# throughput limits stacked many times in a row.
+
+nb_drones: 55
+
+start_hub: start 0 0 [color=green]
+
+# === Floor 1 ===
+hub: stair1 0 2 [color=red max_drones=1]
+hub: room1a 2 1 [color=blue max_drones=6]
+hub: room1b 2 2 [color=blue max_drones=6]
+hub: room1c 2 3 [color=blue max_drones=6]
+hub: landing1 4 2 [color=orange max_drones=8]
+
+# === Floor 2 ===
+hub: stair2 0 6 [color=red max_drones=1]
+hub: room2a 2 5 [color=blue max_drones=6]
+hub: room2b 2 6 [color=blue max_drones=6]
+hub: room2c 2 7 [color=blue max_drones=6]
+hub: landing2 4 6 [color=orange max_drones=8]
+
+# === Floor 3 ===
+hub: stair3 0 10 [color=red max_drones=1]
+hub: room3a 2 9 [color=blue max_drones=6]
+hub: room3b 2 10 [color=blue max_drones=6]
+hub: room3c 2 11 [color=blue max_drones=6]
+hub: landing3 4 10 [color=orange max_drones=8]
+
+# === Floor 4 ===
+hub: stair4 0 14 [color=red max_drones=1]
+hub: room4a 2 13 [color=blue max_drones=6]
+hub: room4b 2 14 [color=blue max_drones=6]
+hub: room4c 2 15 [color=blue max_drones=6]
+hub: landing4 4 14 [color=orange max_drones=8]
+
+# === Floor 5 ===
+hub: stair5 0 18 [color=red max_drones=1]
+hub: room5a 2 17 [color=blue max_drones=6]
+hub: room5b 2 18 [color=blue max_drones=6]
+hub: room5c 2 19 [color=blue max_drones=6]
+hub: landing5 4 18 [color=orange max_drones=8]
+
+# === Floor 6 ===
+hub: stair6 0 22 [color=red max_drones=1]
+hub: room6a 2 21 [color=blue max_drones=6]
+hub: room6b 2 22 [color=blue max_drones=6]
+hub: room6c 2 23 [color=blue max_drones=6]
+hub: landing6 4 22 [color=orange max_drones=8]
+
+end_hub: goal 6 22 [color=rainbow]
+
+# === CONNECTIONS ===
+connection: start-stair1 [max_link_capacity=1]
+connection: stair1-room1a
+connection: stair1-room1b
+connection: stair1-room1c
+connection: room1a-landing1
+connection: room1b-landing1
+connection: room1c-landing1
+connection: landing1-stair2 [max_link_capacity=1]
+connection: stair2-room2a
+connection: stair2-room2b
+connection: stair2-room2c
+connection: room2a-landing2
+connection: room2b-landing2
+connection: room2c-landing2
+connection: landing2-stair3 [max_link_capacity=1]
+connection: stair3-room3a
+connection: stair3-room3b
+connection: stair3-room3c
+connection: room3a-landing3
+connection: room3b-landing3
+connection: room3c-landing3
+connection: landing3-stair4 [max_link_capacity=1]
+connection: stair4-room4a
+connection: stair4-room4b
+connection: stair4-room4c
+connection: room4a-landing4
+connection: room4b-landing4
+connection: room4c-landing4
+connection: landing4-stair5 [max_link_capacity=1]
+connection: stair5-room5a
+connection: stair5-room5b
+connection: stair5-room5c
+connection: room5a-landing5
+connection: room5b-landing5
+connection: room5c-landing5
+connection: landing5-stair6 [max_link_capacity=1]
+connection: stair6-room6a
+connection: stair6-room6b
+connection: stair6-room6c
+connection: room6a-landing6
+connection: room6b-landing6
+connection: room6c-landing6
+connection: landing6-goal

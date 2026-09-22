@@ -1,0 +1,119 @@
+# COMPLEX LEVEL 11: THE FRACTAL SPRAWL
+# A large, irregular multi-layer network with asymmetric branching,
+# nested restricted zones, and several long-range bypass links.
+# Every hub (including start/end) has a unique coordinate.
+
+nb_drones: 90
+
+start_hub: start 0 0 [color=green]
+
+# === LAYER 1: Wide entry fan (9 branches, staggered y to avoid collisions) ===
+hub: l1_1 2 8 [color=blue]
+hub: l1_2 2 6 [color=blue]
+hub: l1_3 2 4 [color=blue]
+hub: l1_4 2 2 [color=blue]
+hub: l1_5 2 -2 [color=blue]
+hub: l1_6 2 -4 [color=blue]
+hub: l1_7 2 -6 [color=blue]
+hub: l1_8 2 -8 [color=blue]
+hub: l1_9 2 10 [color=blue]
+
+# === LAYER 2: Irregular merge points (uneven fan-in ratios) ===
+hub: l2_1 4 9 [zone=restricted color=purple max_drones=6]
+hub: l2_2 4 5 [zone=restricted color=purple max_drones=5]
+hub: l2_3 4 1 [zone=restricted color=purple max_drones=4]
+hub: l2_4 4 -3 [zone=restricted color=purple max_drones=5]
+hub: l2_5 4 -7 [zone=restricted color=purple max_drones=4]
+hub: l2_6 4 -11 [zone=restricted color=purple max_drones=3]
+
+# Layer1 -> Layer2 connections
+
+# === LAYER 3: Dead-end traps interleaved with real relay nodes ===
+hub: relay1 6 8 [color=orange max_drones=8]
+hub: trap1 6 6 [color=black]
+hub: relay2 6 4 [color=orange max_drones=8]
+hub: trap2 6 2 [color=black]
+hub: relay3 6 0 [color=orange max_drones=8]
+hub: trap3 6 -2 [color=black]
+hub: relay4 6 -4 [color=orange max_drones=8]
+hub: trap4 6 -6 [color=black]
+hub: relay5 6 -9 [color=orange max_drones=6]
+
+# Layer2 -> Layer3 (some hubs feed both a relay and a decoy trap)
+
+# === LAYER 4: Convergence ring (relays only, traps go nowhere) ===
+hub: ring1 9 7 [zone=restricted color=darkred max_drones=4]
+hub: ring2 9 3 [zone=restricted color=darkred max_drones=4]
+hub: ring3 9 -1 [zone=restricted color=darkred max_drones=4]
+hub: ring4 9 -5 [zone=restricted color=darkred max_drones=4]
+hub: ring5 9 -9 [zone=restricted color=darkred max_drones=4]
+
+
+# === LAYER 5: Priority pre-final zone ===
+hub: pre1 11 5 [zone=priority color=gold max_drones=10]
+hub: pre2 11 1 [zone=priority color=gold max_drones=10]
+hub: pre3 11 -3 [zone=priority color=gold max_drones=10]
+hub: pre4 11 -7 [zone=priority color=gold max_drones=8]
+
+
+# === LAYER 6: Final merge + gauntlet ===
+hub: final_merge 13 -1 [color=violet max_drones=30]
+hub: gaunt1 15 -1 [color=crimson max_drones=15]
+hub: gaunt2 17 -1 [color=crimson max_drones=8]
+hub: gaunt3 19 -1 [color=crimson max_drones=4]
+
+end_hub: goal 21 -1 [color=rainbow]
+
+# === Long-range bypass links (expensive shortcuts across layers) ===
+
+# === CONNECTIONS ===
+connection: start-l1_1
+connection: l1_1-l2_1
+connection: l1_9-l2_1
+connection: l1_2-l2_2
+connection: l1_3-l2_2
+connection: l1_4-l2_3
+connection: l1_5-l2_4
+connection: l1_6-l2_4
+connection: l1_7-l2_5
+connection: l1_8-l2_5
+connection: l1_8-l2_6
+connection: l2_1-relay1
+connection: l2_1-trap1
+connection: l2_2-relay2
+connection: l2_2-trap2
+connection: l2_3-relay3
+connection: l2_3-trap3
+connection: l2_4-relay4
+connection: l2_4-trap4
+connection: l2_5-relay5
+connection: l2_6-relay5
+connection: relay1-ring1
+connection: relay2-ring2
+connection: relay3-ring3
+connection: relay4-ring4
+connection: relay5-ring5
+connection: ring1-ring2 [max_link_capacity=3]
+connection: ring2-ring3 [max_link_capacity=3]
+connection: ring3-ring4 [max_link_capacity=3]
+connection: ring4-ring5 [max_link_capacity=3]
+connection: ring1-pre1
+connection: ring2-pre1
+connection: ring2-pre2
+connection: ring3-pre2
+connection: ring3-pre3
+connection: ring4-pre3
+connection: ring4-pre4
+connection: ring5-pre4
+connection: pre1-final_merge
+connection: pre2-final_merge
+connection: pre3-final_merge
+connection: pre4-final_merge
+connection: final_merge-gaunt1
+connection: gaunt1-gaunt2
+connection: gaunt2-gaunt3
+connection: gaunt3-goal
+connection: l1_9-ring5 [max_link_capacity=1]
+connection: l1_1-ring1 [max_link_capacity=1]
+connection: trap1-pre1 [max_link_capacity=1]
+connection: l2_6-pre4 [max_link_capacity=2]

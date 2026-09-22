@@ -1,0 +1,92 @@
+# COMPLEX LEVEL 13: THE NESTED LABYRINTH
+# A recursive maze of nested restricted zones, each layer hiding both
+# a real path forward and a false loop that traps drones. Every hub has
+# a unique coordinate; no two hubs (including start/end) overlap.
+
+nb_drones: 65
+
+start_hub: start 0 0 [color=green]
+
+# === Shell 1: real gate + decoy loop ===
+hub: gate1 2 0 [color=blue max_drones=9]
+hub: loop1a 2 3 [zone=restricted color=brown]
+hub: loop1b 3 4 [zone=restricted color=brown]
+hub: loop1c 2 5 [zone=restricted color=brown]
+hub: dead1 2 -3 [color=black]
+
+# === Shell 2: real gate + decoy loop ===
+hub: gate2 4 0 [color=blue max_drones=8]
+hub: loop2a 4 6 [zone=restricted color=brown]
+hub: loop2b 5 7 [zone=restricted color=brown]
+hub: loop2c 4 8 [zone=restricted color=brown]
+hub: dead2 4 -6 [color=black]
+
+# === Shell 3: real gate + decoy loop ===
+hub: gate3 6 0 [color=blue max_drones=7]
+hub: loop3a 6 9 [zone=restricted color=brown]
+hub: loop3b 7 10 [zone=restricted color=brown]
+hub: loop3c 6 11 [zone=restricted color=brown]
+hub: dead3 6 -9 [color=black]
+
+# === Shell 4: real gate + decoy loop ===
+hub: gate4 8 0 [color=blue max_drones=6]
+hub: loop4a 8 12 [zone=restricted color=brown]
+hub: loop4b 9 13 [zone=restricted color=brown]
+hub: loop4c 8 14 [zone=restricted color=brown]
+hub: dead4 8 -12 [color=black]
+
+# === Shell 5: real gate + decoy loop ===
+hub: gate5 10 0 [color=blue max_drones=5]
+hub: loop5a 10 15 [zone=restricted color=brown]
+hub: loop5b 11 16 [zone=restricted color=brown]
+hub: loop5c 10 17 [zone=restricted color=brown]
+hub: dead5 10 -15 [color=black]
+
+# === Core vault (heavily restricted, requires passing all 5 gates) ===
+hub: vault_outer 12 0 [zone=restricted color=darkred max_drones=4]
+hub: vault_inner 14 0 [zone=restricted color=darkred max_drones=2]
+
+# === Final approach ===
+hub: approach1 16 0 [color=crimson max_drones=6]
+hub: approach2 18 0 [color=crimson max_drones=3]
+end_hub: goal 20 0 [color=rainbow]
+
+# === One secret shortcut bypassing shells 3-4 entirely (very costly) ===
+
+# === CONNECTIONS ===
+connection: start-gate1 [max_link_capacity=10]
+connection: gate1-loop1a
+connection: loop1a-loop1b
+connection: loop1b-loop1c
+connection: loop1c-loop1a
+connection: gate1-dead1
+connection: gate1-gate2 [max_link_capacity=9]
+connection: gate2-loop2a
+connection: loop2a-loop2b
+connection: loop2b-loop2c
+connection: loop2c-loop2a
+connection: gate2-dead2
+connection: gate2-gate3 [max_link_capacity=8]
+connection: gate3-loop3a
+connection: loop3a-loop3b
+connection: loop3b-loop3c
+connection: loop3c-loop3a
+connection: gate3-dead3
+connection: gate3-gate4 [max_link_capacity=7]
+connection: gate4-loop4a
+connection: loop4a-loop4b
+connection: loop4b-loop4c
+connection: loop4c-loop4a
+connection: gate4-dead4
+connection: gate4-gate5 [max_link_capacity=6]
+connection: gate5-loop5a
+connection: loop5a-loop5b
+connection: loop5b-loop5c
+connection: loop5c-loop5a
+connection: gate5-dead5
+connection: gate5-vault_outer
+connection: vault_outer-vault_inner
+connection: vault_inner-approach1
+connection: approach1-approach2
+connection: approach2-goal
+connection: gate2-vault_outer [max_link_capacity=1]

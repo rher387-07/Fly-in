@@ -1,0 +1,37 @@
+# RING LEVEL: THE CIRCLE
+# A ring topology where drones can go clockwise or counter-clockwise to
+# reach the goal. Tests whether an algorithm splits flow across both
+# directions efficiently instead of overloading one side.
+
+nb_drones: 24
+
+start_hub: start 0 6 [color=green]
+end_hub: goal 0 -6 [color=gold]
+
+# Clockwise side
+hub: cw1 3 5 [color=blue max_drones=6]
+hub: cw2 4 2 [color=blue max_drones=6]
+hub: cw3 4 -2 [color=blue max_drones=6]
+hub: cw4 3 -5 [color=blue max_drones=6]
+
+# Counter-clockwise side
+hub: ccw1 -3 5 [color=purple max_drones=6]
+hub: ccw2 -4 2 [color=purple max_drones=6]
+hub: ccw3 -4 -2 [color=purple max_drones=6]
+hub: ccw4 -3 -5 [color=purple max_drones=6]
+
+connection: start-cw1 [max_link_capacity=6]
+connection: cw1-cw2 [max_link_capacity=6]
+connection: cw2-cw3 [max_link_capacity=6]
+connection: cw3-cw4 [max_link_capacity=6]
+connection: cw4-goal [max_link_capacity=6]
+
+connection: start-ccw1 [max_link_capacity=6]
+connection: ccw1-ccw2 [max_link_capacity=6]
+connection: ccw2-ccw3 [max_link_capacity=6]
+connection: ccw3-ccw4 [max_link_capacity=6]
+connection: ccw4-goal [max_link_capacity=6]
+
+# Cross-links partway around the ring (extra flexibility)
+connection: cw2-ccw2 [max_link_capacity=2]
+connection: cw3-ccw3 [max_link_capacity=2]

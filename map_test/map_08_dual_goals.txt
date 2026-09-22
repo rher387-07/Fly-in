@@ -1,0 +1,31 @@
+# SPLIT LEVEL: THE FORK OF DESTINY
+# Two separate goal hubs fed by a shared network. Tests how an algorithm
+# allocates drones between multiple valid destinations when the paths
+# share congested middle sections.
+
+nb_drones: 35
+
+start_hub: start 0 0 [color=green]
+
+hub: shared1 2 0 [color=blue max_drones=10]
+hub: shared2 4 0 [color=blue max_drones=10]
+
+hub: branchA1 6 3 [color=teal max_drones=6]
+hub: branchA2 8 3 [color=teal max_drones=6]
+
+hub: branchB1 6 -3 [color=magenta max_drones=6]
+hub: branchB2 8 -3 [color=magenta max_drones=6]
+
+end_hub: goalA 10 3 [color=gold]
+end_hub: goalB 10 -3 [color=gold]
+
+connection: start-shared1 [max_link_capacity=20]
+connection: shared1-shared2 [max_link_capacity=20]
+
+connection: shared2-branchA1
+connection: branchA1-branchA2
+connection: branchA2-goalA
+
+connection: shared2-branchB1
+connection: branchB1-branchB2
+connection: branchB2-goalB

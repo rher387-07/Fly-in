@@ -1,0 +1,21 @@
+# SIMPLE LEVEL: THE STARTER
+# A small, easy map meant to sanity-check that a pathfinding algorithm
+# handles the basics correctly before facing harder tests.
+
+nb_drones: 5
+
+start_hub: start 0 0 [color=green]
+
+hub: a 2 1 [color=blue]
+hub: b 2 -1 [color=blue zone=priority]
+hub: c 4 1 [color=blue]
+hub: d 4 -1 [color=blue]
+
+end_hub: goal 6 0 [color=gold]
+
+connection: start-a
+connection: start-b
+connection: a-c
+connection: b-d
+connection: c-goal
+connection: d-goal

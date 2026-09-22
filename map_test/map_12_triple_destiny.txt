@@ -1,0 +1,69 @@
+# COMPLEX LEVEL 12: THE TRIPLE DESTINY
+# Three independent end_hubs fed by a shared, congested backbone with
+# nested restricted zones and several decoy sub-networks. Tests demand
+# allocation across multiple simultaneous goals under shared congestion.
+
+nb_drones: 75
+
+start_hub: start 0 0 [color=green]
+
+# === Backbone spine (shared, heavily congested) ===
+hub: spine1 2 0 [color=blue max_drones=11]
+hub: spine2 4 0 [color=blue max_drones=10]
+hub: spine3 6 0 [color=blue max_drones=9]
+hub: spine4 8 0 [color=blue max_drones=8]
+
+
+# === Decoy sub-network hanging off spine2 (dead ends, no goal reachable) ===
+hub: decoy1 4 4 [color=purple]
+hub: decoy2 5 5 [color=purple]
+hub: decoy3 6 6 [color=purple]
+hub: decoy_dead 7 7 [color=black]
+
+# === Fork point splitting into three branches ===
+hub: fork 10 0 [zone=priority color=gold max_drones=20]
+
+# === Branch A (short, low capacity) ===
+hub: branchA1 12 6 [color=teal max_drones=5]
+hub: branchA2 14 8 [color=teal max_drones=5]
+#end_hub: goalA 16 10 [color=gold]
+
+# === Branch B (long, medium capacity, restricted mid-section) ===
+hub: branchB1 12 0 [color=magenta max_drones=8]
+hub: branchB2 14 0 [zone=restricted color=darkred max_drones=3]
+hub: branchB3 16 0 [zone=restricted color=darkred max_drones=3]
+hub: branchB4 18 0 [color=magenta max_drones=8]
+#end_hub: goalB 20 0 [color=gold]
+
+# === Branch C (very narrow single-file bottleneck) ===
+hub: branchC1 12 -6 [color=orange max_drones=6]
+hub: branchC2 14 -8 [color=red max_drones=1]
+hub: branchC3 16 -8 [color=red max_drones=1]
+end_hub: goalC 18 -8 [color=gold]
+
+# === Rare cross-branch bypass (expensive rebalancing route) ===
+
+# === CONNECTIONS ===
+connection: start-spine1 [max_link_capacity=25]
+connection: spine1-spine2 [max_link_capacity=20]
+connection: spine2-spine3 [max_link_capacity=16]
+connection: spine3-spine4 [max_link_capacity=12]
+connection: spine2-decoy1
+connection: decoy1-decoy2
+connection: decoy2-decoy3
+connection: decoy3-decoy_dead
+connection: spine4-fork
+connection: fork-branchA1 [max_link_capacity=8]
+connection: branchA1-branchA2
+#connection: branchA2-goalA
+connection: fork-branchB1 [max_link_capacity=15]
+connection: branchB1-branchB2
+connection: branchB2-branchB3
+connection: branchB3-branchB4
+#connection: branchB4-goalB
+connection: fork-branchC1 [max_link_capacity=6]
+connection: branchC1-branchC2 [max_link_capacity=1]
+connection: branchC2-branchC3 [max_link_capacity=1]
+connection: branchC3-goalC [max_link_capacity=1]
+connection: branchB2-branchA1 [max_link_capacity=2]
+connection: branchB3-branchC1 [max_link_capacity=2]

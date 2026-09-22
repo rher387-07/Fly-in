@@ -1,0 +1,61 @@
+# PYRAMID LEVEL: THE FUNNEL
+# Starts very wide (many parallel entries) and narrows step by step down
+# to a single goal. Tests progressive load consolidation rather than a
+# single sharp bottleneck.
+
+nb_drones: 50
+
+start_hub: start 0 0 [color=green]
+
+# Row 1: 8 wide
+hub: r1_1 2 7 [color=blue]
+hub: r1_2 2 5 [color=blue]
+hub: r1_3 2 3 [color=blue]
+hub: r1_4 2 1 [color=blue]
+hub: r1_5 2 -1 [color=blue]
+hub: r1_6 2 -3 [color=blue]
+hub: r1_7 2 -5 [color=blue]
+hub: r1_8 2 -7 [color=blue]
+
+# Row 2: 4 wide (each merges 2 from row 1)
+hub: r2_1 4 4 [color=orange max_drones=14]
+hub: r2_2 4 2 [color=orange max_drones=14]
+hub: r2_3 4 -2 [color=orange max_drones=14]
+hub: r2_4 4 -4 [color=orange max_drones=14]
+
+# Row 3: 2 wide
+hub: r3_1 6 2 [color=red max_drones=26]
+hub: r3_2 6 -2 [color=red max_drones=26]
+
+# Row 4: single funnel point
+hub: r4_1 8 0 [color=crimson max_drones=50]
+
+end_hub: goal 10 0 [color=gold]
+
+connection: start-r1_1
+connection: start-r1_2
+connection: start-r1_3
+connection: start-r1_4
+connection: start-r1_5
+connection: start-r1_6
+connection: start-r1_7
+connection: start-r1_8
+
+connection: r1_1-r2_1
+connection: r1_2-r2_1
+connection: r1_3-r2_2
+connection: r1_4-r2_2
+connection: r1_5-r2_3
+connection: r1_6-r2_3
+connection: r1_7-r2_4
+connection: r1_8-r2_4
+
+connection: r2_1-r3_1
+connection: r2_2-r3_1
+connection: r2_3-r3_2
+connection: r2_4-r3_2
+
+connection: r3_1-r4_1
+connection: r3_2-r4_1
+
+connection: r4_1-goal

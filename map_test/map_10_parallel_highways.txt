@@ -1,0 +1,76 @@
+# HIGHWAY LEVEL: THE PARALLEL LANES
+# A very large swarm routed through several wide parallel "highways" of
+# equal capacity. Tests whether an algorithm distributes drones evenly
+# across symmetric lanes at scale, rather than overloading a single lane.
+
+nb_drones: 501
+
+start_hub: start 0 0 [color=green]
+end_hub: goal 12 0 [color=gold]
+
+# Lane A
+hub: a1 2 6 [color=blue max_drones=25]
+hub: a2 5 6 [color=blue max_drones=25]
+hub: a3 8 6 [color=blue max_drones=25]
+hub: a4 10 6 [color=blue max_drones=25]
+
+# Lane B
+hub: b1 2 3 [color=blue max_drones=25]
+hub: b2 5 3 [color=blue max_drones=25]
+hub: b3 8 3 [color=blue max_drones=25]
+hub: b4 10 3 [color=blue max_drones=25]
+
+# Lane C
+hub: c1 2 0 [color=blue max_drones=25]
+hub: c2 5 0 [color=blue max_drones=25]
+hub: c3 8 0 [color=blue max_drones=25]
+hub: c4 10 0 [color=blue max_drones=25]
+
+# Lane D
+hub: d1 2 -3 [color=blue max_drones=25]
+hub: d2 5 -3 [color=blue max_drones=25]
+hub: d3 8 -3 [color=blue max_drones=25]
+hub: d4 10 -3 [color=blue max_drones=25]
+
+# Lane E
+hub: e1 2 -6 [color=blue max_drones=25]
+hub: e2 5 -6 [color=blue max_drones=25]
+hub: e3 8 -6 [color=blue max_drones=25]
+hub: e4 10 -6 [color=blue max_drones=25]
+
+connection: start-a1 [max_link_capacity=25]
+connection: start-b1 [max_link_capacity=25]
+connection: start-c1 [max_link_capacity=25]
+connection: start-d1 [max_link_capacity=25]
+connection: start-e1 [max_link_capacity=25]
+
+connection: a1-a2 [max_link_capacity=25]
+connection: a2-a3 [max_link_capacity=25]
+connection: a3-a4 [max_link_capacity=25]
+connection: a4-goal [max_link_capacity=25]
+
+connection: b1-b2 [max_link_capacity=25]
+connection: b2-b3 [max_link_capacity=25]
+connection: b3-b4 [max_link_capacity=25]
+connection: b4-goal [max_link_capacity=25]
+
+connection: c1-c2 [max_link_capacity=25]
+connection: c2-c3 [max_link_capacity=25]
+connection: c3-c4 [max_link_capacity=25]
+connection: c4-goal [max_link_capacity=25]
+
+connection: d1-d2 [max_link_capacity=25]
+connection: d2-d3 [max_link_capacity=25]
+connection: d3-d4 [max_link_capacity=25]
+connection: d4-goal [max_link_capacity=25]
+
+connection: e1-e2 [max_link_capacity=25]
+connection: e2-e3 [max_link_capacity=25]
+connection: e3-e4 [max_link_capacity=25]
+connection: e4-goal [max_link_capacity=25]
+
+# A few cross-lane links to allow rebalancing mid-route
+connection: a2-b2 [max_link_capacity=5]
+connection: b2-c2 [max_link_capacity=5]
+connection: c2-d2 [max_link_capacity=5]
+connection: d2-e2 [max_link_capacity=5]

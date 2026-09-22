@@ -1,0 +1,73 @@
+# COMPLEX LEVEL 14: THE ADAPTIVE MESH
+# A dense, highly cross-linked mesh with several independent redundant
+# paths of very different capacities. Tests whether an algorithm finds
+# the true max-flow instead of settling for the first obvious route.
+# start_hub and end_hub each occupy a unique coordinate, like every hub.
+
+nb_drones: 120
+
+start_hub: start 0 0 [color=green]
+
+# === Column 1: 5 entries, staggered ===
+hub: c1_1 2 8 [color=blue max_drones=15]
+hub: c1_2 2 4 [color=blue max_drones=15]
+hub: c1_3 2 0 [color=blue max_drones=15]
+hub: c1_4 2 -4 [color=blue max_drones=15]
+hub: c1_5 2 -8 [color=blue max_drones=15]
+
+
+# === Column 2: mesh cross-links (every col1 hub reaches 2 col2 hubs) ===
+hub: c2_1 5 6 [zone=restricted color=orange max_drones=10]
+hub: c2_2 5 2 [zone=restricted color=orange max_drones=10]
+hub: c2_3 5 -2 [zone=restricted color=orange max_drones=10]
+hub: c2_4 5 -6 [zone=restricted color=orange max_drones=10]
+
+# === Column 3: partial mesh with one severe bottleneck hub ===
+hub: c3_1 8 5 [color=maroon max_drones=12]
+hub: c3_2 8 1 [color=maroon max_drones=1]
+hub: c3_3 8 -3 [color=maroon max_drones=12]
+
+# === Column 4: recombination before final stretch ===
+hub: c4_1 11 3 [zone=priority color=gold max_drones=20]
+hub: c4_2 11 -1 [zone=priority color=gold max_drones=20]
+
+# === Final stretch ===
+hub: final1 14 1 [color=crimson max_drones=25]
+hub: final2 17 1 [color=crimson max_drones=15]
+end_hub: goal 20 1 [color=rainbow]
+
+# === Extra long-range mesh links for adaptive rerouting ===
+
+# === CONNECTIONS ===
+connection: start-c1_1 [max_link_capacity=30]
+connection: start-c1_3 [max_link_capacity=40]
+connection: c1_1-c1_2 [max_link_capacity=8]
+connection: c1_2-c1_3 [max_link_capacity=8]
+connection: c1_3-c1_4 [max_link_capacity=8]
+connection: c1_4-c1_5 [max_link_capacity=8]
+connection: c1_1-c2_1 [max_link_capacity=8]
+connection: c1_2-c2_1 [max_link_capacity=8]
+connection: c1_2-c2_2 [max_link_capacity=8]
+connection: c1_3-c2_2 [max_link_capacity=8]
+connection: c1_3-c2_3 [max_link_capacity=8]
+connection: c1_4-c2_3 [max_link_capacity=8]
+connection: c1_4-c2_4 [max_link_capacity=8]
+connection: c1_5-c2_4 [max_link_capacity=8]
+connection: c2_1-c3_1 [max_link_capacity=10]
+connection: c2_2-c3_1 [max_link_capacity=10]
+connection: c2_2-c3_2 [max_link_capacity=1]
+connection: c2_3-c3_2 [max_link_capacity=1]
+connection: c2_3-c3_3 [max_link_capacity=10]
+connection: c2_4-c3_3 [max_link_capacity=10]
+connection: c3_1-c4_1 [max_link_capacity=15]
+connection: c3_2-c4_1 [max_link_capacity=1]
+connection: c3_2-c4_2 [max_link_capacity=1]
+connection: c3_3-c4_2 [max_link_capacity=15]
+connection: c4_1-final1 [max_link_capacity=20]
+connection: c4_2-final1 [max_link_capacity=20]
+connection: final1-final2 [max_link_capacity=30]
+connection: final2-goal [max_link_capacity=30]
+connection: c1_1-c2_2 [max_link_capacity=3]
+connection: c1_5-c2_3 [max_link_capacity=3]
+connection: c2_1-c3_3 [max_link_capacity=2]
+connection: c2_4-c3_1 [max_link_capacity=2]

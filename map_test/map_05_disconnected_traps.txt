@@ -1,0 +1,55 @@
+# TRAP LEVEL: THE DEAD ENDS
+# A map with several tempting-looking clusters that are NOT actually
+# connected to the goal. Tests whether an algorithm correctly detects
+# unreachable branches instead of wasting resources exploring them,
+# and still finds the one real (narrow) path that works.
+
+nb_drones: 20
+
+start_hub: start 0 0 [color=green]
+
+# Real path (narrow but valid)
+hub: real1 2 0 [color=blue max_drones=3]
+hub: real2 4 0 [color=blue max_drones=3]
+hub: real3 6 0 [color=blue max_drones=3]
+
+end_hub: goal 8 0 [color=gold]
+
+# Decoy cluster A - looks rich but is a dead end
+hub: decoyA1 2 2 [color=purple]
+hub: decoyA2 3 2 [color=purple]
+hub: decoyA3 4 2 [color=purple]
+hub: decoyA4 5 2 [color=purple]
+hub: decoyA_dead 6 2 [color=black]
+
+# Decoy cluster B - fully disconnected island (not even reachable from start)
+hub: islandB1 2 -3 [color=purple]
+hub: islandB2 3 -3 [color=purple]
+hub: islandB3 4 -3 [color=purple]
+
+# Decoy cluster C - loops back on itself, never reaches goal
+hub: loopC1 2 -1 [zone=restricted color=brown]
+hub: loopC2 3 -1 [zone=restricted color=brown]
+hub: loopC3 4 -1 [zone=restricted color=brown]
+hub: loopC4 3 -2 [zone=restricted color=brown]
+
+connection: start-real1
+connection: real1-real2
+connection: real2-real3
+connection: real3-goal
+
+connection: start-decoyA1
+connection: decoyA1-decoyA2
+connection: decoyA2-decoyA3
+connection: decoyA3-decoyA4
+connection: decoyA4-decoyA_dead
+
+connection: islandB1-islandB2
+connection: islandB2-islandB3
+connection: islandB3-islandB1
+
+connection: start-loopC1
+connection: loopC1-loopC2
+connection: loopC2-loopC3
+connection: loopC3-loopC4
+connection: loopC4-loopC1

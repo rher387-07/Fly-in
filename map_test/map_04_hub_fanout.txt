@@ -1,0 +1,68 @@
+# FAN LEVEL: THE CENTRAL NEXUS
+# Everything funnels through one giant central hub. Tests how an algorithm
+# handles a critical single point of convergence shared by many independent
+# branches, both incoming and outgoing.
+
+nb_drones: 60
+
+start_hub: start 0 0 [color=green]
+
+# Fan-in branches (8 parallel paths from start to nexus)
+hub: in1 2 3 [color=blue]
+hub: in2 2 2 [color=blue]
+hub: in3 2 1 [color=blue]
+hub: in4 2 0 [color=blue]
+hub: in5 2 -1 [color=blue]
+hub: in6 2 -2 [color=blue]
+hub: in7 2 -3 [color=blue]
+hub: in8 2 -4 [color=blue]
+
+hub: nexus 5 0 [zone=priority color=orange max_drones=15]
+
+# Fan-out branches (8 parallel paths from nexus to goal)
+hub: out1 8 3 [color=purple]
+hub: out2 8 2 [color=purple]
+hub: out3 8 1 [color=purple]
+hub: out4 8 0 [color=purple]
+hub: out5 8 -1 [color=purple]
+hub: out6 8 -2 [color=purple]
+hub: out7 8 -3 [color=purple]
+hub: out8 8 -4 [color=purple]
+
+end_hub: goal 10 0 [color=gold]
+
+connection: start-in1
+connection: start-in2
+connection: start-in3
+connection: start-in4
+connection: start-in5
+connection: start-in6
+connection: start-in7
+connection: start-in8
+
+connection: in1-nexus [max_link_capacity=8]
+connection: in2-nexus [max_link_capacity=8]
+connection: in3-nexus [max_link_capacity=8]
+connection: in4-nexus [max_link_capacity=8]
+connection: in5-nexus [max_link_capacity=8]
+connection: in6-nexus [max_link_capacity=8]
+connection: in7-nexus [max_link_capacity=8]
+connection: in8-nexus [max_link_capacity=8]
+
+connection: nexus-out1 [max_link_capacity=8]
+connection: nexus-out2 [max_link_capacity=8]
+connection: nexus-out3 [max_link_capacity=8]
+connection: nexus-out4 [max_link_capacity=8]
+connection: nexus-out5 [max_link_capacity=8]
+connection: nexus-out6 [max_link_capacity=8]
+connection: nexus-out7 [max_link_capacity=8]
+connection: nexus-out8 [max_link_capacity=8]
+
+connection: out1-goal
+connection: out2-goal
+connection: out3-goal
+connection: out4-goal
+connection: out5-goal
+connection: out6-goal
+connection: out7-goal
+connection: out8-goal
