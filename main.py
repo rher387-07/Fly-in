@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/22 17:39:18 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/22 18:27:06 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -129,7 +129,7 @@ def main() -> None:
         speed = 0
 
         if velocity is None or velocity == "":
-            speed = 1
+            speed = 2
             print(f"\n{WARNING_CLR}[WARNING]: The default speed "
                   "is applied because the search for the appropriate "
                   f"variable returned no results.{RESET_CLR}\n")
