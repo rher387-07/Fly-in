@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 12:09:02 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/22 17:03:21 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/22 22:25:02 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -18,8 +18,15 @@ from render_camera import Camera
 
 
 class Platform(pygame.sprite.Sprite):
-    """A hub sprite, rendered as a platform with its name label.
+    """A hub sprite rendered as a platform with its name label.
+
+    Attributes:
+        network (Network): Network containing the represented hub.
+        hub (Hub): Hub represented by this platform.
+        image (pygame.Surface): Base platform image.
+        rect (pygame.Rect): Current screen-space rectangle of the platform.
     """
+
     def __init__(
         self,
         hub: Hub,
@@ -60,8 +67,13 @@ class Platform(pygame.sprite.Sprite):
         self.font = pygame.font.Font(None, 22)
         self.paused = False
 
-    def __str__(self) -> str:
-        return self.hub.name
+    # def __str__(self) -> str:
+    #     """Returns the name of the hub represented by the platform.
+
+    #     Returns:
+    #         str: The represented hub's name.
+    #     """
+    #     return self.hub.name
 
     def _get_color_random(self) -> tuple[int, int, int]:
         """Generates a smoothly cycling RGB color based on elapsed time.
