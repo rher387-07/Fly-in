@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 11:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/21 17:43:31 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/22 22:23:08 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -17,7 +17,15 @@ from render_camera import Camera
 
 
 class Drone(pygame.sprite.Sprite):
-    """An animated drone sprite, rendered either on a platform or in flight.
+    """An animated drone sprite rendered either on a platform or in flight.
+
+    Attributes:
+        sprite (pygame.Surface): Original drone spritesheet.
+        frames (list[pygame.Surface]): Individual animation frames.
+        current_frame (int): Index of the currently displayed frame.
+        speed (int): Animation update interval in milliseconds.
+        x (float): Horizontal animation position.
+        direction (int): Horizontal movement direction.
     """
     def __init__(
         self,
