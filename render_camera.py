@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 11:33:09 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/21 15:35:59 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/22 12:12:19 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -44,8 +44,8 @@ class Camera:
         self.y = 0
         self.speed = 10
         self.zoom = 1.0
-        self.zoom_step = 0.1
-        self.zoom_min = 0.5
+        self.zoom_step = 0.05
+        self.zoom_min = 0.05
         self.zoom_max = 2.0
 
     def update(self) -> None:

@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:06 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/21 17:51:58 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/22 17:33:15 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -21,8 +21,8 @@ from render_platform import Platform
 W_FENETRE = 1800
 H_FENETRE = 900
 
-PLATF = "asset/platform/1_Industrial_Tileset_1B.png"
-DRONE = "asset/drone/free-drones-pack-pixel-art/1 Drones/2/Forward.png"
+PLATF = "asset/platform/1.png"
+DRONE = "asset/drone/1.png"
 BACKGROUND = "asset/cloud/1.png"
 
 
@@ -41,7 +41,10 @@ class Lancer:
                  network: Network,
                  schedules: list[tuple[list[str],
                                        list[tuple[str, str, int, int]]]],
-                 filename: str, turn: int) -> None:
+                 filename: str,
+                 turn: int,
+                 velocity: int
+                 ) -> None:
         """Initializes pygame, loads assets, and lays out the network.
 
         Args:
@@ -74,6 +77,7 @@ class Lancer:
         self.schedules = schedules
         self.filename = filename
         self.turn = turn
+        self.velocity = velocity
         self.running = True
         self.paused = False
         self.simulation_time = 0.0
@@ -415,11 +419,15 @@ class Lancer:
                         self.camera.zoom_in()
             if not self.paused:
                 self.simulation_time += (
-                    self.clock.get_time() / 1000 / 0.7
+                    self.clock.get_time() / 1000 * self.velocity
                 )
+                if self.simulation_time >= self.turn:
+                    self.simulation_time = self.turn
+                    self.draw()
+                    pygame.time.delay(500)
+                    self.running = False
+                    continue
             self.camera.update()
             self.draw()
             self.clock.tick(60)
-            # if self.terminus:
-            #     self.running = False
         pygame.quit()

@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 12:09:02 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/21 18:02:35 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/22 17:03:21 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -124,9 +124,6 @@ class Platform(pygame.sprite.Sprite):
 
         self.rect = image.get_rect(topleft=(screen_x, screen_y))
 
-        # ajust_x = 24
-        # ajust_y = 38
-
         screen.blit(image, self.rect)
 
         color_hub: pygame.Color | tuple[int, int, int]
@@ -152,5 +149,3 @@ class Platform(pygame.sprite.Sprite):
                     )
         )
         screen.blit(name_hub, name_hub_rect)
-
-        # return (self.rect.x + ajust_x, self.rect.y - ajust_y)

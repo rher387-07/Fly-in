@@ -7,11 +7,12 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/21 17:39:13 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/22 17:39:18 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
-from parser_errors import ParseError, DotenvError, BlockedZone, RenderError
+from parser_errors import (ParseError, DotenvError,
+                           BlockedZone, RenderError, VelocityError)
 from parser import FlyInParser
 from importlib import import_module
 from algo_graph import Graph
@@ -114,18 +115,43 @@ def main() -> None:
                       "Error loading environment variable\n"
                       "Use 'cp .env_example .env'\n"
                       "Or use the environment variable "
-                      "e.g.: MAP=<path> and RENDER=<flag>")
+                      "e.g.: MAP=<path> RENDER=<flag> and "
+                      "(SPEED=<value> — this is optional)")
+
         load()
         filename = str(os.getenv("MAP"))
-        render = os.getenv("RENDER")
         if filename == "":
             raise ParseError("The map path must not be empty")
+
+        render = os.getenv("RENDER")
+
+        velocity = os.getenv("SPEED")
+        speed = 0
+
+        if velocity is None or velocity == "":
+            speed = 1
+            print(f"\n{WARNING_CLR}[WARNING]: The default speed "
+                  "is applied because the search for the appropriate "
+                  f"variable returned no results.{RESET_CLR}\n")
+        else:
+            try:
+                speed = int(velocity)
+            except ValueError as e:
+                raise VelocityError(
+                    "The 'SPEED' value must be an integer "
+                    "or be convertible to an integer.") from e
+
+            if speed <= 0:
+                raise VelocityError(
+                    "The 'SPEED' value must be a positive integer; therefore, "
+                    "it cannot be equal to or less than zero.")
 
         parser = FlyInParser(filename)
         network = parser.parse()
 
         graph = Graph.build_graph(network)
         if network.start_hub and network.end_hub:
+            # print(paths)
             paths = graph.yen(network.start_hub.name, network.end_hub.name, 20)
             if not paths:
                 raise BlockedZone("No valid route from start_hub to end_hub")
@@ -142,7 +168,8 @@ def main() -> None:
                 lancer = Lancer(network,
                                 simulation.scheduled_routes,
                                 filename,
-                                turn)
+                                turn,
+                                speed)
                 lancer.run()
                 simulation.render_terminal(events)
 
@@ -165,6 +192,8 @@ def main() -> None:
         print(f"{ERROR_CLR}[ZONE ERROR]: {e}{RESET_CLR}\n")
     except RenderError as e:
         print(f"{ERROR_CLR}[RENDER FLAG ERROR]: {e}{RESET_CLR}\n")
+    except VelocityError as e:
+        print(f"{ERROR_CLR}[VELOCITY ERROR]: {e}{RESET_CLR}\n")
     except ValueError as e:
         print(f"{ERROR_CLR}[VALUE ERROR]: {e}{RESET_CLR}\n")
     except ImportError as e:
