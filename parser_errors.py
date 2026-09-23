@@ -7,9 +7,12 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:35:49 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/22 22:17:55 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/23 15:28:11 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
+
+"""specific classes of errors."""
+
 
 class Error(Exception):
     """Base exception for Fly-in configuration, parsing, and simulation errors.
@@ -17,9 +20,9 @@ class Error(Exception):
     Args:
         msg (str): Human-readable error message.
     """
-    
+
     def __init__(self, msg: str):
-        """Initializes an error with a human-readable message.
+        """Initialize an error with a human-readable message.
 
         Args:
             msg (str): Message describing the error.

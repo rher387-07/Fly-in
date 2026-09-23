@@ -7,9 +7,15 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:36:11 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/22 16:57:24 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/23 15:41:41 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
+
+
+"""Analyze the provided file.
+
+Extract the data, and convert it into a format that can be manipulated.
+"""
 
 from sys import maxsize
 from parser_errors import ParseError
@@ -35,10 +41,10 @@ VALID_MTD_CONNEC = {
 
 
 class FlyInParser:
-    """Parses a map configuration file into a manipulable `Network` object.
-    """
+    """Parses a map configuration file into a manipulable `Network` object."""
+
     def __init__(self, filename: str) -> None:
-        """Initializes the parser.
+        """Initialize the parser.
 
         Args:
             filename (str): Path to the configuration file (MAP) to parse.
@@ -47,7 +53,7 @@ class FlyInParser:
         self.network = Network(nb_drones=0)
 
     def parse(self) -> Network:
-        """Parses the configuration file and builds the network.
+        """Parse the configuration file and builds the network.
 
         Raises:
             ParseError: If the input file or map is empty.
@@ -68,7 +74,7 @@ class FlyInParser:
         return self.network
 
     def _read_file(self) -> list[tuple[int, str]]:
-        """Reads the configuration file and returns its content.
+        """Read the configuration file and returns its content.
 
         Strips inline comments (anything after `#`) and skips blank or
         comment-only lines.
@@ -100,7 +106,7 @@ class FlyInParser:
         self,
         line_info: tuple[int, str],
     ) -> None:
-        """Parses the number of drones from the first line of the file.
+        """Parse the number of drones from the first line of the file.
 
         Args:
             line_info (tuple[int, str]): The first file line, as a
@@ -113,7 +119,6 @@ class FlyInParser:
             ParseError: If the value of `nb_drones` is not positive.
             ParseError: If the value of `nb_drones` exceeds 1,000.
         """
-
         line_number, line = line_info
         if not line.startswith("nb_drones:"):
             raise ParseError(
@@ -139,7 +144,7 @@ class FlyInParser:
             warning_color = '\033[33m'
             reset_color = '\033[0m'
             print(
-                f"{warning_color}[WARNING] The number of drones exceeds 1500,"
+                f"{warning_color}[WARNING] The number of drones exceeds 1500, "
                 f"and it takes a little time.{reset_color}\n")
 
             if nb_drones > 3000:
@@ -151,7 +156,7 @@ class FlyInParser:
         self.network.nb_drones = nb_drones
 
     def _chech_special_character(self, value: str, line_number: int) -> None:
-        """Checks that a numeric value does not contain an underscore.
+        """Check that a numeric value does not contain an underscore.
 
         Python allows `_` as a digit grouping separator in int literals
         (e.g. `1_000`), which would otherwise silently pass `int()`. This
@@ -172,7 +177,7 @@ class FlyInParser:
                     f"instead of '{value}'?")
 
     def _check_color_valid(self, name_color: str, line_number: int) -> None:
-        """Checks that a color name is valid.
+        """Check that a color name is valid.
 
         Accepts the special value "rainbow", or any single-word CSS color
         name resolvable by the `webcolors` module.
@@ -220,7 +225,6 @@ class FlyInParser:
             ParseError: If the line does not match any known
                 instruction prefix.
         """
-
         if line.startswith("start_hub:"):
             self._parse_special_hub(
                 line,
@@ -250,7 +254,7 @@ class FlyInParser:
         line_number: int,
         name: str,
     ) -> None:
-        """Parses a `start_hub:` or `end_hub:` line and registers it.
+        """Parse a `start_hub:` or `end_hub:` line and registers it.
 
         Args:
             line (str): The configuration line to parse.
@@ -266,7 +270,6 @@ class FlyInParser:
             ParseError: If `name` is not "start" and `end_hub` has
                 already been defined.
         """
-
         hub = self._create_hub(line, line_number)
 
         if hub.name in self.network.hubs:
@@ -295,7 +298,7 @@ class FlyInParser:
         line: str,
         line_number: int,
     ) -> None:
-        """Parses a `hub:` line and registers it as a regular hub.
+        """Parse a `hub:` line and registers it as a regular hub.
 
         Args:
             line (str): The configuration line to parse.
@@ -305,7 +308,6 @@ class FlyInParser:
             ParseError: If the parsed hub duplicates the name of an
                 already-registered hub.
         """
-
         hub = self._create_hub(line, line_number, False)
 
         if hub.name in self.network.hubs:
@@ -321,7 +323,7 @@ class FlyInParser:
         line_number: int,
         flag: bool = True
     ) -> Hub:
-        """Builds a `Hub` object from a `hub:`/`start_hub:`/`end_hub:` line.
+        """Build a `Hub` object from a `hub:`/`start_hub:`/`end_hub:` line.
 
         Expects a "name x y" triplet, optionally followed by a
         "[key=value ...]" metadata block (zone, color, max_drones). The
@@ -347,7 +349,6 @@ class FlyInParser:
         Returns:
             Hub: The newly constructed hub.
         """
-
         _, content = line.split(":", 1)
         content = content.strip()
         metadata = self._extract_metadata(
@@ -412,7 +413,7 @@ class FlyInParser:
         line: str,
         line_number: int,
     ) -> None:
-        """Parses a `connection:` line and registers the resulting link.
+        """Parse a `connection:` line and registers the resulting link.
 
         Expects a "hub1-hub2" pair, optionally followed by a
         "[key=value ...]" metadata block (max_link_capacity).
@@ -430,7 +431,6 @@ class FlyInParser:
             ParseError: If this connection already exists (in either
                 direction).
         """
-
         _, content = line.split(":", 1)
         content = content.strip()
 
@@ -491,7 +491,7 @@ class FlyInParser:
         data: str,
         line_number: int,
     ) -> dict[str, str]:
-        """Extracts and validates a "[key=value ...]" metadata block.
+        """Extract and validates a "[key=value ...]" metadata block.
 
         Args:
             content (str): The line content (after the instruction
@@ -515,7 +515,6 @@ class FlyInParser:
             Returns an empty dict if there is no metadata block, or an
             empty one.
         """
-
         if "[" not in content:
             return {}
 
@@ -566,7 +565,7 @@ class FlyInParser:
         name: str,
         line_number: int,
     ) -> int:
-        """Parses and validates a strictly positive integer field.
+        """Parse and validate a strictly positive integer field.
 
         Args:
             value (str): The raw string value to parse.
@@ -603,7 +602,7 @@ class FlyInParser:
         hub1: str,
         hub2: str,
     ) -> bool:
-        """Checks whether a connection between two hubs already exists.
+        """Check whether a connection between two hubs already exists.
 
         The check is direction-agnostic: a connection "A-B" is
         considered to already exist for the pair ("B", "A") too.
@@ -616,7 +615,6 @@ class FlyInParser:
             bool: True if a connection between `hub1` and `hub2` (in
             either direction) is already registered, False otherwise.
         """
-
         return any(
             {
                 connection.hub1,
@@ -627,13 +625,12 @@ class FlyInParser:
         )
 
     def _validate_network(self) -> None:
-        """Validates that the network has both a start and an end hub.
+        """Validate that the network has both a start and an end hub.
 
         Raises:
             ParseError: If `start_hub` was never defined.
             ParseError: If `end_hub` was never defined.
         """
-
         if self.network.start_hub is None:
             raise ParseError(
                 "Missing start_hub."
@@ -645,7 +642,7 @@ class FlyInParser:
             )
 
     def _validate_cordo(self) -> None:
-        """Validates that no two hubs share the same coordinates.
+        """Validate that no two hubs share the same coordinates.
 
         Raises:
             ParseError: If any two hubs in the network have identical

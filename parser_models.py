@@ -7,9 +7,12 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:36:00 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/21 15:38:33 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/23 15:32:49 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
+
+"""All the models used in the program."""
+
 
 from dataclasses import dataclass, field
 
@@ -27,6 +30,7 @@ class Hub:
         max_drones: Maximum number of drones that can be stationed
             simultaneously. Defaults to 1.
     """
+
     name: str
     x: int
     y: int
@@ -45,6 +49,7 @@ class Connection:
         max_capacity: The maximum number of drones that can use this link
             simultaneously. Defaults to 1.
     """
+
     hub1: str
     hub2: str
     max_capacity: int = 1
@@ -52,8 +57,9 @@ class Connection:
 
 @dataclass
 class Network:
-    """Manages the entire network topology, including hubs,
-    links, and the number of drones.
+    """Manages the entire network topology.
+
+    Including hubs, links, and the number of drones.
 
     Attributes:
         nb_drones: Total number of drones.
@@ -62,6 +68,7 @@ class Network:
         hubs: Dictionary mapping hub names to their Hub objects.
         connections: List of all connections.
     """
+
     nb_drones: int
     start_hub: Hub | None = None
     end_hub: Hub | None = None
@@ -82,6 +89,7 @@ class Drone:
         position_path: The drone's current position or stage along the
             path being followed. Defaults to 0.
     """
+
     paths: list[tuple[float, list[str]]]
     current_hub: Hub
     next_hub: Hub
@@ -97,5 +105,6 @@ class DroneState:
         id: The drone's display identifier (e.g. "D1").
         path: Ordered list of hub names the drone travels through.
     """
+
     id: str
     path: list[str]
