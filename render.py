@@ -7,9 +7,12 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:06 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/22 17:33:15 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/23 15:47:31 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
+
+"""Pygame rendering management."""
+
 
 import pygame
 
@@ -37,6 +40,7 @@ class Lancer:
     the sprites (platforms and drones), as well as
     the main loop and the game loop.
     """
+
     def __init__(self,
                  network: Network,
                  schedules: list[tuple[list[str],
@@ -45,7 +49,7 @@ class Lancer:
                  turn: int,
                  velocity: int
                  ) -> None:
-        """Initializes pygame, loads assets, and lays out the network.
+        """Initialize pygame, loads assets, and lays out the network.
 
         Args:
             network (Network): The network to render (hubs and
@@ -84,12 +88,12 @@ class Lancer:
         self.camera = Camera(W_FENETRE, H_FENETRE)
         self.platform_image = self.load_tile(PLATF, 0, 0, 96, 32)
         self.restricted_image = self.load_tile(PLATF, 96, 0, 32, 32)
-        self.forward_image = pygame.image.load(DRONE).convert_alpha()
+        self.drone_image = pygame.image.load(DRONE).convert_alpha()
         self.background = pygame.image.load(BACKGROUND).convert()
         self.platforms: pygame.sprite.Group[
             Platform] = pygame.sprite.Group()
         self.platforms_by_name: dict[str, Platform] = {}
-        self.drones = [Drone(self.forward_image) for _ in schedules]
+        self.drones = [Drone(self.drone_image) for _ in schedules]
         (self.offset_x, self.offset_y,
          self.spacing_x, self.spacing_y) = (self._layout())
         self.create_platform()
@@ -100,7 +104,7 @@ class Lancer:
     def load_tile(
         self, path: str, x: int, y: int, width: int, height: int
     ) -> pygame.Surface:
-        """Extracts a single tile from a tileset image.
+        """Extract a single tile from a tileset image.
 
         Args:
             path (str): Path to the tileset image file.
@@ -121,7 +125,7 @@ class Lancer:
         return tile
 
     def _layout(self) -> tuple[float, float, int, int]:
-        """Computes the camera zoom and offsets needed to fit the map.
+        """Compute the camera zoom and offsets needed to fit the map.
 
         Finds the bounding box of all hub coordinates and sets
         `self.camera.zoom` (capped at 1.0) so the whole network fits
@@ -153,15 +157,14 @@ class Lancer:
         return offset_x, offset_y, spacing_x, spacing_y
 
     def create_platform(self) -> None:
-        """Creates and registers a `Platform` sprite for each network hub.
-        """
+        """Create and registers a `Platform` sprite for each network hub."""
         for hub in self.network.hubs.values():
             platform = Platform(hub, self.platform_image, self.network)
             self.platforms.add(platform)
             self.platforms_by_name[hub.name] = platform
 
     def _screen_position(self, name: str) -> tuple[int, int]:
-        """Computes the on-screen center position of a named platform.
+        """Compute the on-screen center position of a named platform.
 
         Args:
             name (str): Name of the hub/platform to locate.
@@ -184,7 +187,7 @@ class Lancer:
     def _drone_position(
         self, movements: list[tuple[str, str, int, int]], time: float
     ) -> tuple[int, int]:
-        """Computes a drone's interpolated on-screen position at a given time.
+        """Compute a drone's interpolated on-screen position at a given time.
 
         Walks the drone's list of movements to find which leg `time`
         falls into, then linearly interpolates its screen position
@@ -221,7 +224,7 @@ class Lancer:
     def _drone_speed(
         self, movements: list[tuple[str, str, int, int]], time: float
     ) -> float:
-        """Computes a drone's animation speed multiplier at a given time.
+        """Compute a drone's animation speed multiplier at a given time.
 
         The multiplier is halved while the drone is flying into a
         "restricted" zone hub, and 1.0 otherwise.
@@ -244,15 +247,14 @@ class Lancer:
         return 1.0
 
     def draw_background(self) -> None:
-        """Draws the background image, scaled to fill the window.
-        """
+        """Draw the background image, scaled to fill the window."""
         background = pygame.transform.scale(
             self.background, (W_FENETRE, H_FENETRE)
         )
         self.screen.blit(background, background.get_rect())
 
     def draw_connections(self) -> None:
-        """Draws every connection as a line, with a marker on restricted legs.
+        """Draw every connection as a line, with a marker on restricted legs.
 
         For each connection whose second hub is a "restricted" zone, a
         warning marker is also drawn at the connection's midpoint.
@@ -286,7 +288,7 @@ class Lancer:
                 self.screen.blit(marker, marker_rect)
 
     def draw_controls_hint(self) -> None:
-        """Draws a full-width bottom bar listing the keyboard controls.
+        """Draw a full-width bottom bar listing the keyboard controls.
 
         Renders a single rounded-corner panel spanning the whole width
         of the window, anchored to the bottom of the screen, and split
@@ -360,7 +362,7 @@ class Lancer:
             self.screen.blit(action_surface, action_rect)
 
     def draw(self) -> None:
-        """Renders a full simulation frame: background, hubs, and drones.
+        """Render a full simulation frame: background, hubs, and drones.
 
         Clears the screen, draws the background, the connections between
         hubs, every platform, then every drone at its interpolated
@@ -383,7 +385,7 @@ class Lancer:
         for drone, (_, movements) in zip(self.drones, self.schedules):
             speed = self._drone_speed(movements, self.simulation_time)
             drone.update(speed)
-            drone.draw_at(
+            drone.draw(
                 self.screen,
                 self._drone_position(movements, self.simulation_time),
                 self.camera,
@@ -396,14 +398,13 @@ class Lancer:
         # print(ter)
 
     def run(self) -> None:
-        """executes the simulation's main loop.
+        """Execute the simulation's main loop.
 
         The simulation window opens and the loop begins: handling input
         (Quit, Esc, Space to pause, Numpad +/- to zoom), advancing
         simulation time (unless paused), updating the camera,
         and rendering each frame, until the window is closed.
         """
-
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

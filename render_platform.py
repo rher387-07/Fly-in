@@ -7,9 +7,12 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 12:09:02 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/22 22:25:02 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/23 15:45:42 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
+
+"""Platform (Hub) management."""
+
 
 import pygame
 import time
@@ -33,7 +36,7 @@ class Platform(pygame.sprite.Sprite):
         image: pygame.Surface,
         network: Network
     ) -> None:
-        """Initializes the platform sprite for a given hub.
+        """Initialize the platform sprite for a given hub.
 
         Args:
             hub (Hub): The hub this platform represents.
@@ -76,7 +79,7 @@ class Platform(pygame.sprite.Sprite):
     #     return self.hub.name
 
     def _get_color_random(self) -> tuple[int, int, int]:
-        """Generates a smoothly cycling RGB color based on elapsed time.
+        """Generate a smoothly cycling RGB color based on elapsed time.
 
         Used for hubs with `zone_type` (or color) "rainbow", so their
         label color shifts continuously over time.
@@ -101,7 +104,7 @@ class Platform(pygame.sprite.Sprite):
         offset_y: float,
         camera: Camera
     ) -> None:
-        """Draws the platform and its hub name label on screen.
+        """Draw the platform and its hub name label on screen.
 
         Converts the hub's grid coordinates to screen coordinates using
         the given spacing/offset and the camera's pan and zoom, then
@@ -123,7 +126,6 @@ class Platform(pygame.sprite.Sprite):
             ValueError: If `hub.color` is not a valid color name or
                 value recognized by `pygame.Color`.
         """
-
         window_x = offset_x + self.x * space_x
         window_y = offset_y + self.y * space_y
 

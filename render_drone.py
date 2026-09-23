@@ -7,10 +7,11 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 11:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/22 22:23:08 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/23 15:44:29 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
+"""Drone management."""
 
 import pygame
 from render_camera import Camera
@@ -27,12 +28,13 @@ class Drone(pygame.sprite.Sprite):
         x (float): Horizontal animation position.
         direction (int): Horizontal movement direction.
     """
+
     def __init__(
         self,
         sprite: pygame.Surface,
         forward_sprite: pygame.Surface | None = None,
     ) -> None:
-        """Initializes the drone and slices its spritesheet into frames.
+        """Initialize the drone and slices its spritesheet into frames.
 
         Args:
             sprite (pygame.Surface): Default spritesheet used for the
@@ -132,7 +134,7 @@ class Drone(pygame.sprite.Sprite):
     #     self.rect = image.get_rect(midbottom=(x, y))
     #     screen.blit(image, self.rect)
 
-    def draw_at(
+    def draw(
         self,
         screen: pygame.Surface,
         position: tuple[int, int],
