@@ -7,9 +7,15 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/22 18:27:06 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/23 15:25:42 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
+
+"""Program entry point.
+
+Loading environment variables, parsing,graph creation,
+pathing, simulation, and rendering.
+"""
 
 from parser_errors import (ParseError, DotenvError,
                            BlockedZone, RenderError, VelocityError)
@@ -21,7 +27,7 @@ import os
 
 
 def main() -> None:
-    """Runs the drone simulation end to end.
+    """Run the drone simulation end to end.
 
     Loads configuration (map path and render flag) from a `.env` file or
     from environment variables, parses the map into a network, builds the
@@ -107,14 +113,14 @@ def main() -> None:
         path = find_path_conf()
         if path == "":
             print(f"\n{WARNING_CLR}[WARNING]: Dotenv could not find "
-                  f"the file '.env'.{RESET_CLR}\n")
+                  f"the file '.env'.{RESET_CLR}")
             flag_load = load()
             map = os.getenv("MAP") is not None
             if map is False and flag_load is False:
                 raise DotenvError(
                       "Error loading environment variable\n"
                       "Use 'cp .env_example .env'\n"
-                      "Or use the environment variable "
+                      "Or use the environment variable\n"
                       "e.g.: MAP=<path> RENDER=<flag> and "
                       "(SPEED=<value> — this is optional)")
 

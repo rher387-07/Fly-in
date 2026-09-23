@@ -7,10 +7,11 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/19 12:46:42 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/22 11:30:20 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/23 15:22:15 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
+"""Graph construction and pathfinding."""
 
 from heapq import heapify, heappop, heappush
 from parser_models import Hub, Network
@@ -27,17 +28,17 @@ class Graph:
             "A": {"B": 3, "C": 3},
             "B": {"A": 3, "D": 3.5, "E": 2.8}
         }
-
     Attributes:
         graph (dict[str, dict[str, float]]): Adjacency list of the graph.
         shortest_paths (list): The K shortest paths found by `yen`,
             populated after calling that method.
     """
+
     def __init__(
         self,
         graph: dict[str, dict[str, float]] | None = None
     ) -> None:
-        """Initializes the Graph.
+        """Initialize the Graph.
 
         Args:
             graph (dict[str, dict[str, float]] | None, optional): A set of
@@ -48,7 +49,7 @@ class Graph:
         self.graph = graph if graph is not None else {}
 
     def add_summit(self, node1: str, node2: str, hub_: list[Hub]) -> None:
-        """Adds a directed edge between two nodes, weighted by zone type.
+        """Add a directed edge between two nodes, weighted by zone type.
 
         The edge weight defaults to 1.0, but is adjusted depending on the
         zone type of `node2`'s corresponding hub: 2.0 for a "restricted"
@@ -74,7 +75,7 @@ class Graph:
 
     @staticmethod
     def build_graph(network: Network) -> 'Graph':
-        """Builds a complete graph from a network's hubs and connections.
+        """Build a complete graph from a network's hubs and connections.
 
         Connections involving a "blocked" hub (on either end) are skipped.
         Every remaining connection is added as two directed edges (one in
@@ -104,7 +105,7 @@ class Graph:
         ign_summit: set[str] | None = None,
         ign_seq: set[tuple[str, str]] | None = None
     ) -> tuple[float, list[str]]:
-        """Computes the shortest path between two nodes.
+        """Compute the shortest path between two nodes.
 
         Uses Dijkstra's algorithm on the internal adjacency graph, with
         optional support for excluding specific nodes and/or specific
@@ -157,7 +158,7 @@ class Graph:
         return float("inf"), []
 
     def sum_distance_path(self, path: list[str]) -> float:
-        """Calculates the total length of a specific path.
+        """Calculate the total length of a specific path.
 
         Args:
             path (list[str]): Ordered list of nodes forming the path.
@@ -175,7 +176,7 @@ class Graph:
         source: str,
         destination: str, k: int
     ) -> list[tuple[float, list[str]]]:
-        """Finds the K shortest loopless paths between two nodes.
+        """Find the K shortest loopless paths between two nodes.
 
         This is a direct extension of Dijkstra's algorithm. While Dijkstra
         finds only the shortest (best) path, Yen's algorithm finds the K

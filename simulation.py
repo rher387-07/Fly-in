@@ -7,11 +7,13 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:26 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/21 15:30:12 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/23 15:50:40 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
+"""Simulation management (scheduling)."""
 from typing import Optional
+# from functools import lru_cache
 
 from algo_graph import Graph
 from parser_models import Network, DroneState
@@ -23,7 +25,7 @@ RST_CLR = "\033[0m"
 
 
 class Simulation:
-    """Schedules and simulates drone deliveries over a network.
+    """Schedule and simulates drone deliveries over a network.
 
     Given a network and either a pre-built `Graph` or a set of candidate
     paths (as produced by `Graph.yen`), schedules each drone's departure
@@ -31,12 +33,13 @@ class Simulation:
     travel-time constraints (slower through "restricted" zones), then
     exposes the resulting per-turn events.
     """
+
     def __init__(
         self,
         network: Network,
         graph_or_paths: Graph | list[tuple[float, list[str]]],
     ) -> None:
-        """Initializes the simulation for a network.
+        """Initialize the simulation for a network.
 
         Args:
             network (Network): The network to simulate deliveries over.
@@ -87,7 +90,7 @@ class Simulation:
         self._last_movements: list[tuple[str, str, int, int]] = []
 
     def _edge_capacity(self, first: str, second: str) -> int:
-        """Looks up the maximum simultaneous capacity of a connection.
+        """Look up the maximum simultaneous capacity of a connection.
 
         Args:
             first (str): Name of one hub of the connection.
@@ -104,7 +107,7 @@ class Simulation:
         return 0
 
     def _travel_time(self, destination: str) -> int:
-        """Returns how many turns it takes to reach a given hub.
+        """Return how many turns it takes to reach a given hub.
 
         Args:
             destination (str): Name of the destination hub.
@@ -125,7 +128,7 @@ class Simulation:
         departure: int,
         arrival: int,
     ) -> bool:
-        """Checks whether a leg can be scheduled without exceeding capacity.
+        """Check whether a leg can be scheduled without exceeding capacity.
 
         Args:
             first (str): Name of the departure hub.
@@ -162,7 +165,7 @@ class Simulation:
         departure: int,
         arrival: int,
     ) -> None:
-        """Reserves edge capacity for a leg across its travel turns.
+        """Reserve edge capacity for a leg across its travel turns.
 
         Increments the reservation count on the (first, second) edge for
         every turn in [departure, arrival).
@@ -183,7 +186,7 @@ class Simulation:
         movements: list[tuple[str, str, int, int]],
         max_turns: int,
     ) -> None:
-        """Reserves hub occupancy for each intermediate stop of a route.
+        """Reserve hub occupancy for each intermediate stop of a route.
 
         For every movement that does not end at the network's end hub,
         marks the arrival hub as occupied from its arrival turn until
@@ -215,7 +218,7 @@ class Simulation:
         earliest_start: int,
         max_turns: int,
     ) -> Optional[dict[int, list[str]]]:
-        """Attempts to schedule a single drone's full path.
+        """Attempt to schedule a single drone's full path.
 
         Tries successive start turns (from `earliest_start` up to
         `max_turns`), and for each, greedily schedules every leg of the
@@ -271,6 +274,7 @@ class Simulation:
                     events.setdefault(departure + 1, []).append(
                         f"{first}-{second}")
                 events.setdefault(target, []).append(second)
+            # print(events)
             return events
 
         return None
@@ -278,7 +282,7 @@ class Simulation:
     def run_from_all_path(self,
                           max_steps: int = maxsize
                           ) -> dict[int, list[str]]:
-        """Schedules every drone and builds the full simulation event log.
+        """Schedule every drone and builds the full simulation event log.
 
         Assigns each drone's route dynamically, one drone at a time: for
         every drone, `_choose_best_path` tests all candidate paths from
@@ -344,7 +348,7 @@ class Simulation:
         return events
 
     def render_terminal(self, events: dict[int, list[str]]) -> None:
-        """Prints the simulation's events to the terminal, turn by turn.
+        """Print the simulation's events to the terminal, turn by turn.
 
         Each event is colored according to the `color` of the hub it
         refers to (using the same color name as the graphical render,
@@ -370,7 +374,7 @@ class Simulation:
             print(f"\n{color_max_t}Max turn: {max(events)}{reset}\n")
 
     def _color_event(self, event: str) -> str:
-        """Colors only the destination part of an event, by its hub's color.
+        """Color only the destination part of an event, by its hub's color.
 
         An event is formatted as "{drone_id}-{destination}", where
         `destination` is either a single hub name, or a "hub1-hub2"
@@ -403,7 +407,7 @@ class Simulation:
         return f"{color_drone}{d_id}{RST_CLR}{sep}{color_code}{dest}{RST_CLR}"
 
     def _ansi_color(self, color_name: str | None) -> str:
-        """Converts a hub color name to a 24-bit ANSI foreground escape code.
+        r"""Convert a hub color name to a 24-bit ANSI foreground escape code.
 
         Mirrors the coloring used by the graphical render: "rainbow"
         cycles smoothly over time (same sine-based formula as
@@ -445,7 +449,7 @@ class Simulation:
     ) -> Optional[
         tuple[int, list[tuple[str, str, int, int]], dict[int, list[str]]]
     ]:
-        """Picks the candidate path that lets one more drone finish earliest.
+        """Pick the candidate path that lets one more drone finish earliest.
 
         Tests every candidate path on a disposable `Simulation` seeded
         with a shallow copy of the current (real) reservations, so the
