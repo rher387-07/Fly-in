@@ -3,7 +3,7 @@
 # by most algorithms. It's intended as a stress test and research challenge.
 # The goal is NOT to validate this map but to push algorithmic limits.
 
-nb_drones: 3
+nb_drones: 1000
 
 # === LAYER 0: The Nightmare Begins ===
 start_hub: start 0 0 [color=green]
@@ -17,7 +17,7 @@ hub: gate_hell5 6 0 [color=red max_drones=1]
 
 # === LAYER 1: The Maze of Despair ===
 # Multiple interconnected dead ends and loops
-hub: maze_trap_a1 2 1 [color=purple zone=blocked]
+hub: maze_trap_a1 2 1 [color=purple]
 hub: maze_trap_a2 3 1 [color=purple]
 hub: maze_trap_a3 4 1 [color=purple]
 hub: maze_dead_a 5 1 [color=black]
