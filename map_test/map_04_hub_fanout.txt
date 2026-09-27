@@ -17,7 +17,7 @@ hub: in6 2 -2 [color=blue]
 hub: in7 2 -3 [color=blue]
 hub: in8 2 -4 [color=blue]
 
-hub: nexus 5 0 [zone=priority color=orange max_drones=15]
+hub: nexus 5 0 [zone=priority color=orange max_drones=100]
 
 # Fan-out branches (8 parallel paths from nexus to goal)
 hub: out1 8 3 [color=purple]
