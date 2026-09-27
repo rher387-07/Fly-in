@@ -2,272 +2,188 @@
 
 # Fly-in
 
+![fly-in](asset/screeshot/screenshot.png)
+
+
 ## Description
 
-Fly-in is a drone guidance project developed in Python.
+**Fly-in** is a Python project that simulates a fleet of drones travelling through a network of connected zones.
 
-The project aims to manage the movement of multiple drones, verify their integrity, and calculate the shortest paths between a starting point and a destination, taking into account the capacities of each zone as well as the connection capacities between zones. It demonstrates the use of classic weighted graph algorithms, specifically **Dijkstra**'s algorithm (developed by Edsger W. Dijkstra) and **Yen**'s algorithm (developed by Jin Y. Yen).
+The goal is to move every drone from a unique starting hub to a unique destination hub in as few simulation turns as possible while respecting:
 
-Data regarding each zone and its connections is defined in a file that is provided to the program.
+- zone types and their movement costs;
+- zone occupancy limits;
+- connection capacities;
+- blocked zones;
+- simultaneous drone movements;
+- restricted zones requiring two turns to reach;
+- routing conflicts and congestion.
 
-The project supports both command-line output and a graphical visualization created using Pygame.
+The project is divided into four main stages:
 
+1. **Parse** the map and validate its structure.
+2. **Build** a weighted graph while excluding blocked zones.
+3. **Find candidate paths** with Dijkstra and Yen's k-shortest-path algorithm.
+4. **Schedule and simulate** all drones while respecting capacities and movement times.
 
-## Instructions
+> A graphical representation is also available with **Pygame**, in addition to the colored terminal output.
 
-### pre-launch
-You launch the project using a `.env` configuration file or directly via environment variables;
-* For the configuration file, simply copy the `.env_example` file and enter the actual values.
-```bash
-cp .env_example .env
-```
-* For environment variables, simply inject the value directly into the command line (see the Makefile section **make run**).
-    * MAP: path to your map
-    * RENDER: your display preference (boolean) (default: terminal rendering); this option is optional
-    * SPEED: animation speed (default: 2); this option is optional
+---
 
-e.g.:
-```bash
-MAP=maps/easy/01_linear_path.txt RENDER=true SPEED=3
-```
-> The value of RENDER can be entirely in lowercase.
+## Features
 
-### Makefile
+- Python 3.10+ implementation.
+- Fully object-oriented architecture.
+- Typed functions and classes.
+- Map parser with detailed validation errors.
+- Weighted graph representation.
+- Dijkstra shortest-path algorithm.
+- Yen's k-shortest simple paths algorithm.
+- Dynamic route selection for each drone.
+- Hub occupancy reservations.
+- Connection capacity reservations.
+- Support for normal, priority, restricted and blocked zones.
+- Two-turn movements for restricted destinations.
+- Colored terminal simulation output.
+- Pygame graphical visualization.
+- Camera panning and zooming.
+- Configurable animation speed.
+- Makefile for installation, execution, debugging and linting.
 
-- Install the project dependencies:
+---
 
-This project uses Poetry for dependency management.
+## Requirements
+
+- Python **3.10 or later**
+- Poetry
+- A terminal capable of displaying ANSI colors for the colored terminal output
+- Pygame for graphical rendering
+
+> The project dependencies are declared in `pyproject.toml`.
+
+Main dependencies include:
+
+- `pygame`
+- `python-dotenv`
+- `webcolors`
+- `flake8`
+- `mypy`
+
+---
+
+## Installation
+
+Install the dependencies with Poetry:
 
 ```bash
 make install
 ```
 
-- Executes the main script
+This installs the dependencies declared in `pyproject.toml`.
+
+---
+
+## Configuration
+
+The program reads its configuration from a `.env` file or from environment variables.
+
+Create the configuration file from the example:
+
 ```bash
-make run MAP=maps/easy/01_linear_path.txt RENDER=false
+cp .env_example .env
 ```
 
-- Run the main script in debug mode using Python's built-in debugger, pdb
+The available variables are:
+
+| Variable | Required | Description | Default |
+|---|---|---|---|
+| `MAP` | Yes | Path to the map file | — |
+| `RENDER` | No | Enables the Pygame renderer | Terminal output |
+| `SPEED` | No | Pygame animation speed | `2` |
+
+Example:
+
+```env
+MAP=maps/easy/01_linear_path.txt
+RENDER=false
+SPEED=2
+```
+
+Environment variables can also be provided directly:
+
+```bash
+MAP=maps/easy/01_linear_path.txt RENDER=false make run
+```
+
+For graphical rendering:
+
+```bash
+MAP=maps/easy/01_linear_path.txt RENDER=true SPEED=3 make run
+```
+
+`RENDER` accepts `true`, `false`, `True` or `False`.
+
+---
+
+## Usage
+
+### Run the project
+
+```bash
+make run
+```
+
+The selected map is read from `MAP`.
+
+The program:
+
+1. loads the configuration;
+2. parses the map;
+3. builds the graph;
+4. computes candidate paths;
+5. schedules every drone;
+6. prints the simulation turn by turn;
+7. optionally opens the Pygame renderer.
+
+### Debug mode
+
+The Makefile provides a `pdb` debug target:
+
 ```bash
 make debug
 ```
 
-- Delete temporary files or caches to keep the project environment clean.
+### Code quality
+
+Run the standard linting checks:
+
+```bash
+make lint
+```
+
+Run the stricter mypy configuration:
+
+```bash
+make lint-strict
+```
+
+### Cleanup
+
+Remove Python caches and temporary test caches:
+
 ```bash
 make clean
 ```
 
-- Verify code quality and consistency.
-```bash
-make lint # or make lint-strict
-```
+---
 
-> **make install** just installs or updates the dependencies.
+## Input Map Format
 
-> **make run** launches the program and updates dependencies or installs them completely..
+A map contains the number of drones, one start hub, one end hub, regular hubs and bidirectional connections.
 
+Example:
 
-## Resources
-
-- [Dijkstra](https://coddy.tech/visualize/fr/graphs/dijkstras-algorithm)
-- [Yen's k-shortest paths algorithm](https://www.linchenguang.com/2018/01/30/Yen-s-algorithm/)
-- [Python heap queue documentation](https://docs.python.org/3/library/heapq.html)
-- [Pygame documentation](https://www.pygame.org/docs/)
-- [Tutoriel Pygame](https://www.youtube.com/watch?v=8J8wWxbAdFg&list=PLMS9Cy4Enq5KsM7GJ4LHnlBQKTQBV8kaR)
-- [background pygame](https://gamedevacademy.org/pygame-background-image-tutorial-complete-guide/)
-- [Round-robin scheduling](https://en.wikipedia.org/wiki/Round-robin_scheduling)
-- [Round Robin geeksforgeeks](https://www.geeksforgeeks.org/operating-systems/round-robin-scheduling-in-operating-system/)
-- [Scheduling (computing)](https://en.wikipedia.org/wiki/Scheduling_(computing))
-
-### AI Usage
-#################################################
-
-
-## Algorithm
-
-## Detailed description of the choice of algorithms and the implementation strategy
-Arcs are weighted based on the destination zone: standard and priority hubs require one time step, whereas restricted-access hubs require two. Blocked hubs are excluded from the graph. Yen's algorithm generates alternative simple paths. Drones are distributed across these paths and then scheduled using time reservations for each arc traversal and each arrival at an intermediate hub. A restricted movement entails initiating the connection during the first time step and reaching the destination during the second.
-
-- Pathfinding
-
-We used two pathfinding algorithms, Dijkstra and Yen.
-
-<u>**dijkstra:**</u> Dijkstra's algorithm finds the shortest path from a source node to all other nodes in a graph with non-negative edge weights. It maintains a tentative distance for each node, repeatedly selects the unvisited node with the smallest tentative distance, and relaxes its edges-updating a neighbor's distance whenever a shorter route via the current node is found. Press play above to watch the distances decrease as each node is finalized.
-
-Dijkstra's algorithm handles weighted graphs—whether directed or undirected—very well.
-
-The graph includes weights that vary according to the type of destination zone (priority: 0.99; normal: 1; restricted: 2); "blocked" zones are not included in the graph.
-
-- We first have this instruction for the weights.
-
-```python
-weight = 1.0
-for hub in hub_:
-    if node2 == hub.name:
-        if hub.zone_type == "restricted":
-            weight = 2.0
-        if hub.zone_type == "priority":
-            weight = 0.99
-```
-- ...and this instruction regarding the creation of the graph using the `add_summit` function, while ignoring blocked areas.
-
-```python
-for connection in network.connections:
-    if (network.hubs[connection.hub1].zone_type == "blocked"
-            or network.hubs[connection.hub2].zone_type == "blocked"):
-        continue
-    graph.add_summit(connection.hub1, connection.hub2, hubs)
-    graph.add_summit(connection.hub2, connection.hub1, hubs)
-```
-
-- Then, we use this graph for pathfinding with Dijkstra
-
-- So, what is the objective of Yen's algorithm? It forms the core of our program. Dijkstra's algorithm simply searches for a single path-which could lead to bottlenecks if certain areas are blocked-so we need to find alternative routes.
-
-Thus, Yen's algorithm generates multiple possible paths (k-paths), ranging from the shortest to the longest.
-Here's a brief overview:
-
-```python
-prev_path = self.shortest_paths[-1][1]
-for i in range(len(prev_path) - 1):
-    alternative_summit = prev_path[i]
-    accumulate = prev_path[:i + 1]
-
-    sequence_ignore = set()
-    for (_, p) in self.shortest_paths:
-        if len(p) > i and p[:i + 1] == accumulate:
-            sequence_ignore.add((p[i], p[i + 1]))
-    ignored_summit = set(accumulate[:-1])
-
-    _, alternative_path = self.dijkstra(alternative_summit,
-                                        destination,
-                                        ignored_summit,
-                                        sequence_ignore)
-```
-
-- Next, we move on to the simulations:
-Based on a network and either a pre-existing `Graph` object or a set of candidate paths (such as those generated by `Graph.yen`), the system schedules departure and arrival times for each drone while adhering to hub and arc capacity constraints as well as travel time constraints (slower movement in "restricted" zones), and then outputs the resulting events for each time step.
-
-    - Finds the maximum simultaneous capacity of a connection.
-    - Returns the number of turns required to reach a given hub.
-    - Checks if a leg can be scheduled without exceeding capacity.
-    - Reserves link capacity for a leg during its travel turns.
-    - Reserves hub occupancy for each intermediate stop on a route.
-    - Attempts to schedule a drone's complete journey.
-    - Schedules all drones and builds the complete simulation event log.
-    - Displays simulation events in the terminal, turn by turn.
-    - Colors only the "destination" part of an event according to the corresponding hub's color.
-    - Converts a hub color name into a 24-bit ANSI text color escape code.
-    - Selects the candidate route that allows an additional drone to finish as early as possible.
-
-Here is a brief overview of the candidate selection process
-```python
-for index, path in enumerate(paths):
-    process = Simulation(self.network, self.graph)
-    process.node_reservations = {
-        k: dict(value) for k, value in self.node_reservations.items()}
-
-    process.edge_reservations = {
-        k: dict(value) for k, value in self.edge_reservations.items()}
-
-    scheduled = process._schedule_path(path, 0, max_steps)
-    if scheduled is None:
-        continue
-
-    finish = max(scheduled)
-    if best is None or finish < best[0]:
-        best = (finish, index, process._last_movements, scheduled)
-
-if best is None:
-    return None
-
-_, index, movements, scheduled = best
-
-```
-
-## complexity
-
-- Yen's algorithm uses loops to find the K paths
-- Outer loop (K): Repeated K times to extract the current shortest path from the candidate list.
-- Inner loop (V) (Deviation nodes): For the last validated path, Yen examines each node along that path (up to V nodes in the worst case).
-- Call to Dijkstra: For each deviation node, a full Dijkstra's algorithm is executed on the temporarily modified graph.
-
-> Multiplying these factors leads to the following result: `O(K·V·E log V)`.
-
-
-
-## Visual Representation
-
-- The Pygame module is used for the visualization component
-
-![screenshot](asset/asset/screenshot.png)
-
-- Regarding visualization, several features have been implemented to enhance the user experience, such as:
-    - the ability to zoom in and out,
-    - as well as move the camera to the left or right
-
-These functions are managed by the `Camera` class.
-
-A quick look:
-```python
-# Get the state of all keyboard buttons (returns a list of booleans)
-key = pygame.key.get_pressed()
-
-# Move left if either the Left Arrow key or Numpad 4 is pressed
-if key[pygame.K_LEFT] or key[pygame.K_KP4]:
-    self.x -= self.speed
-
-# Move right if either the Right Arrow key or Numpad 6 is pressed
-if key[pygame.K_RIGHT] or key[pygame.K_KP6]:
-    self.x += self.speed
-
-# Move up if either the Up Arrow key or Numpad 8 is pressed
-if key[pygame.K_UP] or key[pygame.K_KP8]:
-    self.y -= self.speed
-
-# Move down if either the Down Arrow key or Numpad 2 is pressed
-if key[pygame.K_DOWN] or key[pygame.K_KP2]:
-    self.y += self.speed
-```
-
-- The choice of background; the selection of assets for the hubs and drones; the small details indicated at the bottom; and the colors chosen (excluding the hub names) to ensure visual comfort
-
-## Here are the assets used.
-
-<u>for the drone</u>:
-
-![drone](asset/drone/1.png)
-
-<u>for the platforms</u>:
-
-![platform](asset/platform/1.png)
-
-<u>for the background</u>:
-
-![background](/asset/cloud/1.png)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Example input and expected output demonstrating the program’s functionality
-## Map
-- Map name: 02_simple_fork.txt
-- in the folder: maps/easy
-- Map content: [content](maps/easy/02_simple_fork.txt)
-```bash
-# Easy Level 2: Simple fork with two paths
+```text
 nb_drones: 4
 
 start_hub: start 0 0 [color=green]
@@ -283,11 +199,465 @@ connection: path_a-goal
 connection: path_b-goal
 ```
 
-## Result:
-With rendering using Pygame:
+### Hubs
 
-![simple_fork](asset/asset/simple_fork.png)
+A regular hub uses:
 
-With the terminal:
+```text
+hub: <name> <x> <y> [metadata]
+```
 
-![terminal](asset/asset/terminal.png)
+The special hubs use:
+
+```text
+start_hub: <name> <x> <y> [metadata]
+end_hub: <name> <x> <y> [metadata]
+```
+
+Hub metadata can contain:
+
+- `zone=normal`
+- `zone=priority`
+- `zone=restricted`
+- `zone=blocked`
+- `color=<value>`
+- `max_drones=<positive integer>`
+
+Metadata is optional.
+
+### Zone types
+
+| Zone | Movement cost | Behaviour |
+|---|---:|---|
+| `normal` | 1 turn | Standard zone |
+| `priority` | 1 turn | Preferred during pathfinding |
+| `restricted` | 2 turns | Requires a two-turn movement |
+| `blocked` | — | Cannot be entered or crossed |
+
+A blocked zone is excluded from the graph.
+
+A restricted movement occupies the connection during the two-turn traversal and cannot be interrupted by waiting for the destination.
+
+### Connections
+
+Connections are bidirectional:
+
+```text
+connection: <hub1>-<hub2> [metadata]
+```
+
+Optional metadata:
+
+```text
+[max_link_capacity=2]
+```
+
+> Zone names cannot contain spaces or `-`, because `-` separates the two endpoints of a connection.
+
+---
+
+## Simulation Rules
+
+The simulation is turn-based.
+
+During a turn, a drone can:
+
+- move to an adjacent hub;
+- start or complete a two-turn movement towards a restricted hub;
+- remain in place when movement is not possible.
+
+### Zone capacity
+
+By default, a hub can contain one drone.
+
+A custom capacity can be defined with:
+
+```text
+[max_drones=2]
+```
+
+The start and end hubs have no effective occupancy limit.
+
+When a drone leaves a hub during a turn, its departure frees capacity for another drone entering during the same turn.
+
+### Connection capacity
+
+A connection can limit the number of drones traversing it simultaneously:
+
+```text
+connection: A-B [max_link_capacity=2]
+```
+
+The scheduler reserves the connection for every turn of a movement and refuses schedules that exceed its capacity.
+
+### Restricted movement
+
+Entering a restricted hub costs two turns.
+
+For example:
+
+```text
+A -> restricted_B
+```
+
+is represented by:
+
+```text
+departure: turn N
+in flight: turn N + 1
+arrival: turn N + 2
+```
+
+The drone cannot wait on the connection during this movement.
+
+---
+
+### Main modules
+
+| Module | Responsibility |
+|---|---|
+| `main.py` | Application entry point and complete execution flow |
+| `parser.py` | Map parsing and validation |
+| `parser_models.py` | Network, hub, connection and drone data models |
+| `parser_errors.py` | Project-specific parsing and runtime errors |
+| `algo_graph.py` | Graph construction, Dijkstra and Yen |
+| `simulation.py` | Scheduling, reservations and simulation events |
+| `render.py` | Pygame renderer |
+| `render_camera.py` | Camera movement and zoom |
+| `render_drone.py` | Drone sprite and animation |
+| `render_platform.py` | Hub/platform rendering |
+
+---
+
+# Algorithm
+
+## 1. Graph construction
+
+The input network is converted into an adjacency-list graph.
+
+Connections are bidirectional, so each valid connection produces two directed graph edges.
+
+Blocked zones are excluded before pathfinding.
+
+The movement cost is determined by the **destination** zone:
+
+```text
+normal     -> 1
+priority   -> 1
+restricted -> 2
+blocked    -> excluded
+```
+
+This models the fact that entering a restricted zone requires two simulation turns.
+
+---
+
+## 2. Dijkstra
+
+Dijkstra's algorithm is used to find the minimum-cost path between two hubs.
+
+The graph contains only non-negative edge weights, so Dijkstra is suitable for the weighted routing problem.
+
+A priority queue based on Python's `heapq` module is used to select the next hub with the smallest tentative distance.
+
+The algorithm returns:
+
+```python
+(distance, path)
+```
+
+Dijkstra is also used internally by Yen's algorithm to find alternative routes.
+
+---
+
+## 3. Yen's k-shortest paths
+
+A single shortest path is not always enough for a multi-drone simulation.
+
+If every drone uses the same shortest route, a low-capacity hub or connection can become a bottleneck.
+
+Yen's algorithm is therefore used to generate multiple simple candidate paths.
+
+The application currently requests up to **20 candidate paths**:
+
+```python
+paths = graph.yen(
+    network.start_hub.name,
+    network.end_hub.name,
+    20,
+)
+```
+
+The first path is the shortest path found by Dijkstra.
+
+For subsequent paths, Yen temporarily ignores selected edges and prefixes in order to find different routes.
+
+This provides the scheduler with several possible routes instead of forcing every drone onto the same path.
+
+---
+
+## 4. Dynamic route selection
+
+Candidate paths are not assigned statically.
+
+For each drone, the scheduler evaluates every available candidate path against the reservations already created by previously scheduled drones.
+
+For each candidate:
+
+1. copy the current hub reservations;
+2. copy the current connection reservations;
+3. try to schedule the complete route as early as possible;
+4. determine its finishing turn;
+5. keep the feasible candidate with the earliest finish.
+
+The selected route is then committed to the real simulation state.
+
+This makes route selection depend on the congestion created by drones that have already been scheduled.
+
+---
+
+## 5. Reservation-based scheduling
+
+The scheduler maintains two types of reservations:
+
+### Hub reservations
+
+```python
+node_reservations
+```
+
+They represent the number of drones occupying a hub at each turn.
+
+### Connection reservations
+
+```python
+edge_reservations
+```
+
+They represent how many drones are traversing a connection during each turn.
+
+Before accepting a movement, the scheduler checks:
+
+- connection capacity;
+- destination hub capacity;
+- movement duration;
+- current reservations.
+
+If a movement cannot be performed immediately, the drone waits and the scheduler searches for the next valid departure turn.
+
+---
+
+## Complexity
+
+For Yen's algorithm, a simplified worst-case expression for this implementation is:
+
+```text
+O(K · V · E log V)
+```
+
+where:
+
+- `K` = number of requested candidate paths;
+- `V` = number of vertices/hubs;
+- `E` = number of graph edges/connections.
+
+The scheduling phase additionally depends on:
+
+- the number of drones;
+- the number of candidate paths;
+- the maximum simulated turn;
+- the number of reservations that must be checked.
+
+The project favours reusable path computation and reservation-based scheduling rather than recomputing the complete graph for every drone.
+
+---
+
+# Visual Representation
+
+The project provides two forms of output.
+
+## Terminal
+
+The terminal displays the simulation turn by turn.
+
+Example:
+
+```text
+Turn 1: D1-junction D2-junction
+Turn 2: D1-path_a D2-path_b
+Turn 3: D1-goal D2-goal
+
+Max turn: 3
+```
+
+The destination part of an event is colored according to the hub's configured color when a valid color is available.
+
+## Pygame
+
+The Pygame renderer displays:
+
+- hubs as platforms;
+- connections between hubs;
+- drones moving along their scheduled routes;
+- restricted-zone markers;
+- a background;
+- camera movement;
+- zooming;
+- animated drone sprites.
+
+The camera can be moved with:
+
+- Arrow keys;
+- Numpad `2`, `4`, `6`, `8`.
+
+Zoom is controlled with the Numpad `+` and `-` keys.
+
+The `SPACE` key pauses or resumes the simulation.
+
+`ESC` closes the renderer.
+
+The renderer uses the assets stored in:
+
+```text
+asset/
+├── cloud/
+├── drone/
+└── platform/
+```
+cloud:<br>
+![cloud](asset/cloud/1.png)
+
+drone:<br>
+![drone](asset/drone/1.png)
+
+platform:<br>
+![platform](asset/platform/1.png)
+
+---
+
+## Example
+
+### Map
+
+The following example is `maps/easy/02_simple_fork.txt`:
+
+```text
+nb_drones: 4
+
+start_hub: start 0 0 [color=green]
+hub: junction 1 0 [color=yellow max_drones=2]
+hub: path_a 2 1 [color=blue]
+hub: path_b 2 -1 [color=blue]
+end_hub: goal 3 0 [color=red]
+
+connection: start-junction [max_link_capacity=2]
+connection: junction-path_a
+connection: junction-path_b
+connection: path_a-goal
+connection: path_b-goal
+```
+
+This map gives the scheduler two possible branches after `junction`.
+
+Because the junction has a capacity of two and the first connection has a capacity of two, several drones can progress simultaneously while the scheduler distributes them between the available paths.
+
+### Running the example
+
+Terminal:
+
+```bash
+MAP=maps/easy/02_simple_fork.txt RENDER=false make run
+```
+screenshot:<br>
+![screenshot_terminal](asset/screeshot/terminal.png)
+
+Graphical:
+
+```bash
+MAP=maps/easy/02_simple_fork.txt RENDER=true make run
+```
+screenshot:<br>
+![screenshot_graphical](asset/screeshot/simple_fork.png)
+
+The repository also contains maps grouped by difficulty:
+
+```text
+maps/
+├── easy/
+├── medium/
+├── hard/
+└── challenger/
+```
+
+---
+
+## Performance
+
+| Difficulty | Objective |
+|---|---:|
+| Easy | fewer than 5 turns |
+| Medium | fewer than 16 turns |
+| Hard | fewer than 27 turns |
+| Challenger | 43 turns |
+
+---
+
+## Error Handling
+
+The parser validates the input before the simulation starts.
+
+It checks, among other things:
+
+- positive drone count;
+- exactly one start hub;
+- exactly one end hub;
+- unique hub names;
+- valid integer coordinates;
+- valid zone types;
+- positive capacities;
+- existing connection endpoints;
+- duplicate connections;
+- invalid metadata;
+- invalid connection syntax.
+
+Parsing errors include the affected line when possible, making invalid map files easier to debug.
+
+Runtime configuration errors are also handled for:
+
+- missing `.env` / `MAP`;
+- invalid `RENDER`;
+- invalid `SPEED`;
+- missing route;
+- invalid imports;
+- user interruption.
+
+---
+
+## Resources
+
+### Algorithms
+
+- [Edsger W. Dijkstra — shortest-path algorithm](https://www.w3schools.com/dsa/dsa_algo_graphs_dijkstra.php)
+- [Jin Y. Yen — k-shortest loopless paths algorithm](https://stackoverflow.com/questions/26054468/yens-k-shortest-algorithm-python-implementation-for-a-10-node-all-connected-g)
+- [Python `heapq` documentation — priority queue implementation](https://www.geeksforgeeks.org/python/heap-and-priority-queue-using-heapq-module-in-python/)
+- [Scheduling and round-robin scheduling references](https://www.geeksforgeeks.org/operating-systems/round-robin-scheduling-in-operating-system/)
+
+### Rendering
+
+- [Pygame documentation](https://www.pygame.org/docs/)
+- [Pygame tutorials and sprite/camera references](https://www.youtube.com/watch?v=8J8wWxbAdFg&list=PLMS9Cy4Enq5KsM7GJ4LHnlBQKTQBV8kaR)
+
+---
+
+## AI Usage
+
+They were used for tasks such as:
+
+- discussing algorithmic approaches;
+- reviewing and improving documentation;
+- explaining Python concepts and standard-library features;
+- identifying possible edge cases;
+- helping structure technical documentation;
+- reviewing wording and docstrings.
+
+---
