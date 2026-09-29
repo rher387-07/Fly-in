@@ -6,7 +6,7 @@
 #    By: hery-rak <hery-rak@student.42antananari    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/09/15 09:13:09 by hery-rak          #+#    #+#              #
-#    Updated: 2026/09/21 00:42:37 by hery-rak         ###   ########.fr        #
+#    Updated: 2026/09/29 10:43:10 by hery-rak         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,7 @@ FLAG_MYPY = --warn-return-any --warn-unused-ignores --ignore-missing-imports --d
 FIND = find .
 
 BOLD_ITALIC = \033[1;3m
-	
+
 CLR_BLUE = \033[34m
 CLR_RED = \033[31m
 CLR_GREEN = \033[32m
@@ -54,7 +54,7 @@ clean:
 	@echo ""
 
 flake:
-	@$(POETRY) $(RUN) $(PYTHON) -m $(FLAKE) .
+	@$(POETRY) $(RUN) $(PYTHON) -m $(FLAKE)
 
 lint: flake
 	@echo "$(CLR_RED)$(BOLD_ITALIC)		Verification of code quality and consistency$(RESET)"
