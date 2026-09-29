@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:36 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/23 15:25:42 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/29 10:39:47 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -147,17 +147,17 @@ def main() -> None:
                     "The 'SPEED' value must be an integer "
                     "or be convertible to an integer.") from e
 
-            if speed <= 0:
+            if speed <= 0 or speed > 10:
                 raise VelocityError(
-                    "The 'SPEED' value must be a positive integer; therefore, "
-                    "it cannot be equal to or less than zero.")
+                    "The 'SPEED' value must be a positive integer"
+                    " and cannot exceed 10; therefore, it cannot be "
+                    "less than or equal to zero, nor greater than 10.")
 
         parser = FlyInParser(filename)
         network = parser.parse()
 
         graph = Graph.build_graph(network)
         if network.start_hub and network.end_hub:
-            # print(paths)
             paths = graph.yen(network.start_hub.name, network.end_hub.name, 20)
             if not paths:
                 raise BlockedZone("No valid route from start_hub to end_hub")
