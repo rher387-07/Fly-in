@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/18 11:36:11 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/23 15:41:41 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/29 12:02:05 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -201,7 +201,7 @@ class FlyInParser:
             except ValueError as error:
                 raise ParseError(
                     f"Line {line_number}: "
-                    "Accepted color values are colors supported by Pygame"
+                    "Accepted color values are colors supported by Pygame "
                     "and valid single-word strings (e.g., red, blue, gray)."
                     f"Check your '{name_color}' value."
                 ) from error
