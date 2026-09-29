@@ -7,13 +7,12 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:26 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/23 15:50:40 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/29 11:20:24 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
 """Simulation management (scheduling)."""
 from typing import Optional
-# from functools import lru_cache
 
 from algo_graph import Graph
 from parser_models import Network, DroneState
@@ -168,7 +167,7 @@ class Simulation:
         """Reserve edge capacity for a leg across its travel turns.
 
         Increments the reservation count on the (first, second) edge for
-        every turn in [departure, arrival).
+        every turn in [departure, arrival].
 
         Args:
             first (str): Name of the departure hub.
@@ -274,7 +273,6 @@ class Simulation:
                     events.setdefault(departure + 1, []).append(
                         f"{first}-{second}")
                 events.setdefault(target, []).append(second)
-            # print(events)
             return events
 
         return None
