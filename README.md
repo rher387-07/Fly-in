@@ -71,7 +71,9 @@ Main dependencies include:
 
 ---
 
-## Installation
+## Instructions
+
+### Instalation
 
 Install the dependencies with Poetry:
 
@@ -83,7 +85,7 @@ This installs the dependencies declared in `pyproject.toml`.
 
 ---
 
-## Configuration
+### Configuration
 
 The program reads its configuration from a `.env` file or from environment variables.
 
@@ -125,9 +127,9 @@ MAP=maps/easy/01_linear_path.txt RENDER=true SPEED=3 make run
 
 ---
 
-## Usage
+### Usage
 
-### Run the project
+#### Run the project
 
 ```bash
 make run
@@ -145,7 +147,7 @@ The program:
 6. prints the simulation turn by turn;
 7. optionally opens the Pygame renderer.
 
-### Debug mode
+#### Debug mode
 
 The Makefile provides a `pdb` debug target:
 
@@ -153,7 +155,7 @@ The Makefile provides a `pdb` debug target:
 make debug
 ```
 
-### Code quality
+#### Code quality
 
 Run the standard linting checks:
 
@@ -167,7 +169,7 @@ Run the stricter mypy configuration:
 make lint-strict
 ```
 
-### Cleanup
+#### Cleanup
 
 Remove Python caches and temporary test caches:
 
