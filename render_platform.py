@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/08/22 12:09:02 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/23 15:45:42 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/29 11:04:10 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -69,14 +69,6 @@ class Platform(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.font = pygame.font.Font(None, 22)
         self.paused = False
-
-    # def __str__(self) -> str:
-    #     """Returns the name of the hub represented by the platform.
-
-    #     Returns:
-    #         str: The represented hub's name.
-    #     """
-    #     return self.hub.name
 
     def _get_color_random(self) -> tuple[int, int, int]:
         """Generate a smoothly cycling RGB color based on elapsed time.

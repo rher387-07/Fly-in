@@ -7,7 +7,7 @@
 #   By: hery-rak <hery-rak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/11 23:52:06 by hery-rak            #+#    #+#            #
-#   Updated: 2026/09/23 15:47:31 by hery-rak           ###   ########.fr      #
+#   Updated: 2026/09/29 12:53:21 by hery-rak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -27,10 +27,6 @@ H_FENETRE = 900
 PLATF = "asset/platform/1.png"
 DRONE = "asset/drone/1.png"
 BACKGROUND = "asset/cloud/1.png"
-
-
-MIN_SPACING_X = 200
-MIN_SPACING_Y = 200
 
 
 class Lancer:
@@ -86,8 +82,8 @@ class Lancer:
         self.paused = False
         self.simulation_time = 0.0
         self.camera = Camera(W_FENETRE, H_FENETRE)
-        self.platform_image = self.load_tile(PLATF, 0, 0, 96, 32)
-        self.restricted_image = self.load_tile(PLATF, 96, 0, 32, 32)
+        self.platform_image = self._load_tile(PLATF, 0, 0, 96, 32)
+        self.restricted_image = self._load_tile(PLATF, 96, 0, 32, 32)
         self.drone_image = pygame.image.load(DRONE).convert_alpha()
         self.background = pygame.image.load(BACKGROUND).convert()
         self.platforms: pygame.sprite.Group[
@@ -96,12 +92,10 @@ class Lancer:
         self.drones = [Drone(self.drone_image) for _ in schedules]
         (self.offset_x, self.offset_y,
          self.spacing_x, self.spacing_y) = (self._layout())
-        self.create_platform()
+        self._create_platform()
         self.hint_font = pygame.font.SysFont("Arial", 15, bold=True)
 
-        # self.terminus: bool
-
-    def load_tile(
+    def _load_tile(
         self, path: str, x: int, y: int, width: int, height: int
     ) -> pygame.Surface:
         """Extract a single tile from a tileset image.
@@ -142,8 +136,8 @@ class Lancer:
         max_x = max(hub.x for hub in hubs)
         min_y = min(hub.y for hub in hubs)
         max_y = max(hub.y for hub in hubs)
-        spacing_x = MIN_SPACING_X
-        spacing_y = MIN_SPACING_Y
+        spacing_x = 200
+        spacing_y = 200
         available_width = W_FENETRE - 160
         available_height = H_FENETRE - 220
         span_x = max(max_x - min_x, 1)
@@ -156,7 +150,7 @@ class Lancer:
         offset_y = 140 / self.camera.zoom - min_y * spacing_y
         return offset_x, offset_y, spacing_x, spacing_y
 
-    def create_platform(self) -> None:
+    def _create_platform(self) -> None:
         """Create and registers a `Platform` sprite for each network hub."""
         for hub in self.network.hubs.values():
             platform = Platform(hub, self.platform_image, self.network)
@@ -246,14 +240,14 @@ class Lancer:
                 return 1.0
         return 1.0
 
-    def draw_background(self) -> None:
+    def _draw_background(self) -> None:
         """Draw the background image, scaled to fill the window."""
         background = pygame.transform.scale(
             self.background, (W_FENETRE, H_FENETRE)
         )
         self.screen.blit(background, background.get_rect())
 
-    def draw_connections(self) -> None:
+    def _draw_connections(self) -> None:
         """Draw every connection as a line, with a marker on restricted legs.
 
         For each connection whose second hub is a "restricted" zone, a
@@ -266,17 +260,13 @@ class Lancer:
                 self.screen, (255, 255, 255), first, second, 1
             )
             if self.network.hubs[connection.hub2].zone_type == "restricted":
+                img_w = self.restricted_image.get_width()
+                img_h = self.restricted_image.get_height()
                 marker = pygame.transform.scale(
                     self.restricted_image,
                     (
-                        int(
-                            self.restricted_image.get_width()
-                            * self.camera.zoom
-                        ),
-                        int(
-                            self.restricted_image.get_height()
-                            * self.camera.zoom
-                        ),
+                        int(img_w * self.camera.zoom),
+                        int(img_h * self.camera.zoom),
                     ),
                 )
                 marker_rect = marker.get_rect(
@@ -287,7 +277,7 @@ class Lancer:
                 )
                 self.screen.blit(marker, marker_rect)
 
-    def draw_controls_hint(self) -> None:
+    def _draw_controls_hint(self) -> None:
         """Draw a full-width bottom bar listing the keyboard controls.
 
         Renders a single rounded-corner panel spanning the whole width
@@ -299,21 +289,16 @@ class Lancer:
         """
         all_command = "(ESC)   (SPACE)   (+ -)   (↓ ← → ↑)   (Numpad 2-4-6-8)"
         info = [
-            # ("Esc", "Quit"),
-            # ("Space", "Pause / Resume"),
-            # ("+ / -", "Zoom in / out"),
-            # ("↓←→↑ / Numpad 2-4-6-8", "Move camera"),
             ("Turn", f"{self.turn}"),
             ("number of drones", f"{self.network.nb_drones}"),
             ("map", f"{self.filename}"),
             ("All command", f"{all_command}")
         ]
 
-        margin = 50
         panel_height = 48
-        panel_width = W_FENETRE - margin * 2
-        panel_x = margin
-        panel_y = H_FENETRE - panel_height - 10
+        panel_width = 1700
+        panel_x = 50
+        panel_y = 842
         border_radius = 14
 
         panel = pygame.Surface((panel_width, panel_height), pygame.SRCALPHA)
@@ -361,7 +346,7 @@ class Lancer:
             )
             self.screen.blit(action_surface, action_rect)
 
-    def draw(self) -> None:
+    def _draw(self) -> None:
         """Render a full simulation frame: background, hubs, and drones.
 
         Clears the screen, draws the background, the connections between
@@ -370,8 +355,8 @@ class Lancer:
         and finally flips the display.
         """
         self.screen.fill((0, 0, 0))
-        self.draw_background()
-        self.draw_connections()
+        self._draw_background()
+        self._draw_connections()
         for platform in self.platforms:
             platform.draw_platform(
                 self.screen,
@@ -390,12 +375,9 @@ class Lancer:
                 self._drone_position(movements, self.simulation_time),
                 self.camera,
             )
-        # self.terminus = (cordo_plat == coordo_drone)
 
-        self.draw_controls_hint()
+        self._draw_controls_hint()
         pygame.display.flip()
-
-        # print(ter)
 
     def run(self) -> None:
         """Execute the simulation's main loop.
@@ -424,11 +406,11 @@ class Lancer:
                 )
                 if self.simulation_time >= self.turn:
                     self.simulation_time = self.turn
-                    self.draw()
+                    self._draw()
                     pygame.time.delay(500)
                     self.running = False
                     continue
             self.camera.update()
-            self.draw()
+            self._draw()
             self.clock.tick(60)
         pygame.quit()
